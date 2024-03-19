@@ -1,11 +1,12 @@
 ﻿using HarmonyLib;
 using TMPro;
-using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace FrameCapSlider.Patches
 {
-    public class MenuManagerPatch
+    public class QuickMenuManagerPatch
     {
         static GameObject SettingsPanel; //Where all the settings are found
         public static GameObject Slider; //Slider this mod will be using
@@ -25,16 +26,15 @@ namespace FrameCapSlider.Patches
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {IngamePlayerSettingsPatch.UnsavedLimit}";
             }
             SettingsPanel.transform.Find("Headers").gameObject.transform.Find("ChangesNotApplied").gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
-            SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "DISCARD";
+            SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes";
         }
-        [HarmonyPatch(typeof(MenuManager))]
-        [HarmonyPatch("Awake")]
-        [HarmonyPostfix]
-        public static void OnAwake(MenuManager __instance)
-        {
-            if (__instance.isInitScene) { return; }
 
-            SettingsPanel = GameObject.Find("Canvas").gameObject.transform.Find("MenuContainer").gameObject.transform.Find("SettingsPanel").gameObject; //SettingsPanel has been found and put into variable
+        [HarmonyPatch(typeof(QuickMenuManager))]
+        [HarmonyPatch("Start")]
+        [HarmonyPostfix]
+        public static void OnStart(QuickMenuManager __instance)
+        {
+            SettingsPanel = GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("QuickMenu").gameObject.transform.Find("SettingsPanel").gameObject; //SettingsPanel has been found and put into variable
 
             GameObject FramerateObject = SettingsPanel.transform.Find("FramerateCap").gameObject;
             FramerateObject.SetActive(false); //Hide the dropdown
@@ -46,7 +46,7 @@ namespace FrameCapSlider.Patches
             Slider.transform.SetParent(SettingsPanel.transform); //Parent the slider to the SettingsPanel
             Slider.transform.position = FramerateObject.transform.position + new Vector3(-1.5f, 1f, 0f); //Position the slider to slightly above where the dropdown would be
             Slider.transform.localScale = new Vector3(1f, 1f, 1f); //Change size of the slider (and text)
-            Slider.transform.Find("Image").localPosition = new Vector3(-53.4f,0f,0f); //Offset to a cap of 60
+            Slider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
             Object.Destroy(Slider.transform.Find("Slider").GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(delegate { SliderValueChanged(); });
@@ -64,7 +64,7 @@ namespace FrameCapSlider.Patches
         [HarmonyPrefix]
         public static void UpdateSliderValue()
         {
-            if (!GameObject.Find("Canvas")) { return; }
+            
             if (Initialize.ModSettings.FramerateLimit.Value > 500)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
@@ -86,7 +86,6 @@ namespace FrameCapSlider.Patches
         [HarmonyPostfix]
         public static void ResetValues()
         {
-            if (!GameObject.Find("Systems")) { return; }
             Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;

@@ -3,15 +3,14 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using HarmonyLib;
 using System.Reflection;
-using UnityEngine;
 
-namespace FPSSlider
+namespace FrameCapSlider
 {
     [BepInPlugin(modGUID, modName, modVersion)]
     public class Initialize : BaseUnityPlugin
     {
-        private const string modGUID = "Confusified.FPSSlider";
-        private const string modName = "FPS Slider";
+        private const string modGUID = "Confusified.FrameCapSlider";
+        private const string modName = "Framerate Cap Slider";
         private const string modVersion = "1.0.0";
 
         private readonly ConfigFile modConfig = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Replace(".", "\\") + ".cfg"), false);
@@ -29,9 +28,13 @@ namespace FPSSlider
             modLogger = Logger;
 
             SetDefaultConfigValues();
-
-            _Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            modLogger.LogInfo($"{modName} {modVersion} has loaded");
+            if (ModSettings.ModEnabled.Value) { 
+                _Harmony.PatchAll(Assembly.GetExecutingAssembly()); 
+                modLogger.LogInfo($"{modName} {modVersion} has loaded"); 
+            }
+            else {
+                modLogger.LogInfo($"{modName} {modVersion} did nothing, it is disabled in the config");
+            }
         }
 
         private void SetDefaultConfigValues()

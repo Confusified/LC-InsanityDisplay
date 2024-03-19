@@ -7,8 +7,8 @@
     <ProjectGuid>{3DF3C939-915D-40AF-83E9-B834F47BE026}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FPSSlider</RootNamespace>
-    <AssemblyName>FPSSlider-1.0.0</AssemblyName>
+    <RootNamespace>FrameCapSlider</RootNamespace>
+    <AssemblyName>FramerateCapSlider-1.0.0</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -92,7 +92,8 @@
   <ItemGroup>
     <Compile Include="Initialize.cs" />
     <Compile Include="Patches\MenuManagerPatch.cs" />
-    <Compile Include="Patches\PlayerSettingsPatch.cs" />
+    <Compile Include="Patches\IngamePlayerSettingsPatch.cs" />
+    <Compile Include="Patches\QuickMenuManagerPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
