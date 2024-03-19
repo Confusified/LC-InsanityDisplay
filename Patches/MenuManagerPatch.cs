@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace FrameCapSlider.Patches
@@ -64,6 +65,7 @@ namespace FrameCapSlider.Patches
         [HarmonyPrefix]
         public static void UpdateSliderValue()
         {
+            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
             if (!GameObject.Find("Canvas")) { return; }
             if (Initialize.ModSettings.FramerateLimit.Value > 500)
             {
@@ -86,7 +88,7 @@ namespace FrameCapSlider.Patches
         [HarmonyPostfix]
         public static void ResetValues()
         {
-            if (!GameObject.Find("Systems")) { return; }
+            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
             Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;

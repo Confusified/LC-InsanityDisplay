@@ -64,7 +64,7 @@ namespace FrameCapSlider.Patches
         [HarmonyPrefix]
         public static void UpdateSliderValue()
         {
-            
+            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
             if (Initialize.ModSettings.FramerateLimit.Value > 500)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
@@ -86,6 +86,7 @@ namespace FrameCapSlider.Patches
         [HarmonyPostfix]
         public static void ResetValues()
         {
+            if (!SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
             Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
