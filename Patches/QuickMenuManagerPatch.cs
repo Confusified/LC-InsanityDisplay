@@ -1,8 +1,7 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace FrameCapSlider.Patches
 {
@@ -54,41 +53,6 @@ namespace FrameCapSlider.Patches
             //Set values of the slider
             Slider.transform.Find("Slider").GetComponent<Slider>().minValue = 0; //0 = VSync
             Slider.transform.Find("Slider").GetComponent<Slider>().maxValue = 501; //250 = unlimited in vanilla, if set to 501 actually set to -1 (unlimited)
-            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
-        }
-
-        // IngamePlayerSettings Patches, but specific for certain scenes (aka idk how to keep it organised and function)
-
-        [HarmonyPatch(typeof(IngamePlayerSettings))]
-        [HarmonyPatch("DiscardChangedSettings")]
-        [HarmonyPrefix]
-        public static void UpdateSliderValue()
-        {
-            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
-            if (Initialize.ModSettings.FramerateLimit.Value > 500)
-            {
-                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
-            }
-            else if (Initialize.ModSettings.FramerateLimit.Value == 0)
-            {
-                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: VSync";
-            }
-            else
-            {
-                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
-            }
-            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
-            Initialize.modLogger.LogInfo("Reverted any unsaved changes to the slider");
-        }
-
-        [HarmonyPatch(typeof(IngamePlayerSettings))]
-        [HarmonyPatch("ResetSettingsToDefault")]
-        [HarmonyPostfix]
-        public static void ResetValues()
-        {
-            if (!SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) { return; }
-            Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
-            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
         }
     }
