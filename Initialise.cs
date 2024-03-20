@@ -15,7 +15,7 @@ namespace FramerateSlider
     {
         private const string modGUID = "Confusified.FramerateSlider";
         private const string modName = "Framerate Slider";
-        private const string modVersion = "1.0.1";
+        private const string modVersion = "1.0.2";
 
         private readonly ConfigFile modConfig = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Replace(".", "\\") + ".cfg"), false);
         public class ModSettings
