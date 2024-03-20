@@ -31,6 +31,7 @@ namespace FramerateSlider.Patches
         {
             Initialise.ModSettings.FramerateLimit.Value = UnsavedLimit;
             int cap = (int)Initialise.ModSettings.FramerateLimit.Value;
+            value = 4; //if i somehow forget to set it properly, default to 60 fps
 
             if (cap <= 0)
             {
@@ -38,7 +39,6 @@ namespace FramerateSlider.Patches
                 Application.targetFrameRate = -1;
                 value = 0;
                 __instance.settings.framerateCapIndex = value; //set vanilla to VSync to make it more seamless when removing the mod
-                Initialise.modLogger.LogInfo("Framerate cap was set to VSync");
             }
             else
             {
@@ -48,7 +48,6 @@ namespace FramerateSlider.Patches
                     Application.targetFrameRate = -1; // uncap framerate if above 500
                     value = 1;
                     __instance.settings.framerateCapIndex = value; //Set vanilla setting to Unlimited
-                    Initialise.modLogger.LogInfo("Framerate cap was set above 500, setting it to -1 (Unlimited)");
                 }
                 else
                 {
@@ -79,6 +78,7 @@ namespace FramerateSlider.Patches
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
             }
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
+            UnsavedLimit = Initialise.ModSettings.FramerateLimit.Value;
             Initialise.modLogger.LogInfo("Discarded any unsaved changes to the slider");
         }
 
