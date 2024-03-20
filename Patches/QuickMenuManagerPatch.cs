@@ -8,7 +8,7 @@ namespace FramerateSlider.Patches
     [HarmonyPatch(typeof(QuickMenuManager))]
     public class QuickMenuManagerPatch
     {
-        static GameObject SettingsPanel; //Where all the settings are found
+        private static GameObject SettingsPanel; //Where all the settings are found
         public static GameObject Slider; //Slider this mod will be using
 
         [HarmonyPatch("Start")]

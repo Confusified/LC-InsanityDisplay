@@ -58,7 +58,7 @@ namespace FramerateSlider.Patches
                     __instance.settings.framerateCapIndex = value; //set to 60 because idk!!!!!!!! (maybe in the future i'll change it to set it to whichever is closest to the selected number (a fix for the future i suppose)
                 }
             }
-            //__instance.unsavedSettings.framerateCapIndex = value;
+            __instance.unsavedSettings.framerateCapIndex = value;
             return false;
         }
 

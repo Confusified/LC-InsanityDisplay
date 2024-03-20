@@ -8,12 +8,13 @@ namespace FramerateSlider.Patches
     [HarmonyPatch(typeof(MenuManager))]
     public class MenuManagerPatch
     {
-        static GameObject SettingsPanel; //Where all the settings are found
+        private static GameObject SettingsPanel; //Where all the settings are found
         public static GameObject Slider; //Slider this mod will be using
-        
+        private static GameObject SliderInSlider;
+
         [HarmonyPatch("Awake")]
-        [HarmonyPostfix]
-        public static void OnAwake(MenuManager __instance)
+        [HarmonyPrefix]
+        public static void OnAwakePrefix(MenuManager __instance)
         {
             if (__instance.isInitScene) { return; }
 
@@ -25,7 +26,8 @@ namespace FramerateSlider.Patches
             //Creation and positioning of slider
             Slider = SettingsPanel.transform.Find("MasterVolume").gameObject;
             Slider = GameObject.Instantiate(Slider); //Created copy of MasterVolume, this will be as slider for the FPS
-            GameObject SliderInSlider = Slider.transform.Find("Slider").gameObject;
+            SliderInSlider = Slider.transform.Find("Slider").gameObject;
+            SliderInSlider.GetComponent<SettingsOption>().optionType = SettingsOptionType.CancelOrConfirm; //this should make it disconnect from MasterVolume
             Object.Destroy(SliderInSlider.GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.name = "FramerateSlider"; //No real use, just looks better
             Slider.transform.SetParent(SettingsPanel.transform); //Parent the slider to the SettingsPanel
@@ -35,12 +37,14 @@ namespace FramerateSlider.Patches
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);
 
             //Set values of the slider
-            SliderInSlider.GetComponent<Slider>().minValue = 0; //0 = VSync
-            SliderInSlider.GetComponent<Slider>().maxValue = 501; //250 = unlimited in vanilla, if set to 501 actually set to -1 (unlimited)
-            SliderInSlider.GetComponent<Slider>().value = (float)IngamePlayerSettingsPatch.UnsavedLimit;
+            
+            
 
             //Add listener to slider, giving it it's functionality
             SliderInSlider.GetComponent<Slider>().onValueChanged.AddListener(delegate { Initialise.SliderValueChanged(SettingsPanel, Slider); });
+            SliderInSlider.GetComponent<Slider>().minValue = 0; //0 = VSync
+            SliderInSlider.GetComponent<Slider>().maxValue = 501; //250 = unlimited in vanilla, if set to 501 actually set to -1 (unlimited)
+            SliderInSlider.GetComponent<Slider>().value = (float)Initialise.ModSettings.FramerateLimit.Value;
         }
     }
 }
