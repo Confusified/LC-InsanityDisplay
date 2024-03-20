@@ -27,7 +27,8 @@ namespace FramerateSlider.Patches
             Slider = SettingsPanel.transform.Find("MasterVolume").gameObject;
             Slider = GameObject.Instantiate(Slider); //Created copy of MasterVolume, this will be as slider for the FPS
             SliderInSlider = Slider.transform.Find("Slider").gameObject;
-            SliderInSlider.GetComponent<SettingsOption>().optionType = SettingsOptionType.CancelOrConfirm; //this should make it disconnect from MasterVolume
+            SliderInSlider.GetComponent<SettingsOption>().enabled = false;
+            //SliderInSlider.GetComponent<SettingsOption>().optionType = SettingsOptionType.CancelOrConfirm; //this should make it disconnect from MasterVolume
             Object.Destroy(SliderInSlider.GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.name = "FramerateSlider"; //No real use, just looks better
             Slider.transform.SetParent(SettingsPanel.transform); //Parent the slider to the SettingsPanel

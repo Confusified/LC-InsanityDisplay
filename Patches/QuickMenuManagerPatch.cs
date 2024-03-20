@@ -35,8 +35,8 @@ namespace FramerateSlider.Patches
             //Set values of the slider
             SliderInSlider.GetComponent<Slider>().minValue = 0; //0 = VSync
             SliderInSlider.GetComponent<Slider>().maxValue = 501; //250 = unlimited in vanilla, if set to 501 actually set to -1 (unlimited)
-            SliderInSlider.GetComponent<Slider>().value = (float)IngamePlayerSettingsPatch.UnsavedLimit;
-            
+            SliderInSlider.GetComponent<Slider>().value = (float)Initialise.ModSettings.FramerateLimit.Value;
+
             //Add listener to slider, giving it it's functionality
             SliderInSlider.GetComponent<Slider>().onValueChanged.AddListener(delegate { Initialise.SliderValueChanged(SettingsPanel, Slider); });
         }
