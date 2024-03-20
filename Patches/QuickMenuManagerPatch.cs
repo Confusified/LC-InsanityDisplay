@@ -34,6 +34,7 @@ namespace FramerateSlider.Patches
             Slider.transform.localScale = new Vector3(1f, 1f, 1f);
             Slider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60 (when cursor is on it)
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);
+            Slider.transform.SetAsFirstSibling();
 
             //Add listener to slider, giving it it's functionality
             SliderInSlider.GetComponent<Slider>().onValueChanged.AddListener(delegate { Initialise.SliderValueChanged(SettingsPanel, Slider); });
