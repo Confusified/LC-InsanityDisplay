@@ -15,7 +15,7 @@ namespace FramerateSlider
     {
         private const string modGUID = "Confusified.FramerateSlider";
         private const string modName = "Framerate Slider";
-        private const string modVersion = "1.0.0";
+        private const string modVersion = "1.0.1";
 
         private readonly ConfigFile modConfig = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Replace(".", "\\") + ".cfg"), false);
         public class ModSettings
@@ -69,10 +69,7 @@ namespace FramerateSlider
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);
             SettingsPanel.transform.Find("Headers").gameObject.transform.Find("ChangesNotApplied").gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
             SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes";
-            if (Slider == QuickMenuManagerPatch.Slider)
-            {
-                modLogger.LogInfo("Code for Quick Menu");
-            }
+            IngamePlayerSettings.Instance.SettingsAudio.PlayOneShot(GameNetworkManager.Instance.buttonTuneSFX);
         }
     }
 }

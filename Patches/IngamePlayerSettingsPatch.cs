@@ -39,7 +39,6 @@ namespace FramerateSlider.Patches
                 Application.targetFrameRate = -1;
                 value = 0;
                 __instance.settings.framerateCapIndex = value; //set vanilla to VSync to make it more seamless when removing the mod
-                Initialise.modLogger.LogInfo("Framerate cap was set to VSync");
             }
             else
             {
@@ -49,7 +48,6 @@ namespace FramerateSlider.Patches
                     Application.targetFrameRate = -1; // uncap framerate if above 500
                     value = 1;
                     __instance.settings.framerateCapIndex = value; //Set vanilla setting to Unlimited
-                    Initialise.modLogger.LogInfo("Framerate cap was set above 500, setting it to -1 (Unlimited)");
                 }
                 else
                 {
