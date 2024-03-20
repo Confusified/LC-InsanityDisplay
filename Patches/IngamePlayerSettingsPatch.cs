@@ -1,7 +1,6 @@
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace FramerateSlider.Patches
@@ -12,25 +11,12 @@ namespace FramerateSlider.Patches
         public static int UnsavedLimit = Initialise.ModSettings.FramerateLimit.Value; //so it doesn't mess up the config whenever you launch the game
         static GameObject Slider;
 
-        public static GameObject GetCorrectSlider()
-        {
-            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) //Use QuickMenuManager
-            {
-                return QuickMenuManagerPatch.Slider;
-            }
-            else //Use MenuManager
-            {
-                return MenuManagerPatch.Slider;
-            }
-        }
-
         [HarmonyPatch("SetFramerateCap")]
         [HarmonyPrefix]
         public static bool RewriteSetFramerateCap(IngamePlayerSettings __instance, int value)
         {
             Initialise.ModSettings.FramerateLimit.Value = UnsavedLimit;
             int cap = (int)Initialise.ModSettings.FramerateLimit.Value;
-            value = 4; //if i somehow forget to set it properly, default to 60 fps
 
             if (cap <= 0)
             {
@@ -48,7 +34,7 @@ namespace FramerateSlider.Patches
                     value = 1;
                     __instance.settings.framerateCapIndex = value; //Set vanilla setting to Unlimited
                 }
-                else if (cap < 500)
+                else if (cap <= 500)
                 {
                     Application.targetFrameRate = cap;
                     value = 2;
@@ -81,7 +67,7 @@ namespace FramerateSlider.Patches
         [HarmonyPrefix]
         public static void UpdateSliderValue()
         {
-            Slider = GetCorrectSlider();
+            Slider = SliderHandler.sceneSlider;
             if (Initialise.ModSettings.FramerateLimit.Value > 500)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
@@ -103,7 +89,7 @@ namespace FramerateSlider.Patches
         [HarmonyPostfix]
         public static void ResetValues()
         {
-            Slider = GetCorrectSlider();
+            Slider = SliderHandler.sceneSlider;
             Initialise.ModSettings.FramerateLimit.Value = (int)Initialise.ModSettings.FramerateLimit.DefaultValue;
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
