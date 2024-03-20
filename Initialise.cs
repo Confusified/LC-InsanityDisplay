@@ -69,6 +69,10 @@ namespace FramerateSlider
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);
             SettingsPanel.transform.Find("Headers").gameObject.transform.Find("ChangesNotApplied").gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
             SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes";
+            if (Slider == QuickMenuManagerPatch.Slider)
+            {
+                modLogger.LogInfo("Code for Quick Menu");
+            }
         }
     }
 }

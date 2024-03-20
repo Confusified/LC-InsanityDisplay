@@ -31,6 +31,7 @@ namespace FramerateSlider.Patches
         {
             Initialise.ModSettings.FramerateLimit.Value = UnsavedLimit;
             int cap = (int)Initialise.ModSettings.FramerateLimit.Value;
+            value = 4; //if i somehow forget to set it properly, default to 60 fps
 
             if (cap <= 0)
             {
@@ -57,7 +58,7 @@ namespace FramerateSlider.Patches
                     __instance.settings.framerateCapIndex = value; //set to 60 because idk!!!!!!!! (maybe in the future i'll change it to set it to whichever is closest to the selected number (a fix for the future i suppose)
                 }
             }
-            __instance.unsavedSettings.framerateCapIndex = value;
+            //__instance.unsavedSettings.framerateCapIndex = value;
             return false;
         }
 
@@ -79,6 +80,7 @@ namespace FramerateSlider.Patches
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
             }
             Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
+            UnsavedLimit = Initialise.ModSettings.FramerateLimit.Value;
             Initialise.modLogger.LogInfo("Discarded any unsaved changes to the slider");
         }
 
