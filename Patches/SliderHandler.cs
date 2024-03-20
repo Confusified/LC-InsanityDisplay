@@ -64,7 +64,7 @@ namespace FramerateSlider.Patches
             else
             {
                 sceneSettingsPanel = GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("QuickMenu").gameObject.transform.Find("SettingsPanel").gameObject;
-                positionOffset = new Vector3(-0.08f, 0.06f, 0f);
+                positionOffset = new Vector3(-0.08f, 0.055f, 0f);
             }
             sceneSlider.transform.SetParent(sceneSettingsPanel.transform);
             sceneSlider.transform.SetAsFirstSibling();
