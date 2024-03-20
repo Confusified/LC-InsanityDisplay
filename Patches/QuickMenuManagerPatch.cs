@@ -30,7 +30,7 @@ namespace FramerateSlider.Patches
 
             Slider.transform.name = "FramerateSlider";
             Slider.transform.SetParent(SettingsPanel.transform);
-            Slider.transform.position = FramerateObject.transform.position + new Vector3(-0.08f, 0.06f, 0f); //Position the slider to slightly above where the dropdown would be
+            Slider.transform.position = FramerateObject.transform.position + new Vector3(-0.08f, 0.06f, 0f); //Position the slider to slightly above where the dropdown would be, intensely scaled when in-game
             Slider.transform.localScale = new Vector3(1f, 1f, 1f);
             Slider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60 (when cursor is on it)
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);

@@ -54,7 +54,7 @@ namespace FramerateSlider
             {
                 return "Frame rate cap: Unlimited";
             }
-            else if ((int)Slider.transform.Find("Slider").GetComponent<Slider>().value == 0)
+            else if ((int)Slider.transform.Find("Slider").GetComponent<Slider>().value <= 0)
             {
                 return "Frame rate cap: VSync";
             }

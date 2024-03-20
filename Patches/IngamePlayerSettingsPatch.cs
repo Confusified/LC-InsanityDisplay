@@ -24,7 +24,6 @@ namespace FramerateSlider.Patches
             }
         }
 
-
         [HarmonyPatch("SetFramerateCap")]
         [HarmonyPrefix]
         public static bool RewriteSetFramerateCap(IngamePlayerSettings __instance, int value)
@@ -49,11 +48,29 @@ namespace FramerateSlider.Patches
                     value = 1;
                     __instance.settings.framerateCapIndex = value; //Set vanilla setting to Unlimited
                 }
-                else
+                else if (cap < 500)
+                {
+                    Application.targetFrameRate = cap;
+                    value = 2;
+                    __instance.settings.framerateCapIndex = value; //set to 144 because it is the closest
+                }
+                else if (cap <144)
+                {
+                    Application.targetFrameRate = cap;
+                    value = 3;
+                    __instance.settings.framerateCapIndex = value; //set to 120
+                }
+                else if (cap < 120)
                 {
                     Application.targetFrameRate = cap;
                     value = 4;
-                    __instance.settings.framerateCapIndex = value; //set to 60 because idk!!!!!!!! (maybe in the future i'll change it to set it to whichever is closest to the selected number (a fix for the future i suppose)
+                    __instance.settings.framerateCapIndex = value; //set to 60
+                }
+                else
+                {
+                    Application.targetFrameRate = cap;
+                    value = 5;
+                    __instance.settings.framerateCapIndex = value; //set to 30
                 }
             }
             __instance.unsavedSettings.framerateCapIndex = value;
