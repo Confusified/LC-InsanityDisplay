@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace FrameCapSlider.Patches
 {
+    [HarmonyPatch(typeof(QuickMenuManager))]
     public class QuickMenuManagerPatch
     {
         static GameObject SettingsPanel; //Where all the settings are found
@@ -28,7 +29,7 @@ namespace FrameCapSlider.Patches
             SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes";
         }
 
-        [HarmonyPatch(typeof(QuickMenuManager))]
+        
         [HarmonyPatch("Start")]
         [HarmonyPostfix]
         public static void OnStart(QuickMenuManager __instance)
@@ -43,7 +44,7 @@ namespace FrameCapSlider.Patches
             Slider = GameObject.Instantiate(Slider); //Created copy of MasterVolume, this will be as slider for the FPS
             Slider.transform.name = "FramerateSlider"; //No real use, just looks better
             Slider.transform.SetParent(SettingsPanel.transform); //Parent the slider to the SettingsPanel
-            Slider.transform.position = FramerateObject.transform.position + new Vector3(-1.5f, 1f, 0f); //Position the slider to slightly above where the dropdown would be
+            Slider.transform.position = FramerateObject.transform.position + new Vector3(-0.08f, 0.06f, 0f); //Position the slider to slightly above where the dropdown would be
             Slider.transform.localScale = new Vector3(1f, 1f, 1f); //Change size of the slider (and text)
             Slider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";

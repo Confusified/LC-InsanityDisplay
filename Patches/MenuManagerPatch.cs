@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace FrameCapSlider.Patches
 {
+    [HarmonyPatch(typeof(MenuManager))]
     public class MenuManagerPatch
     {
         static GameObject SettingsPanel; //Where all the settings are found
@@ -27,7 +28,7 @@ namespace FrameCapSlider.Patches
             SettingsPanel.transform.Find("Headers").gameObject.transform.Find("ChangesNotApplied").gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
             SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "DISCARD";
         }
-        [HarmonyPatch(typeof(MenuManager))]
+        
         [HarmonyPatch("Awake")]
         [HarmonyPostfix]
         public static void OnAwake(MenuManager __instance)
