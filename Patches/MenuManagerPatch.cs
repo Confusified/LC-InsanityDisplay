@@ -17,7 +17,7 @@ namespace FramerateSlider.Patches
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
             }
-            else if ((int)Slider.transform.Find("Slider").GetComponent<Slider>().value == 0)
+            else if ((int)Slider.transform.Find("Slider").GetComponent<Slider>().value <= 0)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: VSync";
             }
@@ -43,13 +43,13 @@ namespace FramerateSlider.Patches
             //Creation and positioning of slider
             Slider = SettingsPanel.transform.Find("MasterVolume").gameObject;
             Slider = GameObject.Instantiate(Slider); //Created copy of MasterVolume, this will be as slider for the FPS
+            Object.Destroy(Slider.transform.Find("Slider").GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.name = "FramerateSlider"; //No real use, just looks better
             Slider.transform.SetParent(SettingsPanel.transform); //Parent the slider to the SettingsPanel
             Slider.transform.position = FramerateObject.transform.position + new Vector3(-1.5f, 1f, 0f); //Position the slider to slightly above where the dropdown would be
             Slider.transform.localScale = new Vector3(1f, 1f, 1f); //Change size of the slider (and text)
             Slider.transform.Find("Image").localPosition = new Vector3(-53.4f,0f,0f); //Offset to a cap of 60
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
-            Object.Destroy(Slider.transform.Find("Slider").GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(delegate { SliderValueChanged(); });
 
             //Set values of the slider
