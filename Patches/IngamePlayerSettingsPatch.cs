@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using UnityEngine;
 
 namespace FrameCapSlider.Patches
@@ -43,6 +43,52 @@ namespace FrameCapSlider.Patches
                     return false;
                 }
             }
+        }
+
+        [HarmonyPatch("DiscardChangedSettings")]
+        [HarmonyPrefix]
+        public static void UpdateSliderValue()
+        {
+            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) //Use QuickMenuManager
+            {
+                GameObject Slider = QuickMenuManagerPatch.Slider;
+            }
+            else //Use MenuManager
+            {
+                GameObject Slider = MenuManagerPatch.Slider;
+            }
+
+            if (Initialize.ModSettings.FramerateLimit.Value > 500)
+            {
+                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
+            }
+            else if (Initialize.ModSettings.FramerateLimit.Value == 0)
+            {
+                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: VSync";
+            }
+            else
+            {
+                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
+            }
+            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
+            Initialize.modLogger.LogInfo("Reverted any unsaved changes to the slider");
+        }
+
+        [HarmonyPatch("ResetSettingsToDefault")]
+        [HarmonyPostfix]
+        public static void ResetValues()
+        {
+            if (SceneManager.GetSceneByName("SampleSceneRelay").isLoaded) //Use QuickMenuManager
+            {
+                GameObject Slider = QuickMenuManagerPatch.Slider;
+            }
+            else //Use MenuManager
+            {
+                GameObject Slider = MenuManagerPatch.Slider;
+            }
+            Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
+            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
+            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
         }
     }
 }
