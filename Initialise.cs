@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using HarmonyLib;
 using System.Reflection;
+using FramerateSlider.Patches;
 
 namespace FramerateSlider
 {
@@ -18,6 +19,7 @@ namespace FramerateSlider
         {
             public static ConfigEntry<bool> ModEnabled;
             public static ConfigEntry<int> FramerateLimit;
+            public static ConfigEntry<bool> FirstTime;
         }
 
         private readonly Harmony _Harmony = new Harmony(modGUID);
@@ -28,11 +30,21 @@ namespace FramerateSlider
             modLogger = Logger;
 
             SetDefaultConfigValues();
-            if (ModSettings.ModEnabled.Value) { 
-                _Harmony.PatchAll(Assembly.GetExecutingAssembly()); 
-                modLogger.LogInfo($"{modName} {modVersion} loaded"); 
+
+            if (ModSettings.ModEnabled.Value)
+            {
+
+                if (ModSettings.FirstTime.Value)
+                {
+                    IngamePlayerSettingsPatch.EnableFirstTime();
+                    ModSettings.FirstTime.Value = false;
+                }
+
+                _Harmony.PatchAll(Assembly.GetExecutingAssembly());
+                modLogger.LogInfo($"{modName} {modVersion} loaded");
             }
-            else {
+            else
+            {
                 modLogger.LogInfo($"{modName} {modVersion} did not load, it is disabled in the config");
             }
         }
@@ -41,6 +53,7 @@ namespace FramerateSlider
         {
             ModSettings.ModEnabled = modConfig.Bind<bool>("Mod Settings", "Enabled", true, "Change the Framerate selector from a dropdown into a slider");
             ModSettings.FramerateLimit = modConfig.Bind<int>("Mod Settings", "FramerateCap", 60, "The maximum amount of frames that your game will render");
+            ModSettings.FirstTime = modConfig.Bind<bool>("Do Not Touch", "FirstTime", true, "Please do not touch this");
         }
     }
 }

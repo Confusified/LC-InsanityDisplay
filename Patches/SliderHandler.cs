@@ -18,7 +18,7 @@ namespace FramerateSlider.Patches
         private static GameObject sceneSettingsPanel;
         private static GameObject sceneSliderInSlider;
         private static Vector3 positionOffset;
-        private static bool ignoreSliderAudio;
+        public static bool ignoreSliderAudio;
 
         public static void CreateSliderInMemory()
         {
@@ -91,10 +91,8 @@ namespace FramerateSlider.Patches
                 return false;
 
             }
-            else
-            {
-                return true;
-            }
+
+            return true;
         }
 
         private static void SliderValueChanged(GameObject SettingsPanel, GameObject Slider)
@@ -115,7 +113,7 @@ namespace FramerateSlider.Patches
             }
             IngamePlayerSettings.Instance.changesNotApplied = true;
         }
-        private static string setCorrectText(GameObject Slider)
+        public static string setCorrectText(GameObject Slider)
         {
             IngamePlayerSettingsPatch.UnsavedLimit = (int)Slider.transform.Find("Slider").GetComponent<Slider>().value;
             if ((int)Slider.transform.Find("Slider").GetComponent<Slider>().value > 500)
@@ -126,10 +124,8 @@ namespace FramerateSlider.Patches
             {
                 return "Frame rate cap: VSync";
             }
-            else
-            {
-                return $"Frame rate cap: {IngamePlayerSettingsPatch.UnsavedLimit}";
-            }
+
+            return $"Frame rate cap: {IngamePlayerSettingsPatch.UnsavedLimit}";
         }
     }
 }
