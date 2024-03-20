@@ -4,12 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace FrameCapSlider.Patches
+namespace FramerateSlider.Patches
 {
     [HarmonyPatch(typeof(IngamePlayerSettings))]
     public class IngamePlayerSettingsPatch
     {
-        public static int UnsavedLimit = Initialize.ModSettings.FramerateLimit.Value; //so it doesn't mess up the config whenever you launch the game
+        public static int UnsavedLimit = Initialise.ModSettings.FramerateLimit.Value; //so it doesn't mess up the config whenever you launch the game
         static GameObject Slider;
 
         public static GameObject GetCorrectSlider()
@@ -29,8 +29,8 @@ namespace FrameCapSlider.Patches
         [HarmonyPrefix]
         public static bool RewriteSetFramerateCap(IngamePlayerSettings __instance, int value)
         {
-            Initialize.ModSettings.FramerateLimit.Value = UnsavedLimit;
-            int cap = (int)Initialize.ModSettings.FramerateLimit.Value;
+            Initialise.ModSettings.FramerateLimit.Value = UnsavedLimit;
+            int cap = (int)Initialise.ModSettings.FramerateLimit.Value;
 
             if (cap <= 0)
             {
@@ -38,8 +38,7 @@ namespace FrameCapSlider.Patches
                 Application.targetFrameRate = -1;
                 value = 0;
                 __instance.settings.framerateCapIndex = value; //set vanilla to VSync to make it more seamless when removing the mod
-                Initialize.modLogger.LogInfo("Framerate cap was set to VSync");
-                return false;
+                Initialise.modLogger.LogInfo("Framerate cap was set to VSync");
             }
             else
             {
@@ -49,17 +48,16 @@ namespace FrameCapSlider.Patches
                     Application.targetFrameRate = -1; // uncap framerate if above 500
                     value = 1;
                     __instance.settings.framerateCapIndex = value; //Set vanilla setting to Unlimited
-                    Initialize.modLogger.LogInfo("Framerate cap was set above 500, setting it to -1 (Unlimited)");
-                    return false;
+                    Initialise.modLogger.LogInfo("Framerate cap was set above 500, setting it to -1 (Unlimited)");
                 }
                 else
                 {
                     Application.targetFrameRate = cap;
                     value = 4;
                     __instance.settings.framerateCapIndex = value; //set to 60 because idk!!!!!!!! (maybe in the future i'll change it to set it to whichever is closest to the selected number (a fix for the future i suppose)
-                    return false;
                 }
             }
+            return false;
         }
 
         [HarmonyPatch("DiscardChangedSettings")]
@@ -67,20 +65,20 @@ namespace FrameCapSlider.Patches
         public static void UpdateSliderValue()
         {
             Slider = GetCorrectSlider();
-            if (Initialize.ModSettings.FramerateLimit.Value > 500)
+            if (Initialise.ModSettings.FramerateLimit.Value > 500)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
             }
-            else if (Initialize.ModSettings.FramerateLimit.Value == 0)
+            else if (Initialise.ModSettings.FramerateLimit.Value == 0)
             {
                 Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: VSync";
             }
             else
             {
-                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
+                Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
             }
-            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
-            Initialize.modLogger.LogInfo("Reverted any unsaved changes to the slider");
+            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
+            Initialise.modLogger.LogInfo("Reverted any unsaved changes to the slider");
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
@@ -88,9 +86,9 @@ namespace FrameCapSlider.Patches
         public static void ResetValues()
         {
             Slider = GetCorrectSlider();
-            Initialize.ModSettings.FramerateLimit.Value = (int)Initialize.ModSettings.FramerateLimit.DefaultValue;
-            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
-            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
+            Initialise.ModSettings.FramerateLimit.Value = (int)Initialise.ModSettings.FramerateLimit.DefaultValue;
+            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
+            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
         }
     }
 }

@@ -4,13 +4,13 @@ using BepInEx.Configuration;
 using HarmonyLib;
 using System.Reflection;
 
-namespace FrameCapSlider
+namespace FramerateSlider
 {
     [BepInPlugin(modGUID, modName, modVersion)]
-    public class Initialize : BaseUnityPlugin
+    public class Initialise : BaseUnityPlugin
     {
-        private const string modGUID = "Confusified.FrameCapSlider";
-        private const string modName = "Framerate Cap Slider";
+        private const string modGUID = "Confusified.FramerateSlider";
+        private const string modName = "Framerate Slider";
         private const string modVersion = "1.0.0";
 
         private readonly ConfigFile modConfig = new ConfigFile(Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Replace(".", "\\") + ".cfg"), false);
@@ -30,7 +30,7 @@ namespace FrameCapSlider
             SetDefaultConfigValues();
             if (ModSettings.ModEnabled.Value) { 
                 _Harmony.PatchAll(Assembly.GetExecutingAssembly()); 
-                modLogger.LogInfo($"{modName} {modVersion} has loaded"); 
+                modLogger.LogInfo($"{modName} {modVersion} has initialised"); 
             }
             else {
                 modLogger.LogInfo($"{modName} {modVersion} did nothing, it is disabled in the config");

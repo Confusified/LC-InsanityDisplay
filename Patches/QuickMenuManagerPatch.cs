@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
 
-namespace FrameCapSlider.Patches
+namespace FramerateSlider.Patches
 {
     [HarmonyPatch(typeof(QuickMenuManager))]
     public class QuickMenuManagerPatch
@@ -47,14 +47,14 @@ namespace FrameCapSlider.Patches
             Slider.transform.position = FramerateObject.transform.position + new Vector3(-0.08f, 0.06f, 0f); //Position the slider to slightly above where the dropdown would be
             Slider.transform.localScale = new Vector3(1f, 1f, 1f); //Change size of the slider (and text)
             Slider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60
-            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialize.ModSettings.FramerateLimit.Value}";
+            Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {Initialise.ModSettings.FramerateLimit.Value}";
             Object.Destroy(Slider.transform.Find("Slider").GetComponent<SettingsOption>()); //Remove SettingsOption component, add custom functionality
             Slider.transform.Find("Slider").GetComponent<Slider>().onValueChanged.AddListener(delegate { SliderValueChanged(); });
 
             //Set values of the slider
             Slider.transform.Find("Slider").GetComponent<Slider>().minValue = 0; //0 = VSync
             Slider.transform.Find("Slider").GetComponent<Slider>().maxValue = 501; //250 = unlimited in vanilla, if set to 501 actually set to -1 (unlimited)
-            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialize.ModSettings.FramerateLimit.Value;
+            Slider.transform.Find("Slider").GetComponent<Slider>().value = Initialise.ModSettings.FramerateLimit.Value;
         }
     }
 }
