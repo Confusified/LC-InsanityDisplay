@@ -69,11 +69,11 @@ namespace FramerateSlider.Patches
             sceneSlider.transform.SetParent(sceneSettingsPanel.transform);
             sceneSlider.transform.SetAsFirstSibling();
 
-            GameObject FramerateObject = mSettingsPanel.transform.Find("FramerateCap").gameObject;
+            GameObject FramerateObject = sceneSettingsPanel.transform.Find("FramerateCap").gameObject;
             FramerateObject.SetActive(false); //Hide the dropdown
 
             sceneSlider.transform.localScale = new Vector3(1f, 1f, 1f);
-            sceneSlider.transform.position += positionOffset;
+            sceneSlider.transform.position = FramerateObject.transform.position + positionOffset;
             sceneSlider.transform.Find("Image").localPosition = new Vector3(-53.4f, 0f, 0f); //Offset to a cap of 60 (when the cursor is on it)
             sceneSliderInSlider = sceneSlider.transform.Find("Slider").gameObject;
             sceneSliderInSlider.GetComponent<Slider>().onValueChanged.AddListener(delegate { SliderValueChanged(sceneSettingsPanel, sceneSlider); });
