@@ -34,7 +34,7 @@ namespace FramerateSlider
             SetDefaultConfigValues();
             if (ModSettings.ModEnabled.Value) { 
                 _Harmony.PatchAll(Assembly.GetExecutingAssembly()); 
-                modLogger.LogInfo($"{modName} {modVersion} has initialised"); 
+                modLogger.LogInfo($"{modName} {modVersion} loaded"); 
             }
             else {
                 modLogger.LogInfo($"{modName} {modVersion} did nothing, it is disabled in the config");
@@ -68,8 +68,16 @@ namespace FramerateSlider
         {
             Slider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = Initialise.setCorrectText(Slider);
             SettingsPanel.transform.Find("Headers").gameObject.transform.Find("ChangesNotApplied").gameObject.GetComponent<TextMeshProUGUI>().enabled = true;
-            SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes";
+            if (Slider == MenuManagerPatch.Slider)
+            {
+                SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "DISCARD"; //In Main Menu
+            }
+            else
+            {
+                SettingsPanel.transform.Find("BackButton").gameObject.transform.Find("Text (TMP)").gameObject.GetComponent<TextMeshProUGUI>().text = "Discard changes"; //In Quick Menu
+            }
             IngamePlayerSettings.Instance.SettingsAudio.PlayOneShot(GameNetworkManager.Instance.buttonTuneSFX);
+            IngamePlayerSettings.Instance.changesNotApplied = true;
         }
     }
 }
