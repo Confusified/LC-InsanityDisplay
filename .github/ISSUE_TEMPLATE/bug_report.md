@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help improve the mod
-title: Bug report
+title: ''
 labels: bug
 assignees: ''
 
@@ -9,6 +9,9 @@ assignees: ''
 
 **Mod (please complete the following information):**
 - Version: [e.g. v1.0.2]
+
+**Game (please complete the following information):**
+- Version [e.g. v49]
 
 **Describe the bug**
 A clear and concise description of what the bug is.
