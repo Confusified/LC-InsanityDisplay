@@ -34,7 +34,7 @@ namespace FramerateSlider.Patches
             }
         }
 
-        [HarmonyPatch("waitToLoadSettings")]
+        [HarmonyPatch("LoadSettingsFromPrefs")]
         [HarmonyPostfix]
         private static void CheckForConfigDesync(IngamePlayerSettings __instance)
         {
@@ -48,6 +48,7 @@ namespace FramerateSlider.Patches
                 syncFrameCap = false;
                 syncDiscardChanges = false;
             }
+            modLogger.LogInfo($"{syncFrameCap} {ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex}");
         }
 
         [HarmonyPatch("SetFramerateCap")]
@@ -107,12 +108,10 @@ namespace FramerateSlider.Patches
                 __instance.unsavedSettings.framerateCapIndex = value;
                 __instance.settings.framerateCapIndex = value;
             }
-            else
-            {
-                syncFrameCap = false;
-            }
+
             ModSettings.LastLoggedIndex.Value = value;
             modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} framecap {syncFrameCap}");
+            syncFrameCap = false;
             return false;
         }
 
@@ -149,11 +148,11 @@ namespace FramerateSlider.Patches
             if (syncDiscardChanges)
             {
                 SliderHandler.ignoreSliderAudio = false;
-                syncDiscardChanges = false;
             }
             ModSettings.LastLoggedIndex.Value = __instance.settings.framerateCapIndex;
             UnsavedLimit = ModSettings.FramerateLimit.Value;
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} slidervalue");
+            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} slidervalue {syncDiscardChanges}");
+            syncDiscardChanges = false;
         }
 
         [HarmonyPatch("SaveChangedSettings")]
