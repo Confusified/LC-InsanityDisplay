@@ -156,10 +156,11 @@ namespace FramerateSlider.Patches
         }
 
         [HarmonyPatch("SaveChangedSettings")]
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         private static void UpdateOnSave(IngamePlayerSettings __instance)
         {
-            __instance.unsavedSettings.framerateCapIndex = ModSettings.LastLoggedIndex.Value;
+            ES3.Save("FPSCap",ModSettings.LastLoggedIndex.Value,"LCGeneralSaveData");
+
             modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} savesettings");
         }
 
