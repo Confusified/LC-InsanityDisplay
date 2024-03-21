@@ -156,7 +156,7 @@ namespace FramerateSlider.Patches
         [HarmonyPostfix]
         private static void UpdateOnSave(IngamePlayerSettings __instance)
         {
-            ES3.Save("FPSCap",ModSettings.LastLoggedIndex.Value,"LCGeneralSaveData");
+            ES3.Save("FPSCap", ModSettings.LastLoggedIndex.Value, "LCGeneralSaveData");
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
@@ -170,8 +170,12 @@ namespace FramerateSlider.Patches
             Application.targetFrameRate = ModSettings.FramerateLimit.Value;
             QualitySettings.vSyncCount = 0;
 
+            SliderHandler.ignoreSliderAudio = true;
             SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = SliderHandler.setCorrectText(SliderHandler.sceneSlider);
             SliderHandler.sceneSlider.transform.Find("Slider").GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
+            SliderHandler.ignoreSliderAudio = false;
+
+            IngamePlayerSettings.Instance.DiscardChangedSettings(); //To hide the changed settings text when using the thang and the slider isn't already on default
         }
     }
 }
