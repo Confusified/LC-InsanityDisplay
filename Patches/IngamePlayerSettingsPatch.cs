@@ -70,7 +70,7 @@ namespace FramerateSlider.Patches
             {
                 QualitySettings.vSyncCount = 1;
                 Application.targetFrameRate = -1;
-                value = 0;
+                value = 0; //Set vanilla setting to VSync
             }
             else
             {
@@ -164,8 +164,13 @@ namespace FramerateSlider.Patches
         private static void ResetValues()
         {
             ModSettings.FramerateLimit.Value = (int)ModSettings.FramerateLimit.DefaultValue;
-            ModSettings.LastLoggedIndex.Value = 4;
-            SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {ModSettings.FramerateLimit.Value}";
+            ModSettings.LastLoggedIndex.Value = (int)ModSettings.LastLoggedIndex.DefaultValue;
+            UnsavedLimit = ModSettings.FramerateLimit.Value;
+
+            Application.targetFrameRate = ModSettings.FramerateLimit.Value;
+            QualitySettings.vSyncCount = 0;
+
+            SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = SliderHandler.setCorrectText(SliderHandler.sceneSlider);
             SliderHandler.sceneSlider.transform.Find("Slider").GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
         }
     }
