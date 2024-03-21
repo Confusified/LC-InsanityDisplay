@@ -48,7 +48,6 @@ namespace FramerateSlider.Patches
                 syncFrameCap = false;
                 syncDiscardChanges = false;
             }
-            modLogger.LogInfo($"{syncFrameCap} {ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex}");
         }
 
         [HarmonyPatch("SetFramerateCap")]
@@ -110,7 +109,6 @@ namespace FramerateSlider.Patches
             }
 
             ModSettings.LastLoggedIndex.Value = value;
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} framecap {syncFrameCap}");
             syncFrameCap = false;
             return false;
         }
@@ -151,7 +149,6 @@ namespace FramerateSlider.Patches
             }
             ModSettings.LastLoggedIndex.Value = __instance.settings.framerateCapIndex;
             UnsavedLimit = ModSettings.FramerateLimit.Value;
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} slidervalue {syncDiscardChanges}");
             syncDiscardChanges = false;
         }
 
@@ -160,8 +157,6 @@ namespace FramerateSlider.Patches
         private static void UpdateOnSave(IngamePlayerSettings __instance)
         {
             ES3.Save("FPSCap",ModSettings.LastLoggedIndex.Value,"LCGeneralSaveData");
-
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex} savesettings");
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
