@@ -35,10 +35,12 @@ namespace FramerateSlider
             {
                 _Harmony.PatchAll(Assembly.GetExecutingAssembly());
                 modLogger.LogInfo($"{modName} {modVersion} loaded");
+                return;
             }
             else
             {
                 modLogger.LogInfo($"{modName} {modVersion} did not load, it is disabled in the config");
+                return;
             }
         }
 

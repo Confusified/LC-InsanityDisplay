@@ -34,15 +34,21 @@ namespace FramerateSlider.Patches
             }
         }
 
-        [HarmonyPatch("Awake")]
+        [HarmonyPatch("waitToLoadSettings")]
         [HarmonyPostfix]
         private static void CheckForConfigDesync(IngamePlayerSettings __instance)
         {
-            if (ModSettings.LastLoggedIndex.Value != __instance.settings.framerateCapIndex) //doubt this works but we'll see
+            if (ModSettings.LastLoggedIndex.Value != __instance.settings.framerateCapIndex)
             {
                 syncFrameCap = true;
                 syncDiscardChanges = true;
             }
+            else
+            {
+                syncFrameCap = false;
+                syncDiscardChanges = false;
+            }
+            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex}");
         }
 
         [HarmonyPatch("SetFramerateCap")]
@@ -58,6 +64,7 @@ namespace FramerateSlider.Patches
             {
                 ModSettings.FramerateLimit.Value = UnsavedLimit;
             }
+
             int cap = ModSettings.FramerateLimit.Value;
 
             if (cap <= 0)
@@ -65,7 +72,6 @@ namespace FramerateSlider.Patches
                 QualitySettings.vSyncCount = 1;
                 Application.targetFrameRate = -1;
                 value = 0;
-                //__instance.settings.framerateCapIndex = value; //set vanilla to VSync to make it more seamless when removing the mod
             }
             else
             {
@@ -97,13 +103,16 @@ namespace FramerateSlider.Patches
                 }
             }
 
-            __instance.unsavedSettings.framerateCapIndex = value;
-            ModSettings.LastLoggedIndex.Value = value;
-            if (syncFrameCap)
+            if (!syncFrameCap)
+            {
+                __instance.unsavedSettings.framerateCapIndex = value;
+            }
+            else
             {
                 syncFrameCap = false;
-                __instance.settings.framerateCapIndex = value;
             }
+            ModSettings.LastLoggedIndex.Value = value;
+            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             return false;
         }
 
@@ -117,6 +126,7 @@ namespace FramerateSlider.Patches
                 ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(__instance.settings.framerateCapIndex);
                 SliderHandler.ignoreSliderAudio = false;
                 modLogger.LogInfo($"Converting vanilla framerate cap into the modded framerate cap: {ModSettings.FramerateLimit.Value}");
+                modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             }
             if (ModSettings.FramerateLimit.Value > 500)
             {
@@ -142,7 +152,16 @@ namespace FramerateSlider.Patches
                 SliderHandler.ignoreSliderAudio = false;
                 syncDiscardChanges = false;
             }
+            ModSettings.LastLoggedIndex.Value = __instance.settings.framerateCapIndex;
             UnsavedLimit = ModSettings.FramerateLimit.Value;
+        }
+
+        [HarmonyPatch("SaveChangedSettings")]
+        [HarmonyPostfix]
+        private static void UpdateOnSave(IngamePlayerSettings __instance)
+        {
+            __instance.settings.framerateCapIndex = __instance.unsavedSettings.framerateCapIndex;
+            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
@@ -150,6 +169,7 @@ namespace FramerateSlider.Patches
         private static void ResetValues()
         {
             ModSettings.FramerateLimit.Value = (int)ModSettings.FramerateLimit.DefaultValue;
+            ModSettings.LastLoggedIndex.Value = 4;
             SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {ModSettings.FramerateLimit.Value}";
             SliderHandler.sceneSlider.transform.Find("Slider").GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
         }
