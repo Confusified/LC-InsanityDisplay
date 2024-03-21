@@ -48,7 +48,7 @@ namespace FramerateSlider.Patches
                 syncFrameCap = false;
                 syncDiscardChanges = false;
             }
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex}");
+            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex}");
         }
 
         [HarmonyPatch("SetFramerateCap")]
@@ -112,7 +112,7 @@ namespace FramerateSlider.Patches
                 syncFrameCap = false;
             }
             ModSettings.LastLoggedIndex.Value = value;
-            modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
+            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             return false;
         }
 
@@ -126,7 +126,7 @@ namespace FramerateSlider.Patches
                 ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(__instance.settings.framerateCapIndex);
                 SliderHandler.ignoreSliderAudio = false;
                 modLogger.LogInfo($"Converting vanilla framerate cap into the modded framerate cap: {ModSettings.FramerateLimit.Value}");
-                modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
+                //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             }
             if (ModSettings.FramerateLimit.Value > 500)
             {
@@ -157,7 +157,7 @@ namespace FramerateSlider.Patches
         }
 
         [HarmonyPatch("SaveChangedSettings")]
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         private static void UpdateOnSave(IngamePlayerSettings __instance)
         {
             __instance.settings.framerateCapIndex = __instance.unsavedSettings.framerateCapIndex;

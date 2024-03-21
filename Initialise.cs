@@ -3,7 +3,6 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using HarmonyLib;
 using System.Reflection;
-using FramerateSlider.Patches;
 
 namespace FramerateSlider
 {
