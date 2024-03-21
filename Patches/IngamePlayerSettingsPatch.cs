@@ -48,7 +48,6 @@ namespace FramerateSlider.Patches
                 syncFrameCap = false;
                 syncDiscardChanges = false;
             }
-            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {__instance.unsavedSettings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.settings.framerateCapIndex}");
         }
 
         [HarmonyPatch("SetFramerateCap")]
@@ -106,13 +105,15 @@ namespace FramerateSlider.Patches
             if (!syncFrameCap)
             {
                 __instance.unsavedSettings.framerateCapIndex = value;
+                __instance.settings.framerateCapIndex = value;
             }
             else
             {
                 syncFrameCap = false;
+                __instance.unsavedSettings.framerateCapIndex = value;
+                __instance.settings.framerateCapIndex = value;
             }
             ModSettings.LastLoggedIndex.Value = value;
-            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             return false;
         }
 
@@ -126,7 +127,6 @@ namespace FramerateSlider.Patches
                 ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(__instance.settings.framerateCapIndex);
                 SliderHandler.ignoreSliderAudio = false;
                 modLogger.LogInfo($"Converting vanilla framerate cap into the modded framerate cap: {ModSettings.FramerateLimit.Value}");
-                //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
             }
             if (ModSettings.FramerateLimit.Value > 500)
             {
@@ -160,8 +160,7 @@ namespace FramerateSlider.Patches
         [HarmonyPrefix]
         private static void UpdateOnSave(IngamePlayerSettings __instance)
         {
-            __instance.settings.framerateCapIndex = __instance.unsavedSettings.framerateCapIndex;
-            //modLogger.LogInfo($"{ModSettings.LastLoggedIndex.Value} {__instance.settings.framerateCapIndex} {ModSettings.FramerateLimit.Value} {__instance.unsavedSettings.framerateCapIndex}");
+            __instance.unsavedSettings.framerateCapIndex = ModSettings.LastLoggedIndex.Value;
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
