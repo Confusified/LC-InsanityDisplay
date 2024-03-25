@@ -1,8 +1,9 @@
 using HarmonyLib;
-using TMPro;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using static FramerateSlider.Initialise;
+using static FramerateSlider.Patches.SliderHandler;
 
 namespace FramerateSlider.Patches
 {
@@ -10,6 +11,8 @@ namespace FramerateSlider.Patches
     public class IngamePlayerSettingsPatch
     {
         public static int UnsavedLimit = ModSettings.FramerateLimit.Value; //so it doesn't mess up the config whenever you launch the game
+        public static IngamePlayerSettings playerSettingsInstance;
+
 
         private static bool syncFrameCap;
         private static bool syncDiscardChanges;
@@ -34,29 +37,11 @@ namespace FramerateSlider.Patches
             }
         }
 
-        [HarmonyPatch("LoadSettingsFromPrefs")]
-        [HarmonyPostfix]
-        private static void CheckForConfigDesync(IngamePlayerSettings __instance)
-        {
-            if (ModSettings.LastLoggedIndex.Value != __instance.settings.framerateCapIndex)
-            {
-                syncFrameCap = true;
-                syncDiscardChanges = true;
-            }
-            else
-            {
-                syncFrameCap = false;
-                syncDiscardChanges = false;
-            }
-        }
-
-        [HarmonyPatch("SetFramerateCap")]
-        [HarmonyPrefix]
-        private static bool RewriteSetFramerateCap(IngamePlayerSettings __instance, int value)
+        private static int SetCorrespondingFramerate(int cap)
         {
             if (syncFrameCap)
             {
-                ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(__instance.settings.framerateCapIndex);
+                ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(playerSettingsInstance.settings.framerateCapIndex);
                 UnsavedLimit = ModSettings.FramerateLimit.Value;
             }
             else
@@ -64,13 +49,11 @@ namespace FramerateSlider.Patches
                 ModSettings.FramerateLimit.Value = UnsavedLimit;
             }
 
-            int cap = ModSettings.FramerateLimit.Value;
-
             if (cap <= 0)
             {
                 QualitySettings.vSyncCount = 1;
                 Application.targetFrameRate = -1;
-                value = 0; //Set vanilla setting to VSync
+                return 0; //Set vanilla setting to VSync
             }
             else
             {
@@ -78,104 +61,144 @@ namespace FramerateSlider.Patches
                 if (cap >= 501)
                 {
                     Application.targetFrameRate = -1; // uncap framerate if above 500
-                    value = 1; //Set vanilla setting to Unlimited
+                    return 1; //Set vanilla setting to Unlimited
                 }
                 else if (cap <= 500 && cap >= 144)
                 {
                     Application.targetFrameRate = cap;
-                    value = 2; //set to 144 because it is the closest
+                    return 2; //set to 144 because it is the closest
                 }
                 else if (cap < 144 && cap >= 120)
                 {
                     Application.targetFrameRate = cap;
-                    value = 3; //set to 120
+                    return 3; //set to 120
                 }
                 else if (cap < 120 && cap >= 60)
                 {
                     Application.targetFrameRate = cap;
-                    value = 4; //set to 60
+                    return 4; //set to 60
                 }
                 else if (cap < 60 && cap > 0)
                 {
                     Application.targetFrameRate = cap;
-                    value = 5; //set to 30
+                    return 5; //set to 30
                 }
             }
+            return 0; //shouldn't be possible but oh well
+        }
+
+        [HarmonyPatch("LoadSettingsFromPrefs")]
+        [HarmonyPostfix]
+        private static void CheckForConfigDesync(IngamePlayerSettings __instance)
+        {
+            playerSettingsInstance = __instance;
+            if (ModSettings.LastLoggedIndex != playerSettingsInstance.settings.framerateCapIndex)
+            {
+                syncFrameCap = true;
+                syncDiscardChanges = true;
+                return;
+            }
+
+            syncFrameCap = false;
+            syncDiscardChanges = false;
+            return;
+        }
+
+        [HarmonyPatch("SetFramerateCap")]
+        [HarmonyPrefix]
+        private static bool RewriteSetFramerateCap()
+        {
+            int cap = ModSettings.FramerateLimit.Value;
+            int value = SetCorrespondingFramerate(cap);
 
             if (!syncFrameCap)
             {
-                __instance.unsavedSettings.framerateCapIndex = value;
-                __instance.settings.framerateCapIndex = value;
+                playerSettingsInstance.unsavedSettings.framerateCapIndex = value;
+                playerSettingsInstance.settings.framerateCapIndex = value;
+                syncFrameCap = false;
             }
 
-            ModSettings.LastLoggedIndex.Value = value;
-            syncFrameCap = false;
+            ModSettings.LastLoggedIndex = value;
+            UpdatePrivateConfig();
             return false;
         }
 
         [HarmonyPatch("DiscardChangedSettings")]
         [HarmonyPrefix]
-        private static void UpdateSliderValue(IngamePlayerSettings __instance)
+        private static void UpdateSliderValue()
         {
+            StringBuilder displayText = new StringBuilder("Converting vanilla framerate cap into the modded framerate cap: ");
             if (syncDiscardChanges)
             {
-                SliderHandler.ignoreSliderAudio = true;
-                ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(__instance.settings.framerateCapIndex);
-                SliderHandler.ignoreSliderAudio = false;
-                modLogger.LogInfo($"Converting vanilla framerate cap into the modded framerate cap: {ModSettings.FramerateLimit.Value}");
+                ignoreSliderAudio = true;
+                ModSettings.FramerateLimit.Value = AdjustFramerateToVanilla(playerSettingsInstance.settings.framerateCapIndex);
+                ignoreSliderAudio = false;
+                displayText.Append(ModSettings.FramerateLimit.Value);
+                modLogger.LogInfo(displayText.ToString());
             }
+
+            displayText = new StringBuilder("Frame rate cap: ");
             if (ModSettings.FramerateLimit.Value > 500)
             {
-                SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: Unlimited";
+                displayText = displayText.Append("Unlimited");
             }
             else if (ModSettings.FramerateLimit.Value == 0)
             {
-                SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = "Frame rate cap: VSync";
+                displayText = displayText.Append("VSync");
             }
             else
             {
-                SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = $"Frame rate cap: {ModSettings.FramerateLimit.Value}";
+                displayText = displayText.Append(ModSettings.FramerateLimit.Value);
             }
+
+            sceneSliderText.text = displayText.ToString();
 
             if (syncDiscardChanges)
             {
-                SliderHandler.ignoreSliderAudio = true;
+                ignoreSliderAudio = true;
             }
 
-            SliderHandler.sceneSlider.transform.Find("Slider").GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
+            sceneSliderInSlider.GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
             if (syncDiscardChanges)
             {
-                SliderHandler.ignoreSliderAudio = false;
+                ignoreSliderAudio = false;
+                syncDiscardChanges = false;
             }
-            ModSettings.LastLoggedIndex.Value = __instance.settings.framerateCapIndex;
+            ModSettings.LastLoggedIndex = playerSettingsInstance.settings.framerateCapIndex;
+            UpdatePrivateConfig();
             UnsavedLimit = ModSettings.FramerateLimit.Value;
-            syncDiscardChanges = false;
+
+            return;
         }
 
         [HarmonyPatch("SaveChangedSettings")]
         [HarmonyPostfix]
-        private static void UpdateOnSave(IngamePlayerSettings __instance)
+        private static void UpdateOnSave()
         {
-            ES3.Save("FPSCap", ModSettings.LastLoggedIndex.Value, "LCGeneralSaveData");
+            ES3.Save("FPSCap", ModSettings.LastLoggedIndex, "LCGeneralSaveData");
+            UpdatePrivateConfig();
+            return;
         }
 
         [HarmonyPatch("ResetSettingsToDefault")]
         [HarmonyPostfix]
         private static void ResetValues()
         {
-            ModSettings.FramerateLimit.Value = (int)ModSettings.FramerateLimit.DefaultValue;
-            ModSettings.LastLoggedIndex.Value = (int)ModSettings.LastLoggedIndex.DefaultValue;
+            ModSettings.FramerateLimit.Value = DefaultConfig.FramerateLimit;
+            ModSettings.LastLoggedIndex = DefaultConfig.LastLoggedIndex;
             UnsavedLimit = ModSettings.FramerateLimit.Value;
+            UpdatePrivateConfig();
 
             Application.targetFrameRate = ModSettings.FramerateLimit.Value;
             QualitySettings.vSyncCount = 0;
 
-            SliderHandler.ignoreSliderAudio = true;
-            SliderHandler.sceneSlider.transform.Find("Text (1)").gameObject.GetComponent<TMP_Text>().text = SliderHandler.setCorrectText(SliderHandler.sceneSlider);
-            SliderHandler.sceneSlider.transform.Find("Slider").GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
-            SliderHandler.ignoreSliderAudio = false;
+            ignoreSliderAudio = true;
+            sceneSliderText.text = setCorrectText();
+            sceneSliderInSlider.GetComponent<Slider>().value = ModSettings.FramerateLimit.Value;
+            ignoreSliderAudio = false;
 
             IngamePlayerSettings.Instance.DiscardChangedSettings(); //To hide the changed settings text when using the thang and the slider isn't already on default
+            return;
         }
     }
 }
