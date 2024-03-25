@@ -3,4 +3,6 @@
 
 This is the GitHub page for Framerate Slider, here you can find the source code for the mod.
 
+Here you can report any bugs you've found or make suggestions for the mod
+
 Feel free to look into the code, hopefully you can learn from it (or even improve it!)
