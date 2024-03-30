@@ -37,6 +37,7 @@ namespace InsanityDisplay.UI
             InsanityImage = InsanityMeter.GetComponent<Image>();
             InsanityImage.color = meterColor;
             InsanityImage.fillAmount = GetFillAmount();
+            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
         }
 
         public static float GetFillAmount()
