@@ -10,7 +10,9 @@ using static InsanityDisplay.ModCompatibility.CompatibilityList;
 namespace InsanityDisplay
 {
     [BepInPlugin(modGUID, modName, modVersion)]
-    [BepInDependency("LCCrouchHUD", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(LCCrouch_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(HealthMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(EladsHUD_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class Initialise : BaseUnityPlugin
     {
         private const string modGUID = "com.Confusified.InsanityDisplay";
@@ -30,20 +32,30 @@ namespace InsanityDisplay
 
             ConfigHandler.InitialiseConfig();
 
-            if (Chainloader.PluginInfos.ContainsKey(LCCrouch_GUID))
-            {
-                LCCrouch_Installed = true;
-                modLogger.LogInfo("Enabling compatibility with LCCrouchHUD");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(EladsHUD_GUID))
-            {
-                EladsHUD_Installed = true;
-                modLogger.LogInfo("Enabling compatibility with Elad's HUD");
-            }
+            CheckForModCompatibility();
 
             _Harmony.PatchAll(Assembly.GetExecutingAssembly());
             modLogger.LogInfo($"{modName} {modVersion} loaded");
             return;
+        }
+
+        private static void CheckForModCompatibility()
+        {
+            if (Chainloader.PluginInfos.ContainsKey(LCCrouch_GUID))
+            {
+                LCCrouch_Installed = true;
+                modLogger.LogInfo("Enabling LCCrouchHUD compatibility");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(EladsHUD_GUID))
+            {
+                EladsHUD_Installed = true;
+                modLogger.LogInfo("Enabling Elad's HUD compatibility");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(HealthMetrics_GUID))
+            {
+                EladsHUD_Installed = true;
+                modLogger.LogInfo("Enabling HealthMetrics compatibility");
+            }
         }
     }
 }

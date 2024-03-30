@@ -2,8 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using InsanityDisplay.ModCompatibility;
-using static InsanityDisplay.Patches.PlayerControllerBPatch;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using GameNetcodeStuff;
 
 namespace InsanityDisplay.UI
 {
@@ -18,11 +18,14 @@ namespace InsanityDisplay.UI
 
         public static Image InsanityImage;
 
+        private static PlayerControllerB localPlayer;
+
         public static void CreateInMemory()
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
             Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
             Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
+            GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
             CreateInScene();
             return;
         }
@@ -46,11 +49,19 @@ namespace InsanityDisplay.UI
             InsanityImage.fillAmount = GetFillAmount();
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
+            EnableCompatibilities();
+        }
+
+        private static void EnableCompatibilities()
+        {
             if (LCCrouch_Installed)
             {
                 LCCrouchHUDCompatibility.MoveCrouchHUD();
             }
-
+            if (HealthMetrics_Installed)
+            {
+                HealthMetricsCompatibility.MoveHealthMetrics();
+            }
             if (EladsHUD_Installed)
             {
                 //nothing yet
@@ -59,8 +70,9 @@ namespace InsanityDisplay.UI
 
         public static float GetFillAmount()
         {
-            if (PlayerControllerBInstance == null) { return 0; } //Avoid errors
-            return PlayerControllerBInstance.insanityLevel / PlayerControllerBInstance.maxInsanityLevel;
+            if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
+            localPlayer = GameNetworkManager.Instance.localPlayerController;
+            return localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
         }
     }
 }
