@@ -10,7 +10,7 @@ namespace InsanityDisplay.Patches
     {
         public static PlayerControllerB PlayerControllerBInstance;
 
-        [HarmonyPatch("Awake")]
+        [HarmonyPatch("Start")]
         private static void Postfix(PlayerControllerB __instance)
         {
             PlayerControllerBInstance = __instance;
@@ -21,6 +21,7 @@ namespace InsanityDisplay.Patches
         private static void Postfix()
         {
             if (InsanityImage == null) { return; } //In case something goes wrong
+
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
             InsanityImage.fillAmount = GetFillAmount();
             InsanityImage.color = ConfigSettings.MeterColor.Value;

@@ -28,10 +28,12 @@ namespace InsanityDisplay.UI
         private static void CreateInScene()
         {
             if (Memory_InsanityMeter == null) { CreateInMemory(); return; }
+            if (InsanityMeter != null) { return; } //Already exists
 
             InsanityMeter = GameObject.Instantiate<GameObject>(Memory_InsanityMeter);
-            Transform meterTransform = InsanityMeter.transform;
+            InsanityMeter.name = "InsanityMeter";
 
+            Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetParent(GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("IngamePlayerHUD").gameObject.transform.Find("TopLeftCorner").gameObject.transform);
             meterTransform.SetAsFirstSibling();
             meterTransform.localPosition = localPosition;

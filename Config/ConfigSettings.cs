@@ -7,5 +7,6 @@ namespace InsanityDisplay.Config
     {
         public static ConfigEntry<bool> ModEnabled;
         public static ConfigEntry<Color> MeterColor; //Default is purple
+        public static ConfigEntry<bool> useAccurateDisplay;
     }
 }
