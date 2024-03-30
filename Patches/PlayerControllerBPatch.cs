@@ -5,15 +5,15 @@ using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
 {
-    [HarmonyPatch(typeof(HUDManager))]
-    public class HUDManagerPatch
+    [HarmonyPatch(typeof(PlayerControllerB))]
+    public class PlayerControllerBPatch
     {
         public static PlayerControllerB PlayerControllerBInstance;
 
         [HarmonyPatch("Awake")]
-        private static void Postfix(HUDManager __instance)
+        private static void Postfix(PlayerControllerB __instance)
         {
-            PlayerControllerBInstance = __instance.localPlayer;
+            PlayerControllerBInstance = __instance;
             CreateInMemory(); //This will create in memory AND also in scene afterwards
         }
 

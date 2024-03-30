@@ -114,7 +114,7 @@
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Config\ConfigSettings.cs" />
     <Compile Include="Initialise.cs" />
-    <Compile Include="Patches\HUDManagerPatch.cs" />
+    <Compile Include="Patches\PlayerControllerBPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\UIHandler.cs" />
   </ItemGroup>
@@ -131,4 +131,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\BepInEx.Core.5.4.21\build\BepInEx.Core.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

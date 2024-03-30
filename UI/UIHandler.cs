@@ -1,7 +1,7 @@
 ﻿using InsanityDisplay.Config;
 using UnityEngine;
 using UnityEngine.UI;
-using static InsanityDisplay.Patches.HUDManagerPatch;
+using static InsanityDisplay.Patches.PlayerControllerBPatch;
 
 namespace InsanityDisplay.UI
 {
@@ -28,9 +28,12 @@ namespace InsanityDisplay.UI
         private static void CreateInScene()
         {
             if (Memory_InsanityMeter == null) { CreateInMemory(); return; }
+
             InsanityMeter = GameObject.Instantiate<GameObject>(Memory_InsanityMeter);
             Transform meterTransform = InsanityMeter.transform;
 
+            meterTransform.SetParent(GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("IngamePlayerHUD").gameObject.transform.Find("TopLeftCorner").gameObject.transform);
+            meterTransform.SetAsFirstSibling();
             meterTransform.localPosition = localPosition;
             meterTransform.localScale = localScale;
 
