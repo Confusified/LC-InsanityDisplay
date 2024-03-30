@@ -1,7 +1,9 @@
 ﻿using InsanityDisplay.Config;
 using UnityEngine;
 using UnityEngine.UI;
+using InsanityDisplay.ModCompatibility;
 using static InsanityDisplay.Patches.PlayerControllerBPatch;
+using static InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace InsanityDisplay.UI
 {
@@ -19,8 +21,8 @@ namespace InsanityDisplay.UI
         public static void CreateInMemory()
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
-            Memory_InsanityMeter = GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("IngamePlayerHUD").gameObject.transform.Find("TopLeftCorner").gameObject.transform.Find("SprintMeter").gameObject;
-            Memory_InsanityMeter = GameObject.Instantiate<GameObject>(Memory_InsanityMeter);
+            Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
+            Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
             CreateInScene();
             return;
         }
@@ -30,7 +32,7 @@ namespace InsanityDisplay.UI
             if (Memory_InsanityMeter == null) { CreateInMemory(); return; }
             if (InsanityMeter != null) { return; } //Already exists
 
-            InsanityMeter = GameObject.Instantiate<GameObject>(Memory_InsanityMeter);
+            InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
             InsanityMeter.name = "InsanityMeter";
 
             Transform meterTransform = InsanityMeter.transform;
@@ -43,10 +45,21 @@ namespace InsanityDisplay.UI
             InsanityImage.color = meterColor;
             InsanityImage.fillAmount = GetFillAmount();
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+
+            if (LCCrouch_Installed)
+            {
+                LCCrouchHUDCompatibility.MoveCrouchHUD();
+            }
+
+            if (EladsHUD_Installed)
+            {
+                //nothing yet
+            }
         }
 
         public static float GetFillAmount()
         {
+            if (PlayerControllerBInstance == null) { return 0; } //Avoid errors
             return PlayerControllerBInstance.insanityLevel / PlayerControllerBInstance.maxInsanityLevel;
         }
     }

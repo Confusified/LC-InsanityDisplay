@@ -1,7 +1,10 @@
 ﻿using GameNetcodeStuff;
 using HarmonyLib;
-using InsanityDisplay.Config;
-using static InsanityDisplay.UI.UIHandler;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace InsanityDisplay.Patches
 {
@@ -10,21 +13,11 @@ namespace InsanityDisplay.Patches
     {
         public static PlayerControllerB PlayerControllerBInstance;
 
-        [HarmonyPatch("Start")]
+        [HarmonyPatch("Awake")]
         private static void Postfix(PlayerControllerB __instance)
         {
+            if (__instance != GameNetworkManager.Instance.localPlayerController) { return; }
             PlayerControllerBInstance = __instance;
-            CreateInMemory(); //This will create in memory AND also in scene afterwards
-        }
-
-        [HarmonyPatch("Update")]
-        private static void Postfix()
-        {
-            if (InsanityImage == null) { return; } //In case something goes wrong
-
-            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
-            InsanityImage.fillAmount = GetFillAmount();
-            InsanityImage.color = ConfigSettings.MeterColor.Value;
         }
     }
 }
