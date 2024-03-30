@@ -2,8 +2,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using InsanityDisplay.ModCompatibility;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
 using GameNetcodeStuff;
+using static InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace InsanityDisplay.UI
 {
@@ -23,6 +23,7 @@ namespace InsanityDisplay.UI
         public static void CreateInMemory()
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
+            if (CompatibilityList.EladsHUD_Installed) { EnableCompatibilities(); return; }
             Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
             Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
@@ -39,7 +40,7 @@ namespace InsanityDisplay.UI
             InsanityMeter.name = "InsanityMeter";
 
             Transform meterTransform = InsanityMeter.transform;
-            meterTransform.SetParent(GameObject.Find("Systems").gameObject.transform.Find("UI").gameObject.transform.Find("Canvas").gameObject.transform.Find("IngamePlayerHUD").gameObject.transform.Find("TopLeftCorner").gameObject.transform);
+            meterTransform.SetParent(GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner").gameObject.transform);
             meterTransform.SetAsFirstSibling();
             meterTransform.localPosition = localPosition;
             meterTransform.localScale = localScale;
@@ -50,6 +51,7 @@ namespace InsanityDisplay.UI
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
             EnableCompatibilities();
+            return;
         }
 
         private static void EnableCompatibilities()
@@ -64,7 +66,9 @@ namespace InsanityDisplay.UI
             }
             if (EladsHUD_Installed)
             {
-                //nothing yet
+                Memory_InsanityMeter = null;
+                InsanityMeter = null;
+                EladsHUDCompatibility.EditEladsHUD(); //Replace them with Elad's HUD UI
             }
         }
 

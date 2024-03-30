@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace InsanityDisplay.ModCompatibility
 {
@@ -15,7 +10,7 @@ namespace InsanityDisplay.ModCompatibility
         {
             GameObject HealthMetricsDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/BottomMiddle/PTTIcon/HealthHUDDisplay").gameObject;
 
-            if (HealthMetricsDisplay == null) { Initialise.modLogger.LogError("LCCrouchHud's icon wasn't found"); return; }
+            if (HealthMetricsDisplay == null) { Initialise.modLogger.LogError("HealthMetrics' display wasn't found"); return; }
 
             HealthMetricsDisplay.transform.localPosition += localPositionOffset;
         }

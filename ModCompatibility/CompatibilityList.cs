@@ -17,5 +17,6 @@ namespace InsanityDisplay.ModCompatibility
 
         public const string EladsHUD_GUID = "me.eladnlg.customhud";
         public static bool EladsHUD_Installed;
+        //An0n patches?
     }
 }

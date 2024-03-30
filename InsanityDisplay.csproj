@@ -58,9 +58,6 @@
     <Reference Include="Mono.Cecil.Rocks, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMod.Backports, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\MonoMod.Backports.1.1.0\lib\net452\MonoMod.Backports.dll</HintPath>
-    </Reference>
     <Reference Include="MonoMod.Core, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\MonoMod.Core.1.1.0\lib\net452\MonoMod.Core.dll</HintPath>
     </Reference>
@@ -115,6 +112,7 @@
     <Compile Include="Config\ConfigSettings.cs" />
     <Compile Include="Initialise.cs" />
     <Compile Include="ModCompatibility\CompatibilityList.cs" />
+    <Compile Include="ModCompatibility\EladsHUDCompatibility.cs" />
     <Compile Include="ModCompatibility\HealthMetricsCompatibility.cs" />
     <Compile Include="ModCompatibility\LCCrouchHUDCompatibility.cs" />
     <Compile Include="Patches\HUDManagerPatch.cs" />
