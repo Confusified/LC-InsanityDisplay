@@ -75,6 +75,8 @@ namespace InsanityDisplay.UI
             }
             if (EladsHUD_Installed && ConfigSettings.EladsHUDCompat.Value)
             {
+                GameObject.Destroy(Memory_InsanityMeter);
+                GameObject.Destroy(InsanityMeter);
                 Memory_InsanityMeter = null;
                 InsanityMeter = null;
                 EladsHUDCompatibility.EditEladsHUD();
@@ -89,16 +91,26 @@ namespace InsanityDisplay.UI
         {
             if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
             localPlayer = GameNetworkManager.Instance.localPlayerController;
-            float finalFillAmount;
-            if (ConfigSettings.useAccurateDisplay.Value && !EladsHUD_Installed) //if using accurate display and Elad's HUD is not present
+
+            if (ConfigSettings.alwaysFull.Value) { return 1; }
+            if (ConfigSettings.useAccurateDisplay.Value && (!EladsHUD_Installed || (EladsHUD_Installed && !ConfigSettings.EladsHUDCompat.Value)))//Start from ~0.2 to ~0.91
             {
-                finalFillAmount = accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
+                if (ConfigSettings.enableReverse.Value) //Go from ~0.91 to ~0.2 instead
+                {
+                    return accurate_MaxValue - ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
+                }
+
+                return accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
             }
             else
             {
-                finalFillAmount = localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
+                if (ConfigSettings.enableReverse.Value) //Go from 100 to 0 instead
+                {
+                    return 1 - localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
+                }
+
+                return localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
             }
-            return finalFillAmount;
         }
     }
 }

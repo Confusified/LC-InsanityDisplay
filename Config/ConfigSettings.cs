@@ -8,6 +8,8 @@ namespace InsanityDisplay.Config
         public static ConfigEntry<bool> ModEnabled;
         public static ConfigEntry<Color> MeterColor; //Default is purple (in file it would be HEX)
         public static ConfigEntry<bool> useAccurateDisplay;
+        public static ConfigEntry<bool> enableReverse; //Become a sanity meter instead of insanity meter
+        public static ConfigEntry<bool> alwaysFull; //Basically just always show the bar
 
         //Compatibility Settings
 
