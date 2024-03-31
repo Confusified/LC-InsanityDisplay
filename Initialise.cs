@@ -11,7 +11,7 @@ namespace InsanityDisplay
 {
     [BepInPlugin(modGUID, modName, modVersion)]
     [BepInDependency(LCCrouch_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(HealthMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(An0nPatches_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(EladsHUD_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class Initialise : BaseUnityPlugin
     {
@@ -51,10 +51,10 @@ namespace InsanityDisplay
                 EladsHUD_Installed = true;
                 modLogger.LogInfo("Enabling Elad's HUD compatibility");
             }
-            if (Chainloader.PluginInfos.ContainsKey(Oxygen_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(An0nPatches_GUID))
             {
-                Oxygen_Installed = true;
-                modLogger.LogInfo("Enabling Oxygen compatibility");
+                An0nPatches_Installed = true;
+                modLogger.LogInfo("Enabling An0n Patches compatibility");
             }
         }
     }
