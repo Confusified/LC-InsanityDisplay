@@ -2,6 +2,7 @@
 using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
 using System;
+using UnityEngine;
 using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
@@ -26,11 +27,11 @@ namespace InsanityDisplay.Patches
             if (CompatibilityList.EladsHUD_Installed)
             {
                 if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
-                EladsHUDCompatibility.InsanityInfo.color = ConfigSettings.MeterColor.Value;
+                EladsHUDCompatibility.InsanityInfo.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
                 EladsHUDCompatibility.InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
             }
             InsanityImage.fillAmount = GetFillAmount();
-            InsanityImage.color = ConfigSettings.MeterColor.Value;
+            InsanityImage.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
         }
     }
 }

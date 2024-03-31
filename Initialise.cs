@@ -10,6 +10,7 @@ using static InsanityDisplay.ModCompatibility.CompatibilityList;
 namespace InsanityDisplay
 {
     [BepInPlugin(modGUID, modName, modVersion)]
+    //Compatibility Mods
     [BepInDependency(LCCrouch_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(An0nPatches_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(EladsHUD_GUID, BepInDependency.DependencyFlags.SoftDependency)]

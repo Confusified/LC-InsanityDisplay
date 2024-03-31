@@ -4,15 +4,14 @@ using UnityEngine.UI;
 using InsanityDisplay.ModCompatibility;
 using GameNetcodeStuff;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
-using TMPro;
 
 namespace InsanityDisplay.UI
 {
     public class UIHandler
     {
-        private static Vector3 localPosition = new Vector3(-274.4761f, 106.3285f, -13.0663f);
+        private static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
-        private static Vector3 selfLocalPosition = new Vector3(-279.5677f, 116.2748f, -14.2174f);
+        private static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, -4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
         private static Color meterColor = ConfigSettings.MeterColor.Value;
 
         private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
@@ -49,7 +48,7 @@ namespace InsanityDisplay.UI
             Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetParent(TopLeftCornerHUD.transform);
             meterTransform.SetAsFirstSibling();
-            meterTransform.localPosition = localPosition;
+            meterTransform.localPosition = localPositionOffset;
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
@@ -58,10 +57,10 @@ namespace InsanityDisplay.UI
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
             GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject;
-            selfObject.transform.localPosition = selfLocalPosition;
+            selfObject.transform.localPosition = selfLocalPositionOffset;
 
             GameObject selfRedObject = TopLeftCornerHUD.transform.Find("SelfRed").gameObject;
-            selfRedObject.transform.localPosition = selfLocalPosition;
+            selfRedObject.transform.localPosition = selfLocalPositionOffset;
 
             EnableCompatibilities();
             return;
