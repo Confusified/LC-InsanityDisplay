@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using InsanityDisplay.ModCompatibility;
 using GameNetcodeStuff;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using TMPro;
 
 namespace InsanityDisplay.UI
 {
@@ -13,6 +14,9 @@ namespace InsanityDisplay.UI
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
         private static Vector3 selfLocalPosition = new Vector3(-279.5677f, 116.2748f, -14.2174f);
         private static Color meterColor = ConfigSettings.MeterColor.Value;
+
+        private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
+        private const float accurate_MaxValue = 0.9101f; //No visible changes after this value
 
         public static GameObject Memory_InsanityMeter;
         public static GameObject InsanityMeter;
@@ -49,7 +53,7 @@ namespace InsanityDisplay.UI
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
-            InsanityImage.color = meterColor;
+            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
             InsanityImage.fillAmount = GetFillAmount();
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
@@ -85,7 +89,16 @@ namespace InsanityDisplay.UI
         {
             if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
             localPlayer = GameNetworkManager.Instance.localPlayerController;
-            return localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
+            float finalFillAmount = 0;
+            if (ConfigSettings.useAccurateDisplay.Value && !EladsHUD_Installed) //if using accurate display and Elad's HUD is not present
+            {
+                finalFillAmount = accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
+            }
+            else
+            {
+                finalFillAmount = localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
+            }
+            return finalFillAmount;
         }
     }
 }

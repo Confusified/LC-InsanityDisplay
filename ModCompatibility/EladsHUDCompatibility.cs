@@ -39,12 +39,12 @@ namespace InsanityDisplay.ModCompatibility
             PercentageInsanityText = meterTransform.Find("StaminaInfo").gameObject;
 
             InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
-            InsanityInfo.color = ConfigSettings.MeterColor.Value;
+            InsanityInfo.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             InsanityInfo.horizontalAlignment = HorizontalAlignmentOptions.Right;
             InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
 
             InsanityImage = meterTransform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-            InsanityImage.color = ConfigSettings.MeterColor.Value;
+            InsanityImage.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             InsanityImage.fillAmount = GetFillAmount();
         }
 
@@ -61,12 +61,11 @@ namespace InsanityDisplay.ModCompatibility
             PercentageInsanityText = Memory_InsanityMeter.transform.Find("StaminaInfo").gameObject;
 
             InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
-            InsanityInfo.color = ConfigSettings.MeterColor.Value;
+            InsanityInfo.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
 
             InsanityImage = Memory_InsanityMeter.transform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-            InsanityImage.color = ConfigSettings.MeterColor.Value;
+            InsanityImage.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
-            Initialise.modLogger.LogInfo("created in memory"); //
         }
 
         private static void MoveWithOffset()
