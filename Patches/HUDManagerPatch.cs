@@ -24,7 +24,7 @@ namespace InsanityDisplay.Patches
         {
             if (InsanityImage == null || InsanityMeter == null) { return; } //In case something goes wrong
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
-            if (CompatibilityList.EladsHUD_Installed)
+            if (CompatibilityList.EladsHUD_Installed && ConfigSettings.EladsHUDCompat.Value)
             {
                 if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
                 EladsHUDCompatibility.InsanityInfo.color = ConfigSettings.MeterColor.Value + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config

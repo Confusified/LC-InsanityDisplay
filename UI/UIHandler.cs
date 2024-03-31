@@ -11,7 +11,7 @@ namespace InsanityDisplay.UI
     {
         private static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
-        private static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, -4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
+        private static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, 4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
         private static Color meterColor = ConfigSettings.MeterColor.Value;
 
         private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
@@ -48,7 +48,7 @@ namespace InsanityDisplay.UI
             Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetParent(TopLeftCornerHUD.transform);
             meterTransform.SetAsFirstSibling();
-            meterTransform.localPosition += localPositionOffset;
+            meterTransform.localPosition = TopLeftCornerHUD.transform.Find("SprintMeter").gameObject.transform.localPosition + localPositionOffset;
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
@@ -60,14 +60,15 @@ namespace InsanityDisplay.UI
             selfObject.transform.localPosition += selfLocalPositionOffset;
 
             GameObject selfRedObject = TopLeftCornerHUD.transform.Find("SelfRed").gameObject;
-            selfRedObject.transform.localPosition += selfLocalPositionOffset;
-
+            selfRedObject.transform.localPosition = selfObject.transform.localPosition;
+            Initialise.modLogger.LogInfo("Created insanity meter succesfully");
             EnableCompatibilities();
             return;
         }
 
         private static void EnableCompatibilities()
         {
+            Initialise.modLogger.LogInfo("Enabling allowed compatibilities");
             if (LCCrouch_Installed && ConfigSettings.LCCrouchHUDCompat.Value)
             {
                 LCCrouchHUDCompatibility.MoveCrouchHUD();
@@ -88,7 +89,7 @@ namespace InsanityDisplay.UI
         {
             if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
             localPlayer = GameNetworkManager.Instance.localPlayerController;
-            float finalFillAmount = 0;
+            float finalFillAmount;
             if (ConfigSettings.useAccurateDisplay.Value && !EladsHUD_Installed) //if using accurate display and Elad's HUD is not present
             {
                 finalFillAmount = accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
