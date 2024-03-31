@@ -51,10 +51,10 @@ namespace InsanityDisplay
                 EladsHUD_Installed = true;
                 modLogger.LogInfo("Enabling Elad's HUD compatibility");
             }
-            if (Chainloader.PluginInfos.ContainsKey(HealthMetrics_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(Oxygen_GUID))
             {
-                EladsHUD_Installed = true;
-                modLogger.LogInfo("Enabling HealthMetrics compatibility");
+                Oxygen_Installed = true;
+                modLogger.LogInfo("Enabling Oxygen compatibility");
             }
         }
     }

@@ -60,9 +60,9 @@ namespace InsanityDisplay.UI
             {
                 LCCrouchHUDCompatibility.MoveCrouchHUD();
             }
-            if (HealthMetrics_Installed)
+            if (Oxygen_Installed)
             {
-                HealthMetricsCompatibility.MoveHealthMetrics();
+                //Oxygen
             }
             if (EladsHUD_Installed)
             {

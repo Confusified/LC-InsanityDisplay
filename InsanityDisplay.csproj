@@ -113,7 +113,7 @@
     <Compile Include="Initialise.cs" />
     <Compile Include="ModCompatibility\CompatibilityList.cs" />
     <Compile Include="ModCompatibility\EladsHUDCompatibility.cs" />
-    <Compile Include="ModCompatibility\HealthMetricsCompatibility.cs" />
+    <Compile Include="ModCompatibility\OxygenCompatibility.cs" />
     <Compile Include="ModCompatibility\LCCrouchHUDCompatibility.cs" />
     <Compile Include="Patches\HUDManagerPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
