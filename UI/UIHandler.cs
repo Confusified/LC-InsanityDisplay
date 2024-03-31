@@ -48,7 +48,7 @@ namespace InsanityDisplay.UI
             Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetParent(TopLeftCornerHUD.transform);
             meterTransform.SetAsFirstSibling();
-            meterTransform.localPosition = localPositionOffset;
+            meterTransform.localPosition += localPositionOffset;
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
@@ -57,10 +57,10 @@ namespace InsanityDisplay.UI
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
             GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject;
-            selfObject.transform.localPosition = selfLocalPositionOffset;
+            selfObject.transform.localPosition += selfLocalPositionOffset;
 
             GameObject selfRedObject = TopLeftCornerHUD.transform.Find("SelfRed").gameObject;
-            selfRedObject.transform.localPosition = selfLocalPositionOffset;
+            selfRedObject.transform.localPosition += selfLocalPositionOffset;
 
             EnableCompatibilities();
             return;
