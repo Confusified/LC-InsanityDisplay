@@ -3,6 +3,7 @@ using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
@@ -22,6 +23,7 @@ namespace InsanityDisplay.Patches
         [HarmonyPostfix]
         private static void SetMeterValues()
         {
+            if (InsanityImage == null) { InsanityImage = InsanityMeter?.GetComponent<Image>(); }
             if (InsanityImage == null || InsanityMeter == null) { return; } //In case something goes wrong
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
             if (CompatibilityList.EladsHUD_Installed && ConfigSettings.EladsHUDCompat.Value)
