@@ -6,7 +6,7 @@ namespace InsanityDisplay.ModCompatibility
 {
     public class GeneralImprovementsCompatibility
     {
-        private static Vector3 localPositionOffset = new Vector3(0, 20.5f, 0);
+        private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
         private static readonly int maxAttempts = 500; //Amount of frames it will retry (until it is found)
 
         public static void MoveHPHud()

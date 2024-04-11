@@ -15,11 +15,13 @@ namespace InsanityDisplay
     [BepInDependency(An0nPatches_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(EladsHUD_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(GeneralImprovements_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(HealthMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(DamageMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class Initialise : BaseUnityPlugin
     {
         private const string modGUID = "com.Confusified.InsanityDisplay";
         private const string modName = "InsanityDisplay";
-        private const string modVersion = "1.1.1";
+        private const string modVersion = "1.1.2";
 
         private static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
@@ -62,6 +64,16 @@ namespace InsanityDisplay
             {
                 GeneralImprovements_Installed = true;
                 modLogger.LogInfo("Enabling GeneralImprovements compatibility");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(HealthMetrics_GUID))
+            {
+                HealthMetrics_Installed = true;
+                modLogger.LogInfo("Enabling HealthMetrics compatibility");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(DamageMetrics_GUID))
+            {
+                DamageMetrics_Installed = true;
+                modLogger.LogInfo("Enabling DamageMetrics compatibility");
             }
         }
     }

@@ -13,5 +13,13 @@
 
         public const string GeneralImprovements_GUID = "ShaosilGaming.GeneralImprovements";
         public static bool GeneralImprovements_Installed;
+
+        public const string HealthMetrics_GUID = "Matsuura.HealthMetrics";
+        public static bool HealthMetrics_Installed;
+
+        public const string DamageMetrics_GUID = "Matsuura.TestAccount666.DamageMetrics";
+        public static bool DamageMetrics_Installed;
+
+
     }
 }
