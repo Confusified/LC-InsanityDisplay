@@ -52,8 +52,17 @@ namespace InsanityDisplay.UI
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
-            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-            InsanityImage.fillAmount = GetFillAmount();
+            try
+            {
+                if (meterColor == null) { meterColor = (Color)ConfigSettings.MeterColor.DefaultValue; Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); }
+                InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
+                InsanityImage.fillAmount = GetFillAmount();
+            }
+            catch
+            {
+                Initialise.modLogger.LogError("Error while setting insanity meter's color and fill, most likely could not find the meter\nThe mod will attempt to automatically resolve this");
+            }
+
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
             GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject;
