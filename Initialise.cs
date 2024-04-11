@@ -21,6 +21,7 @@ namespace InsanityDisplay
     {
         private const string modGUID = "com.Confusified.InsanityDisplay";
         private const string modName = "InsanityDisplay";
+
         private const string modVersion = "1.1.3";
 
         private static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
