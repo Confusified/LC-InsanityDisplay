@@ -85,6 +85,10 @@ namespace InsanityDisplay.UI
             {
                 An0nPatchesCompatibility.MoveTextHUD();
             }
+            if (GeneralImprovements_Installed && ConfigSettings.GeneralImprovementsCompat.Value)
+            {
+                GeneralImprovementsCompatibility.MoveHPHud();
+            }
         }
 
         public static float GetFillAmount()

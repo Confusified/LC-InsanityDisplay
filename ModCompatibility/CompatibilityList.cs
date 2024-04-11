@@ -10,5 +10,8 @@
 
         public const string An0nPatches_GUID = "com.an0n.patch";
         public static bool An0nPatches_Installed;
+
+        public const string GeneralImprovements_GUID = "ShaosilGaming.GeneralImprovements";
+        public static bool GeneralImprovements_Installed;
     }
 }
