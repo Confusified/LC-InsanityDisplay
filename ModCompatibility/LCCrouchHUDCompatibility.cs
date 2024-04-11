@@ -12,7 +12,7 @@ namespace InsanityDisplay.ModCompatibility
             GameObject CrouchHUDIcon = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/Self/CrouchIcon").gameObject;
 
             if (CrouchHUDIcon == null) { Initialise.modLogger.LogError("LCCrouchHud's icon wasn't found"); return; }
-            //translate position offset to localPosition (-16.2386 -20.2468 -12.0928)
+
             CrouchHUDIcon.transform.localPosition = positionToLocal + localPositionOffset;
         }
     }

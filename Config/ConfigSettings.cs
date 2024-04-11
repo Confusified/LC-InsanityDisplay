@@ -16,5 +16,8 @@ namespace InsanityDisplay.Config
         public static ConfigEntry<bool> LCCrouchHUDCompat;
         public static ConfigEntry<bool> An0nPatchesCompat;
         public static ConfigEntry<bool> EladsHUDCompat;
+        public static ConfigEntry<bool> GeneralImprovementsCompat;
+        public static ConfigEntry<bool> HealthMetricsCompat;
+        public static ConfigEntry<bool> DamageMetricsCompat;
     }
 }

@@ -85,6 +85,18 @@ namespace InsanityDisplay.UI
             {
                 An0nPatchesCompatibility.MoveTextHUD();
             }
+            if (GeneralImprovements_Installed && ConfigSettings.GeneralImprovementsCompat.Value)
+            {
+                GeneralImprovementsCompatibility.MoveHPHud();
+            }
+            if (HealthMetrics_Installed && ConfigSettings.HealthMetricsCompat.Value)
+            {
+                HealthMetricsCompatibility.MoveHealthHUD();
+            }
+            if (DamageMetrics_Installed && ConfigSettings.DamageMetricsCompat.Value)
+            {
+                DamageMetricsCompatibility.MoveDamageHUD();
+            }
         }
 
         public static float GetFillAmount()
@@ -93,9 +105,11 @@ namespace InsanityDisplay.UI
             localPlayer = GameNetworkManager.Instance.localPlayerController;
 
             if (ConfigSettings.alwaysFull.Value) { return 1; }
-            if (ConfigSettings.useAccurateDisplay.Value && (!EladsHUD_Installed || (EladsHUD_Installed && !ConfigSettings.EladsHUDCompat.Value)))//Start from ~0.2 to ~0.91
+
+            if (ConfigSettings.useAccurateDisplay.Value && (!EladsHUD_Installed || (EladsHUD_Installed && !ConfigSettings.EladsHUDCompat.Value))) //Start from ~0.2 to ~0.91
             {
-                if (ConfigSettings.enableReverse.Value) //Go from ~0.91 to ~0.2 instead
+                if (ConfigSettings.enableReverse.Value) //Start from ~0.91 to ~0.2 instead
+
                 {
                     return accurate_MaxValue - ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * accurate_MaxValue);
                 }
@@ -104,7 +118,9 @@ namespace InsanityDisplay.UI
             }
             else
             {
-                if (ConfigSettings.enableReverse.Value) //Go from 100 to 0 instead
+
+                if (ConfigSettings.enableReverse.Value) //Start from 100 to 0 instead
+
                 {
                     return 1 - localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
                 }

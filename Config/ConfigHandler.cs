@@ -13,9 +13,12 @@ namespace InsanityDisplay.Config
             ConfigSettings.enableReverse = modConfig.Bind<bool>("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             ConfigSettings.alwaysFull = modConfig.Bind<bool>("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
 
-            ConfigSettings.LCCrouchHUDCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will move the Crouch HUD slightly up to avoid overlapping");
-            ConfigSettings.An0nPatchesCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will move the An0n Patches HUD slightly up to avoid overlapping");
+            ConfigSettings.LCCrouchHUDCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            ConfigSettings.An0nPatchesCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             ConfigSettings.EladsHUDCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable Elads HUD compatibility", true, "Enabling this will add another bar above the stamina bar displaying your insanity level");
+            ConfigSettings.GeneralImprovementsCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            ConfigSettings.HealthMetricsCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            ConfigSettings.DamageMetricsCompat = modConfig.Bind<bool>("Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             return;
         }
     }
