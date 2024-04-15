@@ -12,7 +12,6 @@ namespace InsanityDisplay.UI
         private static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
         private static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, 4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
-        private static Color meterColor = ConfigSettings.MeterColor.Value;
 
         private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
         private const float accurate_MaxValue = 0.9101f; //No visible changes after this value
@@ -54,7 +53,9 @@ namespace InsanityDisplay.UI
             InsanityImage = InsanityMeter.GetComponent<Image>();
             try
             {
-                if (meterColor == null) { meterColor = (Color)ConfigSettings.MeterColor.DefaultValue; Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); }
+
+                ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
+                if (meterColor == null) { ColorUtility.TryParseHtmlString("#" + (string)ConfigSettings.MeterColor.DefaultValue, out Color defaultColor); Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); meterColor = defaultColor; }
                 InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
                 InsanityImage.fillAmount = GetFillAmount();
             }

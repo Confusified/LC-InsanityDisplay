@@ -49,6 +49,9 @@
     <Reference Include="BMX.LobbyCompatibility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\TeamBMX.LobbyCompatibility.1.1.0\lib\net472\BMX.LobbyCompatibility.dll</HintPath>
     </Reference>
+    <Reference Include="LethalConfig">
+      <HintPath>packages\LethalConfig-1.4.0\plugins\LethalConfig\LethalConfig.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.dll</HintPath>
     </Reference>

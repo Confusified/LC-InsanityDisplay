@@ -10,7 +10,7 @@ namespace InsanityDisplay.Config
         public static void InitialiseConfig()
         {
             ModEnabled = modConfig.Bind<bool>("Display Settings", "Meter enabled", true, "Add a bar above the stamina bar which display your insanity");
-            MeterColor = modConfig.Bind<Color>("Display Settings", "Color of the meter", new Color(0.45f, 0, 0.65f, 1), "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: FFFFFF(FF) (White)");
+            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: FFFFFF(FF) (White)");
             useAccurateDisplay = modConfig.Bind<bool>("Display Settings", "Accurate meter", false, "Show your insanity value more accurately, instead of showing it in the vanilla way");
             enableReverse = modConfig.Bind<bool>("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             alwaysFull = modConfig.Bind<bool>("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
@@ -42,59 +42,74 @@ namespace InsanityDisplay.Config
                 modConfig.Bind("Compatibility Settings", Compat.GeneralImprovements.Definition.Key, true);
                 modConfig.Bind("Compatibility Settings", Compat.HealthMetrics.Definition.Key, true);
                 modConfig.Bind("Compatibility Settings", Compat.DamageMetrics.Definition.Key, true);
+                Initialise.modLogger.LogInfo("test");
+                modConfig.Bind<Color>(MeterColor.Definition.Section, "Color of the meter", new Color(0.45f, 0, 0.65f));
+                Initialise.modLogger.LogInfo("after");
             }
 
             foreach (ConfigDefinition cDef in modConfig.Keys)
             {
-                if (cDef.Section != "Compatibility Settings") { continue; } //Skip over non old ones (if needed i can add to this in the future)
-
-                if (cDef.Key == Compat.LCCrouchHUD.Definition.Key)
+                if (cDef.Section == "Compatibility Settings")
                 {
-                    Initialise.modLogger.LogDebug("Removing old LCCrouchHUD config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.LCCrouchHUD.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
+                    if (cDef.Key == Compat.LCCrouchHUD.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old LCCrouchHUD config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.LCCrouchHUD.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
+                    else if (cDef.Key == Compat.An0nPatches.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old An0n Patches config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.An0nPatches.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
+                    else if (cDef.Key == Compat.EladsHUD.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old Elad's HUD config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.EladsHUD.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
+                    else if (cDef.Key == Compat.GeneralImprovements.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old GeneralImprovements config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.GeneralImprovements.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
+                    else if (cDef.Key == Compat.HealthMetrics.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old HealthMetrics config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.HealthMetrics.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
+                    else if (cDef.Key == Compat.DamageMetrics.Definition.Key)
+                    {
+                        Initialise.modLogger.LogDebug("Removing old DamageMetrics config value");
+                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
+                        Compat.DamageMetrics.Value = entry.Value;
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
                 }
-                else if (cDef.Key == Compat.An0nPatches.Definition.Key)
+                else if (cDef.Section == "Display Settings") //also make sure it is the old one
                 {
-                    Initialise.modLogger.LogDebug("Removing old An0n Patches config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.An0nPatches.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
-                }
-                else if (cDef.Key == Compat.EladsHUD.Definition.Key)
-                {
-                    Initialise.modLogger.LogDebug("Removing old Elad's HUD config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.EladsHUD.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
-                }
-                else if (cDef.Key == Compat.GeneralImprovements.Definition.Key)
-                {
-                    Initialise.modLogger.LogDebug("Removing old GeneralImprovements config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.GeneralImprovements.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
-                }
-                else if (cDef.Key == Compat.HealthMetrics.Definition.Key)
-                {
-                    Initialise.modLogger.LogDebug("Removing old HealthMetrics config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.HealthMetrics.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
-                }
-                else if (cDef.Key == Compat.DamageMetrics.Definition.Key)
-                {
-                    Initialise.modLogger.LogDebug("Removing old DamageMetrics config value");
-                    modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                    Compat.DamageMetrics.Value = entry.Value;
-                    modConfig.Remove(cDef);
-                    continue;
+                    if (cDef.Key == "Color of the meter")
+                    {
+                        Initialise.modLogger.LogDebug("Removing old MeterColor config value");
+                        modConfig.TryGetEntry<Color>(cDef, out ConfigEntry<Color> entry);
+                        MeterColor.Value = ColorUtility.ToHtmlStringRGB(entry.Value);
+                        modConfig.Remove(cDef);
+                        continue;
+                    }
                 }
             }
             ConfigVersion.Value = CurrentVersion;

@@ -11,6 +11,7 @@ namespace InsanityDisplay
 {
     //Soft dependencies
     [BepInDependency(ModGUIDS.LobbyCompatibility, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.EladsHUD, BepInDependency.DependencyFlags.SoftDependency)]
@@ -77,12 +78,12 @@ namespace InsanityDisplay
                 ModInstalled.DamageMetrics = true;
                 modLogger.LogDebug("Found DamageMetrics");
             }
+
             if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LobbyCompatibility))
             {
                 ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion);
                 modLogger.LogDebug("Found LobbyCompatibility");
             }
-
             if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LethalConfig))
             {
                 ModCompatibility.LethalConfigPatch.SetLethalConfigEntries();
