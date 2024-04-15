@@ -18,7 +18,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -45,6 +45,9 @@
     </Reference>
     <Reference Include="BepInEx, Version=5.4.21.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\BepInEx.BaseLib.5.4.21\lib\net35\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="BMX.LobbyCompatibility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TeamBMX.LobbyCompatibility.1.1.0\lib\net472\BMX.LobbyCompatibility.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>packages\Mono.Cecil.0.11.5\lib\net40\Mono.Cecil.dll</HintPath>
@@ -111,6 +114,8 @@
     <Compile Include="Config\ConfigHandler.cs" />
     <Compile Include="Config\ConfigSettings.cs" />
     <Compile Include="Initialise.cs" />
+    <Compile Include="ModCompatibility\LethalConfigPatch.cs" />
+    <Compile Include="ModCompatibility\LobbyCompatibilityPatch.cs" />
     <Compile Include="ModCompatibility\CompatibilityList.cs" />
     <Compile Include="ModCompatibility\EladsHUDCompatibility.cs" />
     <Compile Include="ModCompatibility\An0nPatchesCompatibility.cs" />

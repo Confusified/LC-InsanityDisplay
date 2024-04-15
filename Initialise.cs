@@ -9,21 +9,23 @@ using static InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace InsanityDisplay
 {
+    //Soft dependencies
+    [BepInDependency(ModGUIDS.LobbyCompatibility, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.EladsHUD, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+    //Plugin
     [BepInPlugin(modGUID, modName, modVersion)]
-    //Compatibility Mods
-    [BepInDependency(LCCrouch_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(An0nPatches_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(EladsHUD_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(GeneralImprovements_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(HealthMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(DamageMetrics_GUID, BepInDependency.DependencyFlags.SoftDependency)]
     public class Initialise : BaseUnityPlugin
     {
         private const string modGUID = "com.Confusified.InsanityDisplay";
         private const string modName = "InsanityDisplay";
-        private const string modVersion = "1.1.3";
+        private const string modVersion = "1.1.4";
 
-        private static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
+        public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
 
         private readonly Harmony _Harmony = new Harmony(modGUID);
@@ -45,35 +47,46 @@ namespace InsanityDisplay
 
         private static void CheckForModCompatibility()
         {
-            if (Chainloader.PluginInfos.ContainsKey(LCCrouch_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LCCrouchHUD))
             {
-                LCCrouch_Installed = true;
-                modLogger.LogInfo("Enabling LCCrouchHUD compatibility");
+                ModInstalled.LCCrouchHUD = true;
+                modLogger.LogDebug("Found LCCrouchHUD");
             }
-            if (Chainloader.PluginInfos.ContainsKey(EladsHUD_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.EladsHUD))
             {
-                EladsHUD_Installed = true;
-                modLogger.LogInfo("Enabling Elad's HUD compatibility");
+                ModInstalled.EladsHUD = true;
+                modLogger.LogDebug("Found Elad's HUD");
             }
-            if (Chainloader.PluginInfos.ContainsKey(An0nPatches_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.An0nPatches))
             {
-                An0nPatches_Installed = true;
-                modLogger.LogInfo("Enabling An0n Patches compatibility");
+                ModInstalled.An0nPatches = true;
+                modLogger.LogDebug("Found An0n Patches");
             }
-            if (Chainloader.PluginInfos.ContainsKey(GeneralImprovements_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.GeneralImprovements))
             {
-                GeneralImprovements_Installed = true;
-                modLogger.LogInfo("Enabling GeneralImprovements compatibility");
+                ModInstalled.GeneralImprovements = true;
+                modLogger.LogDebug("Found GeneralImprovements");
             }
-            if (Chainloader.PluginInfos.ContainsKey(HealthMetrics_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.HealthMetrics))
             {
-                HealthMetrics_Installed = true;
-                modLogger.LogInfo("Enabling HealthMetrics compatibility");
+                ModInstalled.HealthMetrics = true;
+                modLogger.LogDebug("Found HealthMetrics");
             }
-            if (Chainloader.PluginInfos.ContainsKey(DamageMetrics_GUID))
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.DamageMetrics))
             {
-                DamageMetrics_Installed = true;
-                modLogger.LogInfo("Enabling DamageMetrics compatibility");
+                ModInstalled.DamageMetrics = true;
+                modLogger.LogDebug("Found DamageMetrics");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LobbyCompatibility))
+            {
+                ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion);
+                modLogger.LogDebug("Found LobbyCompatibility");
+            }
+
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LethalConfig))
+            {
+                ModCompatibility.LethalConfigPatch.SetLethalConfigEntries();
+                modLogger.LogDebug("Found LethalConfig");
             }
         }
     }

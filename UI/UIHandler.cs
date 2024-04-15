@@ -27,7 +27,7 @@ namespace InsanityDisplay.UI
         public static void CreateInMemory()
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
-            if (CompatibilityList.EladsHUD_Installed) { EnableCompatibilities(); return; }
+            if (CompatibilityList.ModInstalled.EladsHUD) { EnableCompatibilities(); return; }
             Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
             Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
@@ -78,11 +78,11 @@ namespace InsanityDisplay.UI
         private static void EnableCompatibilities()
         {
             Initialise.modLogger.LogInfo("Enabling allowed compatibilities");
-            if (LCCrouch_Installed && ConfigSettings.LCCrouchHUDCompat.Value)
+            if (ModInstalled.LCCrouchHUD && ConfigSettings.Compat.LCCrouchHUD.Value)
             {
                 LCCrouchHUDCompatibility.MoveCrouchHUD();
             }
-            if (EladsHUD_Installed && ConfigSettings.EladsHUDCompat.Value)
+            if (ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value)
             {
                 GameObject.Destroy(Memory_InsanityMeter);
                 GameObject.Destroy(InsanityMeter);
@@ -90,19 +90,19 @@ namespace InsanityDisplay.UI
                 InsanityMeter = null;
                 EladsHUDCompatibility.EditEladsHUD();
             }
-            if (An0nPatches_Installed && ConfigSettings.An0nPatchesCompat.Value)
+            if (ModInstalled.An0nPatches && ConfigSettings.Compat.An0nPatches.Value)
             {
                 An0nPatchesCompatibility.MoveTextHUD();
             }
-            if (GeneralImprovements_Installed && ConfigSettings.GeneralImprovementsCompat.Value)
+            if (ModInstalled.GeneralImprovements && ConfigSettings.Compat.GeneralImprovements.Value)
             {
                 GeneralImprovementsCompatibility.MoveHPHud();
             }
-            if (HealthMetrics_Installed && ConfigSettings.HealthMetricsCompat.Value)
+            if (ModInstalled.HealthMetrics && ConfigSettings.Compat.HealthMetrics.Value)
             {
                 HealthMetricsCompatibility.MoveHealthHUD();
             }
-            if (DamageMetrics_Installed && ConfigSettings.DamageMetricsCompat.Value)
+            if (ModInstalled.DamageMetrics && ConfigSettings.Compat.DamageMetrics.Value)
             {
                 DamageMetricsCompatibility.MoveDamageHUD();
             }
@@ -115,7 +115,7 @@ namespace InsanityDisplay.UI
 
             if (ConfigSettings.alwaysFull.Value) { return 1; }
 
-            if (ConfigSettings.useAccurateDisplay.Value && (!EladsHUD_Installed || (EladsHUD_Installed && !ConfigSettings.EladsHUDCompat.Value))) //Start from ~0.2 to ~0.91
+            if (ConfigSettings.useAccurateDisplay.Value && (!ModInstalled.EladsHUD || (ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value))) //Start from ~0.2 to ~0.91
             {
                 if (ConfigSettings.enableReverse.Value) //Start from ~0.91 to ~0.2 instead
 
