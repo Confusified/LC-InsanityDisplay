@@ -13,6 +13,8 @@ namespace InsanityDisplay.ModCompatibility
             public const string DamageMetrics = "Matsuura.TestAccount666.DamageMetrics";
             public const string LobbyCompatibility = "BMX.LobbyCompatibility"; //doesnt have variable in ModInstalled because i won't allow it to be toggled
             public const string LethalConfig = "ainavt.lc.lethalconfig"; //doesnt have variable in ModInstalled because i won't allow it to be toggled
+            public const string LethalCompanyVR = "io.daxcess.lcvr";
+            public const string InfectedCompany = "InfectedCompany.InfectedCompany";
         }
         public class ModInstalled
         {
@@ -22,6 +24,8 @@ namespace InsanityDisplay.ModCompatibility
             public static bool GeneralImprovements;
             public static bool HealthMetrics;
             public static bool DamageMetrics;
+            public static bool LethalCompanyVR;
+            public static bool InfectedCompany;
         }
 
     }

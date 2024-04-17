@@ -16,12 +16,14 @@ namespace InsanityDisplay.ModCompatibility
             var enablereverseEntry = new BoolCheckBoxConfigItem(enableReverse, false);
             var alwaysfullEntry = new BoolCheckBoxConfigItem(alwaysFull, false);
             //Mod Compatibility Settings
-            var lccrouchudEntry = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, false);
-            var an0npatchesEntry = new BoolCheckBoxConfigItem(Compat.An0nPatches, false);
-            var eladshudEntry = new BoolCheckBoxConfigItem(Compat.EladsHUD, false);
-            var generalimprovementsEntry = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, false);
-            var healthmetricsEntry = new BoolCheckBoxConfigItem(Compat.HealthMetrics, false);
-            var damagemetricsEntry = new BoolCheckBoxConfigItem(Compat.DamageMetrics, false);
+            var lccrouchudEntry = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, true);
+            var an0npatchesEntry = new BoolCheckBoxConfigItem(Compat.An0nPatches, true);
+            var eladshudEntry = new BoolCheckBoxConfigItem(Compat.EladsHUD, true);
+            var generalimprovementsEntry = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, true);
+            var healthmetricsEntry = new BoolCheckBoxConfigItem(Compat.HealthMetrics, true);
+            var damagemetricsEntry = new BoolCheckBoxConfigItem(Compat.DamageMetrics, true);
+            var lcvrEntry = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET
+            var infectedcompanyEntry = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
 
             //Display Settings
             LethalConfigManager.AddConfigItem(modenabledEntry);
@@ -36,6 +38,11 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(generalimprovementsEntry);
             LethalConfigManager.AddConfigItem(healthmetricsEntry);
             LethalConfigManager.AddConfigItem(damagemetricsEntry);
+            LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
+            LethalConfigManager.AddConfigItem(infectedcompanyEntry);
+
+            //add icon?
+            LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 
             Initialise.modLogger.LogDebug("Added entries to LethalConfig");
         }

@@ -21,6 +21,8 @@ namespace InsanityDisplay.Config
             Compat.GeneralImprovements = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.HealthMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.DamageMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.LethalCompanyVR = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR"); //NOT FINISHED YET
+            Compat.InfectedCompany = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
 
             ConfigVersion = modConfig.Bind<int>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
@@ -42,11 +44,9 @@ namespace InsanityDisplay.Config
                 modConfig.Bind("Compatibility Settings", Compat.GeneralImprovements.Definition.Key, true);
                 modConfig.Bind("Compatibility Settings", Compat.HealthMetrics.Definition.Key, true);
                 modConfig.Bind("Compatibility Settings", Compat.DamageMetrics.Definition.Key, true);
-                Initialise.modLogger.LogInfo("test");
                 modConfig.Bind<Color>(MeterColor.Definition.Section, "Color of the meter", new Color(0.45f, 0, 0.65f));
-                Initialise.modLogger.LogInfo("after");
             }
-
+            //can absolutely be improved but oh well maybe later
             foreach (ConfigDefinition cDef in modConfig.Keys)
             {
                 if (cDef.Section == "Compatibility Settings")

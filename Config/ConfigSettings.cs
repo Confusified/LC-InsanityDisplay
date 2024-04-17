@@ -1,5 +1,4 @@
 ﻿using BepInEx.Configuration;
-using UnityEngine;
 
 namespace InsanityDisplay.Config
 {
@@ -21,6 +20,8 @@ namespace InsanityDisplay.Config
             public static ConfigEntry<bool> GeneralImprovements;
             public static ConfigEntry<bool> HealthMetrics;
             public static ConfigEntry<bool> DamageMetrics;
+            public static ConfigEntry<bool> LethalCompanyVR;
+            public static ConfigEntry<bool> InfectedCompany;
         }
 
         //_DontTouch

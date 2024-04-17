@@ -7,11 +7,12 @@ namespace InsanityDisplay.ModCompatibility
     public class GeneralImprovementsCompatibility
     {
         private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
-        private static readonly int maxAttempts = 500; //Amount of frames it will retry (until it is found)
+        private const int maxAttempts = 500; //Amount of frames it will retry (until it is found)
+        private static GameObject HitpointDisplay;
 
         public static void MoveHPHud()
         {
-            GameObject HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
+            HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
 
             if (HitpointDisplay == null) { CoroutineHelper.Start(RetryUntilFound()); return; }
 
@@ -20,17 +21,19 @@ namespace InsanityDisplay.ModCompatibility
 
         private static IEnumerator RetryUntilFound() //with a max limit of maxAttempts
         {
-            bool found = false;
             for (int i = 0; i < maxAttempts; i++)
             {
-                yield return null; //Wait one frame
-                GameObject HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
-                if (HitpointDisplay == null) { continue; }
+
+                HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
+                if (HitpointDisplay == null)
+                {
+                    yield return null; //Wait one frame
+                    continue;
+                }
                 HitpointDisplay.transform.localPosition += localPositionOffset;
-                found = true;
                 break;
             }
-            if (!found)
+            if (HitpointDisplay == null)
             {
                 Initialise.modLogger.LogError("GeneralImprovements' health display wasn't found");
             }

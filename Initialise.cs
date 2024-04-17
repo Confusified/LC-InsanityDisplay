@@ -10,14 +10,16 @@ using static InsanityDisplay.ModCompatibility.CompatibilityList;
 namespace InsanityDisplay
 {
     //Soft dependencies
-    [BepInDependency(ModGUIDS.LobbyCompatibility, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.EladsHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.LobbyCompatibility, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
     //Plugin
     [BepInPlugin(modGUID, modName, modVersion)]
     public class Initialise : BaseUnityPlugin
@@ -78,7 +80,6 @@ namespace InsanityDisplay
                 ModInstalled.DamageMetrics = true;
                 modLogger.LogDebug("Found DamageMetrics");
             }
-
             if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LobbyCompatibility))
             {
                 ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion);
@@ -88,6 +89,16 @@ namespace InsanityDisplay
             {
                 ModCompatibility.LethalConfigPatch.SetLethalConfigEntries();
                 modLogger.LogDebug("Found LethalConfig");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LethalCompanyVR))
+            {
+                ModInstalled.LethalCompanyVR = true;
+                modLogger.LogDebug("Found LCVR");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.InfectedCompany))
+            {
+                ModInstalled.InfectedCompany = true;
+                modLogger.LogDebug("Found InfectedCompany");
             }
         }
     }
