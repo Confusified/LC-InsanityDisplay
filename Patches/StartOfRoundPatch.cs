@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using DunGen;
+using HarmonyLib;
 using InsanityDisplay.ModCompatibility;
 
 namespace InsanityDisplay.Patches
@@ -13,7 +14,7 @@ namespace InsanityDisplay.Patches
         {
             if (CompatibilityList.ModInstalled.InfectedCompany)
             {
-                InfectedCompanyCompatibility.ConvertInsanity();
+                CoroutineHelper.Start(InfectedCompanyCompatibility.ConvertInsanity());
             }
 
         }

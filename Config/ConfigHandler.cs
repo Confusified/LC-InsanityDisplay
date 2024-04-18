@@ -21,10 +21,10 @@ namespace InsanityDisplay.Config
             Compat.GeneralImprovements = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.HealthMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.DamageMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.LethalCompanyVR = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR"); //NOT FINISHED YET
+            Compat.LethalCompanyVR = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
             Compat.InfectedCompany = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
 
-            ConfigVersion = modConfig.Bind<int>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
+            ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
             RemoveDeprecatedSettings();
             return;
@@ -34,84 +34,40 @@ namespace InsanityDisplay.Config
         {
             if (ConfigVersion.Value == CurrentVersion) { return; } //Don't update config values
 
-            //Old config entries
+            ConfigEntry<bool> oldBoolEntry;
             //From before ConfigVersion existed so anything below 1
             if (ConfigVersion.Value < 1)
             {
-                modConfig.Bind("Compatibility Settings", Compat.LCCrouchHUD.Definition.Key, true);
-                modConfig.Bind("Compatibility Settings", Compat.An0nPatches.Definition.Key, true);
-                modConfig.Bind("Compatibility Settings", Compat.EladsHUD.Definition.Key, true);
-                modConfig.Bind("Compatibility Settings", Compat.GeneralImprovements.Definition.Key, true);
-                modConfig.Bind("Compatibility Settings", Compat.HealthMetrics.Definition.Key, true);
-                modConfig.Bind("Compatibility Settings", Compat.DamageMetrics.Definition.Key, true);
-                modConfig.Bind<Color>(MeterColor.Definition.Section, "Color of the meter", new Color(0.45f, 0, 0.65f));
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable LCCrouchHUD compatibility", true);
+                Compat.LCCrouchHUD.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable An0n Patches compatibility", true);
+                Compat.An0nPatches.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable Elads HUD compatibility", true);
+                Compat.EladsHUD.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable GeneralImprovements compatibility", true);
+                Compat.GeneralImprovements.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable HealthMetrics compatibility", true);
+                Compat.HealthMetrics.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable DamageMetrics compatibility", true);
+                Compat.DamageMetrics.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                ConfigEntry<Color> oldColorEntry = modConfig.Bind("Display Settings", "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
+                MeterColor.Value = ColorUtility.ToHtmlStringRGB(oldColorEntry.Value);
+                modConfig.Remove(oldColorEntry.Definition);
+
             }
-            //can absolutely be improved but oh well maybe later
-            foreach (ConfigDefinition cDef in modConfig.Keys)
-            {
-                if (cDef.Section == "Compatibility Settings")
-                {
-                    if (cDef.Key == Compat.LCCrouchHUD.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old LCCrouchHUD config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.LCCrouchHUD.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                    else if (cDef.Key == Compat.An0nPatches.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old An0n Patches config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.An0nPatches.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                    else if (cDef.Key == Compat.EladsHUD.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old Elad's HUD config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.EladsHUD.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                    else if (cDef.Key == Compat.GeneralImprovements.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old GeneralImprovements config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.GeneralImprovements.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                    else if (cDef.Key == Compat.HealthMetrics.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old HealthMetrics config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.HealthMetrics.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                    else if (cDef.Key == Compat.DamageMetrics.Definition.Key)
-                    {
-                        Initialise.modLogger.LogDebug("Removing old DamageMetrics config value");
-                        modConfig.TryGetEntry(cDef, out ConfigEntry<bool> entry);
-                        Compat.DamageMetrics.Value = entry.Value;
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                }
-                else if (cDef.Section == "Display Settings") //also make sure it is the old one
-                {
-                    if (cDef.Key == "Color of the meter")
-                    {
-                        Initialise.modLogger.LogDebug("Removing old MeterColor config value");
-                        modConfig.TryGetEntry<Color>(cDef, out ConfigEntry<Color> entry);
-                        MeterColor.Value = ColorUtility.ToHtmlStringRGB(entry.Value);
-                        modConfig.Remove(cDef);
-                        continue;
-                    }
-                }
-            }
+
             ConfigVersion.Value = CurrentVersion;
             Initialise.modLogger.LogDebug("Succesfully updated config file version");
             modConfig.Save();

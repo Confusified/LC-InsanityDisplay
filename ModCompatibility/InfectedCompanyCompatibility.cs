@@ -1,5 +1,4 @@
-﻿using DunGen;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,28 +7,21 @@ namespace InsanityDisplay.ModCompatibility
     public class InfectedCompanyCompatibility
     {
         public static Slider modInsanitySlider;
-        private const int maxAttempts = 500;
+        private const ushort maxAttempts = 500;
         public static bool isInfected;
-        public static void ConvertInsanity()
+        public static IEnumerator ConvertInsanity()
         {
+            yield return new WaitForSeconds(5); //The mod waits this long before choosing infected players
             GameObject.Find("UI_CustomPlayerHUD(Clone)/InfectedPlayerHUD/InsanityMeter")?.TryGetComponent<Slider>(out modInsanitySlider);
-            if (modInsanitySlider == null)
-            {
-                CoroutineHelper.Start(LocateMeter());
-            }
-        }
+            if (modInsanitySlider != null) { yield break; }
 
-        public static IEnumerator LocateMeter()
-        {
-            for (int i = 0; i > maxAttempts; i++) //loop forever (bad) until it's found
+            for (ushort i = 0; i > maxAttempts; i++) //loop forever (bad) until it's found
             {
                 GameObject.Find("UI_CustomPlayerHUD(Clone)/InfectedPlayerHUD/InsanityMeter")?.TryGetComponent<Slider>(out modInsanitySlider);
-                if (modInsanitySlider == null)
-                {
-                    yield return null; //Wait one frame
-                    continue;
-                }
-                break;
+                if (modInsanitySlider != null) { yield break; }
+
+                yield return null; //Wait one frame
+                continue;
             }
             if (!modInsanitySlider)
             {

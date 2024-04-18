@@ -25,7 +25,7 @@ namespace InsanityDisplay.Config
         }
 
         //_DontTouch
-        public static ConfigEntry<int> ConfigVersion;
-        public static int CurrentVersion = 1;
+        public static ConfigEntry<byte> ConfigVersion;
+        public static byte CurrentVersion = 1;
     }
 }
