@@ -29,6 +29,7 @@ namespace InsanityDisplay
         private const string modVersion = "1.1.4";
 
         public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
+
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
 
         private readonly Harmony _Harmony = new Harmony(modGUID);

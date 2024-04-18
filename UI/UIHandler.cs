@@ -59,12 +59,10 @@ namespace InsanityDisplay.UI
             InsanityImage = InsanityMeter.GetComponent<Image>();
             try
             {
-
                 ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
                 if (meterColor == null) { ColorUtility.TryParseHtmlString("#" + (string)ConfigSettings.MeterColor.DefaultValue, out Color defaultColor); Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); meterColor = defaultColor; }
                 InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
                 InsanityImage.fillAmount = GetFillAmount();
-
             }
             catch
             {
