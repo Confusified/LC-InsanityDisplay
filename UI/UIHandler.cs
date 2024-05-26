@@ -6,6 +6,8 @@ using GameNetcodeStuff;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
 using static InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
 using DunGen;
+using TMPro;
+using System;
 
 namespace InsanityDisplay.UI
 {
@@ -14,6 +16,7 @@ namespace InsanityDisplay.UI
         public static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
         public static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, 4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
+        private static Color fullVisibility = new Color(0, 0, 0, 1);
 
         private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
         private const float accurate_MaxValue = 0.9101f; //No visible changes after this value
@@ -31,8 +34,7 @@ namespace InsanityDisplay.UI
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
             if (CompatibilityList.ModInstalled.EladsHUD) { EnableCompatibilities(); return; }
-            Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
-            Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
+            Memory_InsanityMeter = GameObject.Instantiate(GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject);
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
             CreateInScene();
             return;
@@ -59,12 +61,7 @@ namespace InsanityDisplay.UI
             InsanityImage = InsanityMeter.GetComponent<Image>();
             try
             {
-
-                ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
-                if (meterColor == null) { ColorUtility.TryParseHtmlString("#" + (string)ConfigSettings.MeterColor.DefaultValue, out Color defaultColor); Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); meterColor = defaultColor; }
-                InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                InsanityImage.fillAmount = GetFillAmount();
-
+                UpdateMeter(imageMeter: InsanityImage);
             }
             catch
             {
@@ -131,57 +128,112 @@ namespace InsanityDisplay.UI
                 Initialise.modLogger.LogDebug("Enabled InfectedCompany compat");
             }
         }
-        //this needs some refactoring lol  this has to be killing performance
-        public static float GetFillAmount()
+
+        public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
-            if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
+            if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 0) || (textMeter != null && textMeter.text != "0%"))) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
+            if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 1) || (textMeter != null && textMeter.text != "100%"))) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
+
             localPlayer = GameNetworkManager.Instance.localPlayerController;
 
-            if (ConfigSettings.alwaysFull.Value) { return 1; }
-
-            if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null)
+            float finalInsanityValue = 0;
+            if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null) //if using infectedcompany's compat (and it all works)
             {
+                float modInsanityValue = modInsanitySlider.value / modInsanitySlider.maxValue;
                 if (!ConfigSettings.useAccurateDisplay.Value) //NOT using accurate meter
                 {
+
                     if (ConfigSettings.enableReverse.Value)
                     {
-                        return 1 - (modInsanitySlider.value / modInsanitySlider.maxValue);
+                        finalInsanityValue = 1 - modInsanityValue;
+                    }
+                    else
+                    {
+                        finalInsanityValue = modInsanityValue;
                     }
 
-                    return (modInsanitySlider.value / modInsanitySlider.maxValue);
+                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                    return;
                 }
                 else
                 {
+                    finalInsanityValue = modInsanityValue * (accurate_MaxValue - accurate_MinValue);
                     if (ConfigSettings.enableReverse.Value)
 
                     {
-                        return accurate_MaxValue - ((modInsanitySlider.value / modInsanitySlider.maxValue) * (accurate_MaxValue - accurate_MinValue));
+                        finalInsanityValue = accurate_MaxValue - finalInsanityValue;
+                    }
+                    else
+                    {
+                        finalInsanityValue += accurate_MinValue;
                     }
 
-                    return accurate_MinValue + ((modInsanitySlider.value / modInsanitySlider.maxValue) * (accurate_MaxValue - accurate_MinValue));
+                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                    return;
                 }
             }
 
+            float insanityValue = localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
             if (ConfigSettings.useAccurateDisplay.Value && (!ModInstalled.EladsHUD || (ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value))) //Start from ~0.2 to ~0.91
             {
+                finalInsanityValue = insanityValue * (accurate_MaxValue - accurate_MinValue);
                 if (ConfigSettings.enableReverse.Value) //Start from ~0.91 to ~0.2 instead
 
                 {
-                    return accurate_MaxValue - ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * (accurate_MaxValue - accurate_MinValue));
+                    finalInsanityValue = accurate_MaxValue - finalInsanityValue;
+                }
+                else
+                {
+                    finalInsanityValue += accurate_MinValue;
                 }
 
-                return accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * (accurate_MaxValue - accurate_MinValue));
+                SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                return;
             }
             else
             {
-
+                finalInsanityValue = insanityValue;
                 if (ConfigSettings.enableReverse.Value) //Start from 100 to 0 instead
 
                 {
-                    return 1 - (localPlayer.insanityLevel / localPlayer.maxInsanityLevel);
+                    finalInsanityValue = 1 - finalInsanityValue;
                 }
+                SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                return;
+            }
+        }
 
-                return (localPlayer.insanityLevel / localPlayer.maxInsanityLevel);
+
+        private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
+        {
+            if (!ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value = $"#{ConfigSettings.MeterColor.Value}"; }
+            ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
+            meterColor += fullVisibility;
+
+            if (textMeter != null) //player is using elad's hud
+            {
+                string textValue = $"{Math.Floor(insanityValue * 100)}%";
+                if (textMeter.text != textValue) //only update if text isn't the same
+                {
+                    textMeter.text = textValue;
+                }
+                if (textMeter.color != meterColor)
+                {
+                    textMeter.color = meterColor;
+                }
+                return;
+            }
+            if (imageMeter != null) //player isn't using elad's hud
+            {
+                if (imageMeter.fillAmount != insanityValue) //only update if fill amount isn't the same
+                {
+                    imageMeter.fillAmount = insanityValue;
+                }
+                if (imageMeter.color != meterColor)
+                {
+                    imageMeter.color = meterColor;
+                }
+                return;
             }
         }
     }

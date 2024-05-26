@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using static InsanityDisplay.UI.UIHandler;
@@ -26,30 +25,30 @@ namespace InsanityDisplay.Patches
             if (InsanityImage == null) { InsanityImage = InsanityMeter?.GetComponent<Image>(); }
             if (InsanityImage == null || InsanityMeter == null) { return; } //In case something goes wrong
 
-            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+            if (InsanityMeter.activeSelf != ConfigSettings.ModEnabled.Value)
+            {
+                InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+            }
+
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null) //if mod is found 
             {
+                bool setToActive;
+                GameObject infectedCompanySlider = InfectedCompanyCompatibility.modInsanitySlider.gameObject;
                 if (!ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value) //if compat is disabled, meter is disabled, or meter always full
                 {
-                    InfectedCompanyCompatibility.modInsanitySlider.gameObject.SetActive(true); //enable infectedcompany's insanity meter
+                    setToActive = true;
                 }
                 else
                 {
-                    InfectedCompanyCompatibility.modInsanitySlider.gameObject.SetActive(false); //disable infectedcompany's insanity meter
+                    setToActive = false;
+                }
+
+                if (infectedCompanySlider.activeSelf != setToActive)
+                {
+                    infectedCompanySlider.SetActive(setToActive);
                 }
             }
-
-            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); } //Remove # if user put it there
-            ColorUtility.TryParseHtmlString("#" + ConfigSettings.MeterColor.Value, out Color meterColor);
-
-            if (CompatibilityList.ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value && (!CompatibilityList.ModInstalled.LethalCompanyVR || CompatibilityList.ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value))
-            {
-                if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
-                EladsHUDCompatibility.InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                EladsHUDCompatibility.InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
-            }
-            InsanityImage.fillAmount = GetFillAmount();
-            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
+            UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
         }
     }
 }
