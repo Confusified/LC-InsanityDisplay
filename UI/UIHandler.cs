@@ -34,8 +34,7 @@ namespace InsanityDisplay.UI
         {
             if (Memory_InsanityMeter != null) { CreateInScene(); return; } //It already exists
             if (CompatibilityList.ModInstalled.EladsHUD) { EnableCompatibilities(); return; }
-            Memory_InsanityMeter = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject;
-            Memory_InsanityMeter = GameObject.Instantiate(Memory_InsanityMeter);
+            Memory_InsanityMeter = GameObject.Instantiate(GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/SprintMeter").gameObject);
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
             CreateInScene();
             return;
@@ -132,8 +131,8 @@ namespace InsanityDisplay.UI
 
         public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
-            if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && (imageMeter != null && imageMeter.fillAmount != 0 || textMeter != null && textMeter.text != "100%")) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
-            if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && imageMeter.fillAmount != 1) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
+            if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 0) || (textMeter != null && textMeter.text != "0%"))) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
+            if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 1) || (textMeter != null && textMeter.text != "100%"))) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
 
             localPlayer = GameNetworkManager.Instance.localPlayerController;
 
@@ -207,31 +206,32 @@ namespace InsanityDisplay.UI
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
-            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); }
+            if (!ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value = $"#{ConfigSettings.MeterColor.Value}"; }
             ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
-            Color finalMeterColor = meterColor + fullVisibility;
-            if (imageMeter == null) //assume player is using Elad's hud (probably gonna cause errors in the future but that's a problem for future me)
+            meterColor += fullVisibility;
+
+            if (textMeter != null) //player is using elad's hud
             {
                 string textValue = $"{Math.Floor(insanityValue * 100)}%";
                 if (textMeter.text != textValue) //only update if text isn't the same
                 {
                     textMeter.text = textValue;
                 }
-                if (textMeter.color != finalMeterColor)
+                if (textMeter.color != meterColor)
                 {
-                    textMeter.color = finalMeterColor;
+                    textMeter.color = meterColor;
                 }
                 return;
             }
-            if (textMeter == null) //assume player isn't using elad's hud 
+            if (imageMeter != null) //player isn't using elad's hud
             {
                 if (imageMeter.fillAmount != insanityValue) //only update if fill amount isn't the same
                 {
                     imageMeter.fillAmount = insanityValue;
                 }
-                if (textMeter.color != finalMeterColor)
+                if (imageMeter.color != meterColor)
                 {
-                    textMeter.color = finalMeterColor;
+                    imageMeter.color = meterColor;
                 }
                 return;
             }

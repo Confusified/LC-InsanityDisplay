@@ -31,14 +31,6 @@ namespace InsanityDisplay.ModCompatibility
             GameObject.DestroyImmediate(Memory_InsanityMeter.transform.Find("CarryInfo").gameObject); //Remove CarryInfo
             GameObject.DestroyImmediate(Memory_InsanityMeter.transform.Find("Bar/Stamina Change FG").gameObject); //Remove unnecessary part of the insanity bar
 
-            PercentageInsanityText = Memory_InsanityMeter.transform.Find("StaminaInfo").gameObject;
-            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); } //Remove # if user put it there
-            ColorUtility.TryParseHtmlString("#" + ConfigSettings.MeterColor.Value, out Color meterColor);
-            InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
-            InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
-
-            InsanityImage = Memory_InsanityMeter.transform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             GameObject.DontDestroyOnLoad(Memory_InsanityMeter);
         }
 
@@ -61,11 +53,9 @@ namespace InsanityDisplay.ModCompatibility
 
             InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
             InsanityInfo.horizontalAlignment = HorizontalAlignmentOptions.Right;
-            UpdateMeter(textMeter: InsanityInfo);
-
 
             InsanityImage = meterTransform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-            UpdateMeter(imageMeter: InsanityImage);
+            UpdateMeter(imageMeter: InsanityImage, textMeter: InsanityInfo);
         }
 
         private static void MoveWithOffset()
