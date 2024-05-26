@@ -59,17 +59,13 @@ namespace InsanityDisplay.ModCompatibility
 
             PercentageInsanityText = meterTransform.Find("StaminaInfo").gameObject;
 
-            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); } //Remove # if user put it there
-            ColorUtility.TryParseHtmlString("#" + ConfigSettings.MeterColor.Value, out Color meterColor);
             InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
-            InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             InsanityInfo.horizontalAlignment = HorizontalAlignmentOptions.Right;
-            UpdateFillAmount(textMeter: InsanityInfo);
+            UpdateMeter(textMeter: InsanityInfo);
 
 
             InsanityImage = meterTransform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
-            UpdateFillAmount(imageMeter: InsanityImage);
+            UpdateMeter(imageMeter: InsanityImage);
         }
 
         private static void MoveWithOffset()

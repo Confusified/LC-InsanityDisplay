@@ -45,9 +45,9 @@ namespace InsanityDisplay.Patches
             {
                 if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
                 EladsHUDCompatibility.InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                UpdateFillAmount(textMeter: EladsHUDCompatibility.InsanityInfo);
+                UpdateMeter(textMeter: EladsHUDCompatibility.InsanityInfo);
             }
-            UpdateFillAmount(imageMeter: InsanityImage);
+            UpdateMeter(imageMeter: InsanityImage);
             InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
         }
     }

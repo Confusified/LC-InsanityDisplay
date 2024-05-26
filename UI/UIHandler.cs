@@ -16,6 +16,7 @@ namespace InsanityDisplay.UI
         public static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
         public static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, 4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
+        private static Color fullVisibility = new Color(0, 0, 0, 1);
 
         private const float accurate_MinValue = 0.2978f; //Becomes visible starting 0.298f
         private const float accurate_MaxValue = 0.9101f; //No visible changes after this value
@@ -61,12 +62,7 @@ namespace InsanityDisplay.UI
             InsanityImage = InsanityMeter.GetComponent<Image>();
             try
             {
-
-                ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
-                if (meterColor == null) { ColorUtility.TryParseHtmlString("#" + (string)ConfigSettings.MeterColor.DefaultValue, out Color defaultColor); Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); meterColor = defaultColor; }
-                InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                UpdateFillAmount(imageMeter: InsanityImage);
-
+                UpdateMeter(imageMeter: InsanityImage);
             }
             catch
             {
@@ -134,7 +130,7 @@ namespace InsanityDisplay.UI
             }
         }
 
-        public static void UpdateFillAmount(Image imageMeter = null, TextMeshProUGUI textMeter = null)
+        public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
             if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && (imageMeter != null && imageMeter.fillAmount != 0 || textMeter != null && textMeter.text != "100%")) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
             if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && imageMeter.fillAmount != 1) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
@@ -147,12 +143,18 @@ namespace InsanityDisplay.UI
                 float modInsanityValue = modInsanitySlider.value / modInsanitySlider.maxValue;
                 if (!ConfigSettings.useAccurateDisplay.Value) //NOT using accurate meter
                 {
+
                     if (ConfigSettings.enableReverse.Value)
                     {
                         finalInsanityValue = 1 - modInsanityValue;
                     }
+                    else
+                    {
+                        finalInsanityValue = modInsanityValue;
+                    }
 
-                    finalInsanityValue = modInsanityValue;
+                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                    return;
                 }
                 else
                 {
@@ -162,8 +164,13 @@ namespace InsanityDisplay.UI
                     {
                         finalInsanityValue = accurate_MaxValue - finalInsanityValue;
                     }
+                    else
+                    {
+                        finalInsanityValue += accurate_MinValue;
+                    }
 
-                    finalInsanityValue += accurate_MinValue;
+                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                    return;
                 }
             }
 
@@ -176,8 +183,13 @@ namespace InsanityDisplay.UI
                 {
                     finalInsanityValue = accurate_MaxValue - finalInsanityValue;
                 }
+                else
+                {
+                    finalInsanityValue += accurate_MinValue;
+                }
 
-                finalInsanityValue += accurate_MinValue;
+                SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                return;
             }
             else
             {
@@ -187,21 +199,27 @@ namespace InsanityDisplay.UI
                 {
                     finalInsanityValue = 1 - finalInsanityValue;
                 }
+                SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                return;
             }
-
-            SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
-            return;
         }
 
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
+            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); }
+            ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
+            Color finalMeterColor = meterColor + fullVisibility;
             if (imageMeter == null) //assume player is using Elad's hud (probably gonna cause errors in the future but that's a problem for future me)
             {
                 string textValue = $"{Math.Floor(insanityValue * 100)}%";
                 if (textMeter.text != textValue) //only update if text isn't the same
                 {
                     textMeter.text = textValue;
+                }
+                if (textMeter.color != finalMeterColor)
+                {
+                    textMeter.color = finalMeterColor;
                 }
                 return;
             }
@@ -210,7 +228,10 @@ namespace InsanityDisplay.UI
                 if (imageMeter.fillAmount != insanityValue) //only update if fill amount isn't the same
                 {
                     imageMeter.fillAmount = insanityValue;
-
+                }
+                if (textMeter.color != finalMeterColor)
+                {
+                    textMeter.color = finalMeterColor;
                 }
                 return;
             }
