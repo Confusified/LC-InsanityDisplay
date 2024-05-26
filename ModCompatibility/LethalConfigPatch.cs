@@ -41,7 +41,6 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
             LethalConfigManager.AddConfigItem(infectedcompanyEntry);
 
-            //add icon?
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 
             Initialise.modLogger.LogDebug("Added entries to LethalConfig");

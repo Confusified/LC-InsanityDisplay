@@ -64,11 +64,12 @@ namespace InsanityDisplay.ModCompatibility
             InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
             InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
             InsanityInfo.horizontalAlignment = HorizontalAlignmentOptions.Right;
-            InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
+            UpdateFillAmount(textMeter: InsanityInfo);
+
 
             InsanityImage = meterTransform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
             InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config;
-            InsanityImage.fillAmount = GetFillAmount();
+            UpdateFillAmount(imageMeter: InsanityImage);
         }
 
         private static void MoveWithOffset()

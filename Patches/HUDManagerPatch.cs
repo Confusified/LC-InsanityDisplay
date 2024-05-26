@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using static InsanityDisplay.UI.UIHandler;
@@ -46,9 +45,9 @@ namespace InsanityDisplay.Patches
             {
                 if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
                 EladsHUDCompatibility.InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                EladsHUDCompatibility.InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
+                UpdateFillAmount(textMeter: EladsHUDCompatibility.InsanityInfo);
             }
-            InsanityImage.fillAmount = GetFillAmount();
+            UpdateFillAmount(imageMeter: InsanityImage);
             InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
         }
     }

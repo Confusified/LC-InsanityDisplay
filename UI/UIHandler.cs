@@ -6,6 +6,8 @@ using GameNetcodeStuff;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
 using static InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
 using DunGen;
+using TMPro;
+using System;
 
 namespace InsanityDisplay.UI
 {
@@ -63,7 +65,7 @@ namespace InsanityDisplay.UI
                 ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
                 if (meterColor == null) { ColorUtility.TryParseHtmlString("#" + (string)ConfigSettings.MeterColor.DefaultValue, out Color defaultColor); Initialise.modLogger.LogError("Unable to find the color for the meter, setting color to default"); meterColor = defaultColor; }
                 InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                InsanityImage.fillAmount = GetFillAmount();
+                UpdateFillAmount(imageMeter: InsanityImage);
 
             }
             catch
@@ -131,57 +133,86 @@ namespace InsanityDisplay.UI
                 Initialise.modLogger.LogDebug("Enabled InfectedCompany compat");
             }
         }
-        //this needs some refactoring lol  this has to be killing performance
-        public static float GetFillAmount()
+
+        public static void UpdateFillAmount(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
-            if (GameNetworkManager.Instance.localPlayerController == null) { return 0; } //Avoid errors
+            if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && (imageMeter != null && imageMeter.fillAmount != 0 || textMeter != null && textMeter.text != "100%")) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
+            if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && imageMeter.fillAmount != 1) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
+
             localPlayer = GameNetworkManager.Instance.localPlayerController;
 
-            if (ConfigSettings.alwaysFull.Value) { return 1; }
-
-            if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null)
+            float finalInsanityValue = 0;
+            if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null) //if using infectedcompany's compat (and it all works)
             {
+                float modInsanityValue = modInsanitySlider.value / modInsanitySlider.maxValue;
                 if (!ConfigSettings.useAccurateDisplay.Value) //NOT using accurate meter
                 {
                     if (ConfigSettings.enableReverse.Value)
                     {
-                        return 1 - (modInsanitySlider.value / modInsanitySlider.maxValue);
+                        finalInsanityValue = 1 - modInsanityValue;
                     }
 
-                    return (modInsanitySlider.value / modInsanitySlider.maxValue);
+                    finalInsanityValue = modInsanityValue;
                 }
                 else
                 {
+                    finalInsanityValue = modInsanityValue * (accurate_MaxValue - accurate_MinValue);
                     if (ConfigSettings.enableReverse.Value)
 
                     {
-                        return accurate_MaxValue - ((modInsanitySlider.value / modInsanitySlider.maxValue) * (accurate_MaxValue - accurate_MinValue));
+                        finalInsanityValue = accurate_MaxValue - finalInsanityValue;
                     }
 
-                    return accurate_MinValue + ((modInsanitySlider.value / modInsanitySlider.maxValue) * (accurate_MaxValue - accurate_MinValue));
+                    finalInsanityValue += accurate_MinValue;
                 }
             }
 
+            float insanityValue = localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
             if (ConfigSettings.useAccurateDisplay.Value && (!ModInstalled.EladsHUD || (ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value))) //Start from ~0.2 to ~0.91
             {
+                finalInsanityValue = insanityValue * (accurate_MaxValue - accurate_MinValue);
                 if (ConfigSettings.enableReverse.Value) //Start from ~0.91 to ~0.2 instead
 
                 {
-                    return accurate_MaxValue - ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * (accurate_MaxValue - accurate_MinValue));
+                    finalInsanityValue = accurate_MaxValue - finalInsanityValue;
                 }
 
-                return accurate_MinValue + ((localPlayer.insanityLevel / localPlayer.maxInsanityLevel) * (accurate_MaxValue - accurate_MinValue));
+                finalInsanityValue += accurate_MinValue;
             }
             else
             {
-
+                finalInsanityValue = insanityValue;
                 if (ConfigSettings.enableReverse.Value) //Start from 100 to 0 instead
 
                 {
-                    return 1 - (localPlayer.insanityLevel / localPlayer.maxInsanityLevel);
+                    finalInsanityValue = 1 - finalInsanityValue;
                 }
+            }
 
-                return (localPlayer.insanityLevel / localPlayer.maxInsanityLevel);
+            SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+            return;
+        }
+
+
+        private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
+        {
+            if (imageMeter == null) //assume player is using Elad's hud (probably gonna cause errors in the future but that's a problem for future me)
+            {
+                string textValue = $"{Math.Floor(insanityValue * 100)}%";
+                if (textMeter.text != textValue) //only update if text isn't the same
+                {
+                    textMeter.text = textValue;
+                }
+                return;
+            }
+            if (textMeter == null) //assume player isn't using elad's hud 
+            {
+                if (imageMeter.fillAmount != insanityValue) //only update if fill amount isn't the same
+                {
+                    imageMeter.fillAmount = insanityValue;
+
+                }
+                return;
             }
         }
     }
