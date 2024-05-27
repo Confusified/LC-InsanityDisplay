@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,13 +16,12 @@ namespace InsanityDisplay.ModCompatibility
             while (modInsanitySlider == null) //forever (bad) loop to find it
             {
                 GameObject objectInsanityMeter = GameObject.Find("UI_CustomPlayerHUD(Clone)/InfectedPlayerHUD/InsanityMeter").gameObject;
-                objectInsanityMeter?.SetActive(false); //to hide it in case it's visible before being ready
+                objectInsanityMeter?.SetActive(false); //to hide it in case it's visible before being ready (not very useful because it's still visible
                 objectInsanityMeter?.TryGetComponent<Slider>(out modInsanitySlider); //don't immediately set to modInsanitySlider to avoid the meter being visible when it shouldn't be yet
                 GameObject objectFill = objectInsanityMeter?.transform.Find("Fill Area/Fill").gameObject;
                 if (modInsanitySlider != null && objectFill?.transform.localPosition != Vector3.zero) { yield break; } //found infectedcompany's insanity meter when in use and ready
 
                 yield return null; //Wait one frame
-                continue;
             }
         }
 

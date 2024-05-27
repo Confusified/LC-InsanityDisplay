@@ -131,6 +131,7 @@ namespace InsanityDisplay.UI
 
         public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
+            if (!ConfigSettings.ModEnabled.Value) { return; } //Meter isn't visible so don't update at all
             if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 0) || (textMeter != null && textMeter.text != "0%"))) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
             if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 1) || (textMeter != null && textMeter.text != "100%"))) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
 
@@ -140,7 +141,7 @@ namespace InsanityDisplay.UI
             if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null) //if using infectedcompany's compat (and it all works)
             {
                 float modInsanityValue = modInsanitySlider.value / modInsanitySlider.maxValue;
-                if (!ConfigSettings.useAccurateDisplay.Value) //NOT using accurate meter
+                if (!ConfigSettings.useAccurateDisplay.Value || (ConfigSettings.Compat.EladsHUD.Value && ModInstalled.EladsHUD && ConfigSettings.useAccurateDisplay.Value)) //NOT using accurate meter or using elad's hud
                 {
 
                     if (ConfigSettings.enableReverse.Value)
@@ -151,9 +152,6 @@ namespace InsanityDisplay.UI
                     {
                         finalInsanityValue = modInsanityValue;
                     }
-
-                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
-                    return;
                 }
                 else
                 {
@@ -167,10 +165,10 @@ namespace InsanityDisplay.UI
                     {
                         finalInsanityValue += accurate_MinValue;
                     }
-
-                    SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
-                    return;
                 }
+
+                SetValueForCorrectType(imageMeter, textMeter, finalInsanityValue);
+                return;
             }
 
             float insanityValue = localPlayer.insanityLevel / localPlayer.maxInsanityLevel;
@@ -221,7 +219,6 @@ namespace InsanityDisplay.UI
                 {
                     textMeter.color = meterColor;
                 }
-                return;
             }
             if (imageMeter != null) //player isn't using elad's hud
             {
@@ -233,7 +230,6 @@ namespace InsanityDisplay.UI
                 {
                     imageMeter.color = meterColor;
                 }
-                return;
             }
         }
     }

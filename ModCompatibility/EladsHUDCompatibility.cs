@@ -1,6 +1,4 @@
-﻿using InsanityDisplay.Config;
-using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static InsanityDisplay.UI.UIHandler;
