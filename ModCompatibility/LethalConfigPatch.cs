@@ -22,8 +22,9 @@ namespace InsanityDisplay.ModCompatibility
             var generalimprovementsEntry = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, true);
             var healthmetricsEntry = new BoolCheckBoxConfigItem(Compat.HealthMetrics, true);
             var damagemetricsEntry = new BoolCheckBoxConfigItem(Compat.DamageMetrics, true);
-            var lcvrEntry = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET
+            var lcvrEntry = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET (did i never fully implement this? damn)
             var infectedcompanyEntry = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
+            // var shyhudEntry = new BoolCheckBoxConfigItem(Compat.ShyHUD, false);
 
             //Display Settings
             LethalConfigManager.AddConfigItem(modenabledEntry);
@@ -40,6 +41,7 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(damagemetricsEntry);
             LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
             LethalConfigManager.AddConfigItem(infectedcompanyEntry);
+            //LethalConfigManager.AddConfigItem(shyhudEntry); (commented out because i haven't implemented this)
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 

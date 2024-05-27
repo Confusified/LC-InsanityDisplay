@@ -23,6 +23,7 @@ namespace InsanityDisplay.Config
             Compat.DamageMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.LethalCompanyVR = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
             Compat.InfectedCompany = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
+            // Compat.ShyHUD = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable ShyHUD compatibility", true, "Enabling this will fade out the insanity meter once it's full");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 

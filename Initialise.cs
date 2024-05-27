@@ -20,6 +20,7 @@ namespace InsanityDisplay
     [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModGUIDS.ShyHUD, BepInDependency.DependencyFlags.SoftDependency)]
     //Plugin
     [BepInPlugin(modGUID, modName, modVersion)]
     public class Initialise : BaseUnityPlugin
@@ -48,7 +49,7 @@ namespace InsanityDisplay
             return;
         }
 
-        private static void CheckForModCompatibility()
+        private static void CheckForModCompatibility() //is there a better way for this? this looks and is nasty
         {
             if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LCCrouchHUD))
             {
@@ -99,6 +100,11 @@ namespace InsanityDisplay
             {
                 ModInstalled.InfectedCompany = true;
                 modLogger.LogDebug("Found InfectedCompany");
+            }
+            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.ShyHUD))
+            {
+                ModInstalled.ShyHUD = true;
+                modLogger.LogDebug("Found ShyHUD");
             }
         }
     }

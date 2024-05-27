@@ -59,7 +59,7 @@ namespace InsanityDisplay.UI
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter.GetComponent<Image>();
-            try
+            try //i don't think this try catch is needed anymore but just gonna keep it to be safe
             {
                 UpdateMeter(imageMeter: InsanityImage);
             }
@@ -88,7 +88,7 @@ namespace InsanityDisplay.UI
                 LCCrouchHUDCompatibility.MoveCrouchHUD();
                 Initialise.modLogger.LogDebug("Enabled LCCrouchHUD compat");
             }
-            if (ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)) //only do this if LCVR isn't also there
+            if (ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)) //only do this if LCVR isn't also there because, elad's hud is not compatible with lcvr
             {
                 GameObject.Destroy(Memory_InsanityMeter);
                 GameObject.Destroy(InsanityMeter);
@@ -131,7 +131,7 @@ namespace InsanityDisplay.UI
 
         public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
         {
-            if (!ConfigSettings.ModEnabled.Value) { return; } //Meter isn't visible so don't update at all
+            if (!ConfigSettings.ModEnabled.Value || (imageMeter == null && textMeter == null)) { return; } //Meter isn't visible so don't update at all
             if (GameNetworkManager.Instance.localPlayerController == null || (!ConfigSettings.alwaysFull.Value && !ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 0) || (textMeter != null && textMeter.text != "0%"))) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
             if (ConfigSettings.alwaysFull.Value || (ConfigSettings.enableReverse.Value && !GameNetworkManager.Instance.gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 1) || (textMeter != null && textMeter.text != "100%"))) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
 
@@ -204,9 +204,8 @@ namespace InsanityDisplay.UI
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
-            if (!ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value = $"#{ConfigSettings.MeterColor.Value}"; }
+            if (!ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value = $"#{ConfigSettings.MeterColor.Value + fullVisibility}"; }
             ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
-            meterColor += fullVisibility;
 
             if (textMeter != null) //player is using elad's hud
             {

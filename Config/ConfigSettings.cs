@@ -22,6 +22,7 @@ namespace InsanityDisplay.Config
             public static ConfigEntry<bool> DamageMetrics;
             public static ConfigEntry<bool> LethalCompanyVR;
             public static ConfigEntry<bool> InfectedCompany;
+            //   public static ConfigEntry<bool> ShyHUD;
         }
 
         //_DontTouch
