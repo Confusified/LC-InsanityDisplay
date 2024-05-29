@@ -24,13 +24,6 @@ namespace InsanityDisplay.Patches
             CreateInScene();
         }
 
-        [HarmonyPatch(nameof(HUDManager.OnDestroy))]
-        [HarmonyPostfix]
-        private static void DestroyInsanityMeter()
-        {
-            GameObject.Destroy(InsanityMeter?.gameObject);
-        }
-
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         private static void SetMeterValues()
