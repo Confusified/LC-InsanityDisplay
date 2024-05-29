@@ -1,47 +1,49 @@
 ﻿using HarmonyLib;
 using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using DunGen;
 using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
 {
     [HarmonyPatch(typeof(HUDManager))]
-    public class HUDManageratch
+    public class HUDManagerPatch
     {
-        [HarmonyPatch("Start")]
+        [HarmonyPatch("Awake")]
         [HarmonyPostfix]
-        private static void CreateMeter()
+        private static void AwakePostfix()
         {
-            CreateInMemory(); //This will create in memory AND also in scene afterwards
-            return;
+            CoroutineHelper.Start(CreateInsanityMeter());
+        }
+
+        private static IEnumerator CreateInsanityMeter()
+        {
+            yield return new WaitUntil(() => GameNetworkManager.Instance.localPlayerController?.sprintMeterUI != null);
+            CreateInScene();
+        }
+
+        [HarmonyPatch(nameof(HUDManager.OnDestroy))]
+        [HarmonyPostfix]
+        private static void DestroyInsanityMeter()
+        {
+            GameObject.Destroy(InsanityMeter?.gameObject);
         }
 
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         private static void SetMeterValues()
         {
-            if (InsanityImage == null) { InsanityImage = InsanityMeter?.GetComponent<Image>(); }
-            if (InsanityImage == null || InsanityMeter == null) { return; } //In case something goes wrong
-
-            if (InsanityMeter.activeSelf != ConfigSettings.ModEnabled.Value)
+            if (InsanityMeter != null && InsanityMeter.activeSelf != ConfigSettings.ModEnabled.Value)
             {
                 InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
             }
 
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null) //if mod is found 
             {
-                bool setToActive;
+                bool setToActive = !ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value;
                 GameObject infectedCompanySlider = InfectedCompanyCompatibility.modInsanitySlider.gameObject;
-                if (!ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value) //if compat is disabled, meter is disabled, or meter always full
-                {
-                    setToActive = true;
-                }
-                else
-                {
-                    setToActive = false;
-                }
 
                 if (infectedCompanySlider.activeSelf != setToActive)
                 {

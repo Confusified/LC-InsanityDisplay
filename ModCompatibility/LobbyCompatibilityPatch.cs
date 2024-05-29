@@ -9,7 +9,6 @@ namespace InsanityDisplay.ModCompatibility
         public static void UseLobbyCompatibility(string modGUID, string modVersion)
         {
             PluginHelper.RegisterPlugin(modGUID, Version.Parse(modVersion), CompatibilityLevel.ClientOnly, VersionStrictness.None);
-            return;
         }
     }
 }

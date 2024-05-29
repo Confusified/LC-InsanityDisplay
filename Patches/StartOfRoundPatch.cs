@@ -16,29 +16,28 @@ namespace InsanityDisplay.Patches
             {
                 CoroutineHelper.Start(InfectedCompanyCompatibility.ConvertInsanity());
             }
-
         }
 
         [HarmonyPatch("EndOfGame")]
         [HarmonyPostfix]
         public static void EndOfRoundPostfix(StartOfRound __instance)
         {
-            if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null)
-            {
-                InfectedCompanyCompatibility.modInsanitySlider = null;
-            }
-
+            SetModMeterToNull();
         }
 
         [HarmonyPatch("OnDestroy")]
         [HarmonyPostfix]
         public static void LeftLobbbyPostfix(StartOfRound __instance)
         {
+            SetModMeterToNull();
+        }
+
+        private static void SetModMeterToNull()
+        {
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null)
             {
                 InfectedCompanyCompatibility.modInsanitySlider = null;
             }
-
         }
     }
 }

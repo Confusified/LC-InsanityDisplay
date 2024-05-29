@@ -1,18 +1,19 @@
 ﻿using DunGen;
 using System.Collections;
 using UnityEngine;
+using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {
     public class GeneralImprovementsCompatibility
     {
         private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
-        private const int maxAttempts = 500; //Amount of frames it will retry (until it is found)
+        private const int maxAttempts = 600; //Amount of frames it will retry (until it is found)
         private static GameObject HitpointDisplay;
 
         public static void MoveHPHud()
         {
-            HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
+            HitpointDisplay = TopLeftCornerHUD.transform.Find("HPUI")?.gameObject;
 
             if (HitpointDisplay == null) { CoroutineHelper.Start(RetryUntilFound()); return; }
 
@@ -24,7 +25,7 @@ namespace InsanityDisplay.ModCompatibility
             for (int i = 0; i < maxAttempts; i++)
             {
 
-                HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
+                HitpointDisplay = TopLeftCornerHUD.transform.Find("HPUI")?.gameObject;
                 if (HitpointDisplay == null)
                 {
                     yield return null; //Wait one frame

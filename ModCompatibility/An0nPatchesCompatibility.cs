@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {
@@ -8,7 +9,8 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void MoveTextHUD()
         {
-            GameObject An0nTextHUD = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPSP").gameObject;
+
+            GameObject An0nTextHUD = TopLeftCornerHUD.transform.Find("HPSP").gameObject;
 
             if (An0nTextHUD == null) { Initialise.modLogger.LogError("An0nTextHUD's HUD wasn't found"); return; }
 

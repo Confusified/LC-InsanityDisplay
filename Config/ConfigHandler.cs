@@ -10,10 +10,11 @@ namespace InsanityDisplay.Config
         public static void InitialiseConfig()
         {
             ModEnabled = modConfig.Bind<bool>("Display Settings", "Meter enabled", true, "Add a bar above the stamina bar which display your insanity");
-            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "#7300A6", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: #FFFFFF (White)");
+            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "#7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: #FFFFFF(FF) (White)");
             useAccurateDisplay = modConfig.Bind<bool>("Display Settings", "Accurate meter", true, "Show your insanity value more accurately, instead of showing it in the vanilla way");
             enableReverse = modConfig.Bind<bool>("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             alwaysFull = modConfig.Bind<bool>("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
+            // iconAlwaysCentered = modConfig.Bind<bool>("Display Settings", "Always Centered Player Icon", false, "Always have the player icon centered, instead of it moving to it's vanilla position when the insanity meter is not visible");
 
             Compat.LCCrouchHUD = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.An0nPatches = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
@@ -23,7 +24,7 @@ namespace InsanityDisplay.Config
             Compat.DamageMetrics = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.LethalCompanyVR = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
             Compat.InfectedCompany = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
-            // Compat.ShyHUD = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable ShyHUD compatibility", true, "Enabling this will fade out the insanity meter once it's full");
+            //Compat.ShyHUD = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable ShyHUD compatibility", true, "Enabling this will fade out the insanity meter once it's full");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 

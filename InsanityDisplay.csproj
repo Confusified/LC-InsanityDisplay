@@ -105,8 +105,7 @@
     <Compile Include="ModCompatibility\EladsHUDCompatibility.cs" />
     <Compile Include="ModCompatibility\An0nPatchesCompatibility.cs" />
     <Compile Include="ModCompatibility\GeneralImprovementsCompatibility.cs" />
-    <Compile Include="ModCompatibility\DamageMetricsCompatibility.cs" />
-    <Compile Include="ModCompatibility\HealthMetricsCompatibility.cs" />
+    <Compile Include="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
     <Compile Include="ModCompatibility\LCCrouchHUDCompatibility.cs" />
     <Compile Include="Patches\HUDManagerPatch.cs" />
     <Compile Include="Patches\StartOfRoundPatch.cs" />
