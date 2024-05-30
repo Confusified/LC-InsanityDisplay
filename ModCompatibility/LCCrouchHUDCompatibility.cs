@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using InsanityDisplay.Config;
+using UnityEngine;
 using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.ModCompatibility
@@ -10,6 +11,7 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void MoveCrouchHUD()
         {
+
             GameObject CrouchHUDIcon = TopLeftCornerHUD.transform.Find("Self/CrouchIcon")?.gameObject;
 
             if (CrouchHUDIcon == null) { Initialise.modLogger.LogError("LCCrouchHud's icon wasn't found"); return; }

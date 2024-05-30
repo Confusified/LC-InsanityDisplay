@@ -6,6 +6,8 @@ using System.Reflection;
 using InsanityDisplay.Config;
 using BepInEx.Bootstrap;
 using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using System;
+using System.Collections.Generic;
 
 namespace InsanityDisplay
 {
@@ -20,14 +22,13 @@ namespace InsanityDisplay
     [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
-    // [BepInDependency(ModGUIDS.ShyHUD, BepInDependency.DependencyFlags.SoftDependency)]
     //Plugin
     [BepInPlugin(modGUID, modName, modVersion)]
     public class Initialise : BaseUnityPlugin
     {
         private const string modGUID = "com.Confusified.InsanityDisplay";
         private const string modName = "InsanityDisplay";
-        private const string modVersion = "1.1.5";
+        private const string modVersion = "1.2.0";
 
         public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
@@ -49,64 +50,30 @@ namespace InsanityDisplay
             return;
         }
 
-        private static void CheckForModCompatibility() //is there a better way for this? this is nasty
+        private static void CheckForModCompatibility()
         {
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LCCrouchHUD))
+            var modActions = new Dictionary<string, Action>
             {
-                ModInstalled.LCCrouchHUD = true;
-                modLogger.LogDebug("Found LCCrouchHUD");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.EladsHUD))
+                { ModGUIDS.LCCrouchHUD, () => ModInstalled.LCCrouchHUD = true },
+                { ModGUIDS.EladsHUD, () => ModInstalled.EladsHUD = true },
+                { ModGUIDS.An0nPatches, () => ModInstalled.An0nPatches = true },
+                { ModGUIDS.GeneralImprovements, () => ModInstalled.GeneralImprovements = true },
+                { ModGUIDS.HealthMetrics, () => ModInstalled.HealthMetrics = true },
+                { ModGUIDS.DamageMetrics, () => ModInstalled.DamageMetrics = true },
+                { ModGUIDS.LobbyCompatibility, () => ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion) },
+                { ModGUIDS.LethalConfig, () => ModCompatibility.LethalConfigPatch.SetLethalConfigEntries() },
+                { ModGUIDS.LethalCompanyVR, () => ModInstalled.LethalCompanyVR = true },
+                { ModGUIDS.InfectedCompany, () => ModInstalled.InfectedCompany = true }
+             };
+
+            foreach (var modAction in modActions)
             {
-                ModInstalled.EladsHUD = true;
-                modLogger.LogDebug("Found Elad's HUD");
+                if (Chainloader.PluginInfos.ContainsKey(modAction.Key))
+                {
+                    modAction.Value.Invoke();
+                    modLogger.LogDebug($"Found {modAction.Key}");
+                }
             }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.An0nPatches))
-            {
-                ModInstalled.An0nPatches = true;
-                modLogger.LogDebug("Found An0n Patches");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.GeneralImprovements))
-            {
-                ModInstalled.GeneralImprovements = true;
-                modLogger.LogDebug("Found GeneralImprovements");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.HealthMetrics))
-            {
-                ModInstalled.HealthMetrics = true;
-                modLogger.LogDebug("Found HealthMetrics");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.DamageMetrics))
-            {
-                ModInstalled.DamageMetrics = true;
-                modLogger.LogDebug("Found DamageMetrics");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LobbyCompatibility))
-            {
-                ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion);
-                modLogger.LogDebug("Found LobbyCompatibility");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LethalConfig))
-            {
-                ModCompatibility.LethalConfigPatch.SetLethalConfigEntries();
-                modLogger.LogDebug("Found LethalConfig");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.LethalCompanyVR))
-            {
-                ModInstalled.LethalCompanyVR = true;
-                modLogger.LogDebug("Found LCVR");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.InfectedCompany))
-            {
-                ModInstalled.InfectedCompany = true;
-                modLogger.LogDebug("Found InfectedCompany");
-            }
-            /* if (Chainloader.PluginInfos.ContainsKey(ModGUIDS.ShyHUD))
-             {
-                 ModInstalled.ShyHUD = true;
-                 modLogger.LogDebug("Found ShyHUD");
-             }
-            */
         }
     }
 }

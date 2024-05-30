@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using InsanityDisplay.Config;
+using UnityEngine;
 
 namespace InsanityDisplay.ModCompatibility
 {
@@ -9,6 +10,7 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void MoveDisplay(bool usingHealthMetrics)
         {
+
             GameObject MetricDisplay = HUDManager.Instance.PTTIcon.transform.Find("HealthHUDDisplay").gameObject;
 
             if (MetricDisplay == null)

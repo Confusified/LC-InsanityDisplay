@@ -1,4 +1,5 @@
 ﻿using DunGen;
+using InsanityDisplay.Config;
 using System.Collections;
 using UnityEngine;
 using static InsanityDisplay.UI.UIHandler;
@@ -13,8 +14,9 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void MoveHPHud()
         {
-            HitpointDisplay = TopLeftCornerHUD.transform.Find("HPUI")?.gameObject;
 
+            HitpointDisplay = TopLeftCornerHUD.transform.Find("HPUI")?.gameObject;
+            Initialise.modLogger.LogError(HitpointDisplay); //debug purposes
             if (HitpointDisplay == null) { CoroutineHelper.Start(RetryUntilFound()); return; }
 
             HitpointDisplay.transform.localPosition += localPositionOffset;

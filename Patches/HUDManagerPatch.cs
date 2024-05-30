@@ -11,9 +11,9 @@ namespace InsanityDisplay.Patches
     [HarmonyPatch(typeof(HUDManager))]
     public class HUDManagerPatch
     {
-        [HarmonyPatch("Awake")]
+        [HarmonyPatch("Start")]
         [HarmonyPostfix]
-        private static void AwakePostfix()
+        private static void StartPostfix()
         {
             CoroutineHelper.Start(CreateInsanityMeter());
         }
@@ -35,7 +35,7 @@ namespace InsanityDisplay.Patches
 
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null) //if mod is found 
             {
-                bool setToActive = !ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value;
+                bool setToActive = !ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value || (CompatibilityList.ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value && ConfigSettings.Compat.InfectedCompany.Value);
                 GameObject infectedCompanySlider = InfectedCompanyCompatibility.modInsanitySlider.gameObject;
 
                 if (infectedCompanySlider.activeSelf != setToActive)
@@ -43,7 +43,9 @@ namespace InsanityDisplay.Patches
                     infectedCompanySlider.SetActive(setToActive);
                 }
             }
+            EnableCompatibilities(hasCustomBehaviour: true); //only update those that are meant to be updated
             UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
+
         }
     }
 }

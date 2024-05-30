@@ -1,13 +1,14 @@
 ﻿using DunGen;
 using HarmonyLib;
 using InsanityDisplay.ModCompatibility;
+using UnityEngine;
+using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
 {
     [HarmonyPatch(typeof(StartOfRound))]
     public class StartOfRoundPatch
     {
-
         [HarmonyPatch("StartGame")]
         [HarmonyPostfix]
         public static void RoundStartedPostfix(StartOfRound __instance)

@@ -34,7 +34,7 @@ namespace InsanityDisplay.UI
         public static void CreateInScene()
         {
             if (InsanityMeter != null) { return; } //Already exists
-
+            Initialise.modLogger.LogDebug("meter doesnt exist yet");
             localPlayer = GameNetworkManager.Instance.localPlayerController;
             vanillaSprintMeter = localPlayer.sprintMeterUI.gameObject;
 
@@ -49,51 +49,54 @@ namespace InsanityDisplay.UI
             meterTransform.localPosition = vanillaSprintMeter.transform.localPosition + localPositionOffset;
             meterTransform.localScale = localScale;
 
-            InsanityImage = InsanityMeter.GetComponent<Image>();
-
+            InsanityImage = InsanityMeter?.GetComponent<Image>();
+            Initialise.modLogger.LogDebug("before update");
             UpdateMeter(imageMeter: InsanityImage);
-
-            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+            Initialise.modLogger.LogDebug("after update");
+            InsanityMeter?.SetActive(ConfigSettings.ModEnabled.Value);
 
             GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject; //Doesn't seem to have a simple variable attached to it
             selfObject.transform.localPosition += selfLocalPositionOffset;
 
             GameObject selfRedObject = HUDManager.Instance.selfRedCanvasGroup.gameObject;
             selfRedObject.transform.localPosition = selfObject.transform.localPosition;
-            Initialise.modLogger.LogInfo("Created insanity meter succesfully");
-            EnableCompatibilities();
+            Initialise.modLogger.LogDebug("Created insanity meter succesfully");
+            EnableCompatibilities(isMeterCreation: true);
+            Initialise.modLogger.LogDebug("enabled compats first time");
             return;
         }
 
-        private static void EnableCompatibility(bool condition, Action compatibilityAction, string modName)
+        public static void EnableCompatibilities(bool isMeterCreation = false, bool hasCustomBehaviour = false) //those with custom behaviour are meant to be ran every time the meter updates
         {
-            if (condition)
+            if (isMeterCreation)
             {
-                compatibilityAction?.Invoke();
-                Initialise.modLogger.LogDebug($"Enabled {modName} compat");
+                Initialise.modLogger.LogInfo("Enabling compatibilities");
             }
-        }
 
-        private static void EnableCompatibilities()
-        {
-            Initialise.modLogger.LogInfo("Enabling allowed compatibilities");
-            EnableCompatibility(ModInstalled.LCCrouchHUD && ConfigSettings.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, "LCCrouchHUD");
+            EnableCompatibility(ModInstalled.LCCrouchHUD, ConfigSettings.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, "LCCrouchHUD", customBehaviour: hasCustomBehaviour);
             EnableCompatibility(
-                ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || (ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)),
+                ModInstalled.EladsHUD, ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || (ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)),
                 () =>
                 {
                     GameObject.Destroy(InsanityMeter);
                     InsanityMeter = null;
                     EladsHUDCompatibility.EditEladsHUD();
                 },
-                "EladsHUD");
-            EnableCompatibility(ModInstalled.An0nPatches && ConfigSettings.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, "An0nPatches");
-            EnableCompatibility(ModInstalled.GeneralImprovements && ConfigSettings.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, "GeneralImprovements");
-            EnableCompatibility(ModInstalled.HealthMetrics && ConfigSettings.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), "HealthMetrics");
-            EnableCompatibility(ModInstalled.DamageMetrics && ConfigSettings.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), "DamageMetrics");
-            EnableCompatibility(ModInstalled.LethalCompanyVR && ConfigSettings.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()), "LethalCompanyVR");
-            EnableCompatibility(ModInstalled.InfectedCompany && ConfigSettings.Compat.InfectedCompany.Value, null, "InfectedCompany"); //Handled in StartOfRoundPatch
-                                                                                                                                       //    EnableCompatibility(ModInstalled.ShyHUD && ConfigSettings.Compat.ShyHUD.Value, null, "ShyHUD"); //Handled in UIHandler.UpdateColor
+                "EladsHUD", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.An0nPatches, ConfigSettings.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, "An0nPatches", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.GeneralImprovements, ConfigSettings.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, "GeneralImprovements", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.HealthMetrics, ConfigSettings.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), "HealthMetrics", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.DamageMetrics, ConfigSettings.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), "DamageMetrics", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.LethalCompanyVR, ConfigSettings.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()), "LethalCompanyVR");
+            EnableCompatibility(ModInstalled.InfectedCompany, ConfigSettings.Compat.InfectedCompany.Value, null, "InfectedCompany", customBehaviour: hasCustomBehaviour); //Handled in StartOfRoundPatch
+        }
+
+        private static void EnableCompatibility(bool condition1, bool condition2, Action compatibilityAction = null, string modName = "", bool customBehaviour = false)
+        {
+            if ((condition1 && condition2) || (condition1 && customBehaviour))
+            {
+                compatibilityAction?.Invoke();
+            }
         }
 
         public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
@@ -181,39 +184,8 @@ namespace InsanityDisplay.UI
 
         private static void UpdateColor<T>(T meter, Color meterColor, float insanityValue) where T : Graphic
         {
-            if (meter == null) { return; } //if it doesn't exist
-
-            bool usingShyHUDCompat = false; //ModInstalled.ShyHUD && ConfigSettings.Compat.ShyHUD.Value; //currently this is so scuffed so i'm disabling it for now
-            if (usingShyHUDCompat) //if using ShyHUD compatibility
-            {
-                if ((oldColorValue != meterColor && lastInsanityValue != insanityValue) || lastInsanityValue != insanityValue || !oldColorValue.CompareRGB(meterColor)) //if alpha and insanity changed or insanity changed or the colour has changed
-                {
-                    bool useAlwaysFull = ConfigSettings.alwaysFull.Value;
-                    bool useAccurate = ConfigSettings.useAccurateDisplay.Value;
-                    //If bar is full or empty and always full is not enabled
-                    if ((((insanityValue >= accurate_MaxValue && useAccurate) || insanityValue >= 1) || ((insanityValue <= accurate_MinValue && useAccurate) || insanityValue <= 0)) && !useAlwaysFull)
-                    {
-                        meter.CrossFadeAlpha(0f, 5f, false); //Vanish the meter
-                    }
-                    else if (meter.color.a != meterColor.a)
-                    {
-                        meter.CrossFadeAlpha(meterColor.a, .5f, false); //Unvanish the meter (up to whatever the user has defined for transparency)
-                    }
-                    meterColor.a = meter.color.a; //Match the transparency with the fade effect
-
-                }
-            }
-
-            if (meter.color == meterColor) { return; } //already the same colour
+            if (meter == null || meter.color == meterColor) { return; } //if it doesn't exist or the same colour
             meter.color = meterColor;
         }
-
-        /* 
-         * Issues with ShyHUD compat:
-         * if toggled mid game when the meter is invisible it won't show up
-         * if starting a fade it can't be cancelled
-         * idk how but my meter just never became visible at some point
-         * i'm losing my mind
-         */
     }
 }
