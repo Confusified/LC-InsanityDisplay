@@ -104,7 +104,8 @@
     <Compile Include="Patches\HUDManagerPatch.cs" />
     <Compile Include="Patches\StartOfRoundPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\UIHandler.cs" />
+    <Compile Include="UI\IconHandler.cs" />
+    <Compile Include="UI\MeterHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -3,22 +3,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using InsanityDisplay.ModCompatibility;
 using GameNetcodeStuff;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
-using static InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
 using DunGen;
 using TMPro;
 using System;
+using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using static InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
+using static InsanityDisplay.UI.IconHandler;
 
 namespace InsanityDisplay.UI
 {
-    public class UIHandler
+    public class MeterHandler
     {
         public static Vector3 localPositionOffset = new Vector3(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
         private static Vector3 localScale = new Vector3(1.4f, 1.4f, 1.4f); //SprintMeter scale is 1.6892 1.6892 1.6892
-        public static Vector3 selfLocalPositionOffset = new Vector3(-6.8f, 4f, 0f); // -272.7607 112.2663 -14.2212 = normal    -279.5677f, 116.2748f, -14.2174f
 
-        private const float accurate_MinValue = 0.298f; //Becomes visible starting 0.298f
-        private const float accurate_MaxValue = 0.910f; //No visible changes after this value
+        public const float accurate_MinValue = 0.2976f; //Becomes visible starting 0.2976f
+        public const float accurate_MaxValue = 0.9101f; //No visible changes after this value
         private static float lastInsanityValue;
         private static Color oldColorValue;
 
@@ -34,7 +34,7 @@ namespace InsanityDisplay.UI
         public static void CreateInScene()
         {
             if (InsanityMeter != null) { return; } //Already exists
-            Initialise.modLogger.LogDebug("meter doesnt exist yet");
+
             localPlayer = GameNetworkManager.Instance.localPlayerController;
             vanillaSprintMeter = localPlayer.sprintMeterUI.gameObject;
 
@@ -53,14 +53,10 @@ namespace InsanityDisplay.UI
 
             UpdateMeter(imageMeter: InsanityImage);
 
-            InsanityMeter?.SetActive(ConfigSettings.ModEnabled.Value);
+            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
-            GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject; //Doesn't seem to have a simple variable attached to it
-            selfObject.transform.localPosition += selfLocalPositionOffset;
 
-            GameObject selfRedObject = HUDManager.Instance.selfRedCanvasGroup.gameObject;
-            selfRedObject.transform.localPosition = selfObject.transform.localPosition;
-
+            AdjustIcon();
             EnableCompatibilities(isMeterCreation: true);
             return;
         }
@@ -72,7 +68,7 @@ namespace InsanityDisplay.UI
                 Initialise.modLogger.LogInfo("Enabling compatibilities");
             }
 
-            EnableCompatibility(ModInstalled.LCCrouchHUD, ConfigSettings.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, "LCCrouchHUD", customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.LCCrouchHUD, ConfigSettings.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, customBehaviour: hasCustomBehaviour);
             EnableCompatibility(
                 ModInstalled.EladsHUD, ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || (ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)),
                 () =>
@@ -81,16 +77,16 @@ namespace InsanityDisplay.UI
                     InsanityMeter = null;
                     EladsHUDCompatibility.EditEladsHUD();
                 },
-                "EladsHUD", customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.An0nPatches, ConfigSettings.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, "An0nPatches", customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.GeneralImprovements, ConfigSettings.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, "GeneralImprovements", customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.HealthMetrics, ConfigSettings.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), "HealthMetrics", customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.DamageMetrics, ConfigSettings.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), "DamageMetrics", customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.LethalCompanyVR, ConfigSettings.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()), "LethalCompanyVR");
-            EnableCompatibility(ModInstalled.InfectedCompany, ConfigSettings.Compat.InfectedCompany.Value, null, "InfectedCompany", customBehaviour: hasCustomBehaviour); //Handled in StartOfRoundPatch
+                 customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.An0nPatches, ConfigSettings.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.GeneralImprovements, ConfigSettings.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.HealthMetrics, ConfigSettings.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.DamageMetrics, ConfigSettings.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.LethalCompanyVR, ConfigSettings.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()));
+            EnableCompatibility(ModInstalled.InfectedCompany, ConfigSettings.Compat.InfectedCompany.Value, null, customBehaviour: hasCustomBehaviour); //Handled in StartOfRoundPatch
         }
 
-        private static void EnableCompatibility(bool condition1, bool condition2, Action compatibilityAction = null, string modName = "", bool customBehaviour = false)
+        private static void EnableCompatibility(bool condition1, bool condition2, Action compatibilityAction = null, bool customBehaviour = false)
         {
             if ((condition1 && condition2) || (condition1 && customBehaviour))
             {
@@ -148,7 +144,6 @@ namespace InsanityDisplay.UI
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
-            if (!ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value = $"#{ConfigSettings.MeterColor.Value}"; }
             ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
 
             if (textMeter != null) //player is using elad's hud
