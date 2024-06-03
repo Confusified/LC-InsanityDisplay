@@ -1,6 +1,10 @@
-﻿using LethalConfig;
+﻿using BepInEx.Bootstrap;
+using LethalConfig;
 using LethalConfig.ConfigItems;
+using System.Collections.Generic;
+using System;
 using static InsanityDisplay.Config.ConfigSettings;
+using static InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace InsanityDisplay.ModCompatibility
 {
@@ -39,6 +43,7 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(damagemetricsEntry);
             LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
             LethalConfigManager.AddConfigItem(infectedcompanyEntry);
+
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 

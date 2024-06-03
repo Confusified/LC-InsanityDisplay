@@ -11,13 +11,13 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void MoveTextHUD()
         {
-            if (CompatibilityList.ModInstalled.EladsHUD || CompatibilityList.ModInstalled.LethalCompanyVR) { return; } //haven't tested LCVR
-            bool An0nCompat = ConfigSettings.Compat.An0nPatches.Value && CompatibilityList.ModInstalled.An0nPatches;
+            if (CompatibilityList.ModInstalled.EladsHUD) { return; }
 
             GameObject An0nTextHUD = TopLeftCornerHUD?.transform.Find("HPSP").gameObject;
 
             if (An0nTextHUD == null) { Initialise.modLogger.LogError("An0nTextHUD's HUD wasn't found"); return; }
 
+            bool An0nCompat = ConfigSettings.Compat.An0nPatches.Value;
             localPosition = localPosition == Vector3.zero ? An0nTextHUD.transform.localPosition : localPosition;
             if ((An0nCompat && An0nTextHUD.transform.localPosition != (localPosition + localPositionOffset)) || (!An0nCompat && An0nTextHUD.transform.localPosition != localPosition)) //update if hud is positioned incorrectly
             {

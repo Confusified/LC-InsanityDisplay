@@ -1,5 +1,4 @@
 ﻿using InsanityDisplay.Config;
-using InsanityDisplay.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +16,6 @@ namespace InsanityDisplay.ModCompatibility
 
         public static void EditEladsHUD() //This will create a new bar, the stamina bar, and move some elements to make it not overlap (also this code is kinda all over the place damn)
         {
-            bool EladsCompat = ConfigSettings.Compat.EladsHUD.Value && CompatibilityList.ModInstalled.EladsHUD;
             GameObject EladsHUDStamina = vanillaSprintMeter.transform.parent.transform.parent.Find("PlayerInfo(Clone)/Stamina").gameObject;
             if (EladsHUDStamina == null) { Initialise.modLogger.LogError("EladsHUD Stamina bar wasn't found"); return; }
             //Create the meter and remove unnecessary elements from it
@@ -49,6 +47,7 @@ namespace InsanityDisplay.ModCompatibility
             InsanityMeter.transform.localPosition += localPositionOffset;
             PercentageInsanityText.transform.localPosition += Percentage_localPositionOffset;
 
+            bool EladsCompat = ConfigSettings.Compat.EladsHUD.Value;
             if ((EladsCompat && batteryUI.localPosition != (batteryLocalPosition + localPositionOffset)) || (!EladsCompat && batteryUI.localPosition != batteryLocalPosition)) //update if hud is positioned incorrectly (only the battery part of elad's hud)
             {
                 batteryUI.localPosition = EladsCompat && ConfigSettings.ModEnabled.Value ? batteryLocalPosition + localPositionOffset : batteryLocalPosition;

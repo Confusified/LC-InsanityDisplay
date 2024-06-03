@@ -16,7 +16,11 @@ namespace InsanityDisplay.ModCompatibility
 
             if (CrouchHUDIcon == null) { Initialise.modLogger.LogError("LCCrouchHud's icon wasn't found"); return; }
 
-            CrouchHUDIcon.transform.localPosition = positionToLocal + localPositionOffset;
+            bool CrouchHUDCompat = ConfigSettings.Compat.LCCrouchHUD.Value;
+            if ((CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != (positionToLocal + localPositionOffset)) || (!CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != positionToLocal)) //update if hud is positioned incorrectly
+            {
+                CrouchHUDIcon.transform.localPosition = CrouchHUDCompat && ConfigSettings.ModEnabled.Value ? positionToLocal + localPositionOffset : positionToLocal;
+            }
         }
     }
 }

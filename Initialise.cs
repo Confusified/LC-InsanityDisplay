@@ -5,9 +5,9 @@ using HarmonyLib;
 using System.Reflection;
 using InsanityDisplay.Config;
 using BepInEx.Bootstrap;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
 using System;
 using System.Collections.Generic;
+using static InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace InsanityDisplay
 {

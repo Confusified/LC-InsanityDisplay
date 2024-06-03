@@ -50,9 +50,9 @@ namespace InsanityDisplay.UI
             meterTransform.localScale = localScale;
 
             InsanityImage = InsanityMeter?.GetComponent<Image>();
-            Initialise.modLogger.LogDebug("before update");
+
             UpdateMeter(imageMeter: InsanityImage);
-            Initialise.modLogger.LogDebug("after update");
+
             InsanityMeter?.SetActive(ConfigSettings.ModEnabled.Value);
 
             GameObject selfObject = TopLeftCornerHUD.transform.Find("Self").gameObject; //Doesn't seem to have a simple variable attached to it
@@ -60,9 +60,8 @@ namespace InsanityDisplay.UI
 
             GameObject selfRedObject = HUDManager.Instance.selfRedCanvasGroup.gameObject;
             selfRedObject.transform.localPosition = selfObject.transform.localPosition;
-            Initialise.modLogger.LogDebug("Created insanity meter succesfully");
+
             EnableCompatibilities(isMeterCreation: true);
-            Initialise.modLogger.LogDebug("enabled compats first time");
             return;
         }
 
