@@ -4,7 +4,8 @@ using InsanityDisplay.ModCompatibility;
 using System.Collections;
 using UnityEngine;
 using DunGen;
-using static InsanityDisplay.UI.UIHandler;
+using static InsanityDisplay.UI.MeterHandler;
+using static InsanityDisplay.UI.IconHandler;
 
 namespace InsanityDisplay.Patches
 {
@@ -43,9 +44,9 @@ namespace InsanityDisplay.Patches
                     infectedCompanySlider.SetActive(setToActive);
                 }
             }
+            AdjustIcon();
             EnableCompatibilities(hasCustomBehaviour: true); //only update those that are meant to be updated
             UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
-
         }
     }
 }

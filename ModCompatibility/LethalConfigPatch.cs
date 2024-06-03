@@ -1,10 +1,7 @@
-﻿using BepInEx.Bootstrap;
-using LethalConfig;
+﻿using LethalConfig;
 using LethalConfig.ConfigItems;
-using System.Collections.Generic;
-using System;
 using static InsanityDisplay.Config.ConfigSettings;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using LethalConfig.ConfigItems.Options;
 
 namespace InsanityDisplay.ModCompatibility
 {
@@ -14,10 +11,11 @@ namespace InsanityDisplay.ModCompatibility
         {
             //Display Settings
             var modenabledEntry = new BoolCheckBoxConfigItem(ModEnabled, false);
-            var metercolorEntry = new TextInputFieldConfigItem(MeterColor, false);
+            var metercolorEntry = new TextInputFieldConfigItem(MeterColor, new TextInputFieldOptions { CharacterLimit = 9, RequiresRestart = false });
             var useaccuratedisplayEntry = new BoolCheckBoxConfigItem(useAccurateDisplay, false);
             var enablereverseEntry = new BoolCheckBoxConfigItem(enableReverse, false);
             var alwaysfullEntry = new BoolCheckBoxConfigItem(alwaysFull, false);
+            var iconAlwaysCenteredEntry = new BoolCheckBoxConfigItem(iconAlwaysCentered, false);
             //Mod Compatibility Settings
             var lccrouchudEntry = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, false);
             var an0npatchesEntry = new BoolCheckBoxConfigItem(Compat.An0nPatches, false);
@@ -34,6 +32,7 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(useaccuratedisplayEntry);
             LethalConfigManager.AddConfigItem(enablereverseEntry);
             LethalConfigManager.AddConfigItem(alwaysfullEntry);
+            LethalConfigManager.AddConfigItem(iconAlwaysCenteredEntry);
             //Mod Compatibility Settings
             LethalConfigManager.AddConfigItem(lccrouchudEntry);
             LethalConfigManager.AddConfigItem(an0npatchesEntry);
@@ -43,7 +42,6 @@ namespace InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(damagemetricsEntry);
             LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
             LethalConfigManager.AddConfigItem(infectedcompanyEntry);
-
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 

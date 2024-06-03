@@ -1,18 +1,23 @@
 ﻿using InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.UIHandler;
+using static InsanityDisplay.UI.MeterHandler;
+using static InsanityDisplay.UI.IconHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {
     public class GeneralImprovementsCompatibility
     {
+        private static GameObject HitpointDisplay;
         private static Vector3 localPosition = Vector3.zero;
         private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
 
         public static void MoveHPHud()
         {
-            GameObject HitpointDisplay = TopLeftCornerHUD.transform.Find("HPUI")?.gameObject;
-            if (HitpointDisplay == null) { return; }
+            if (!HitpointDisplay)
+            {
+                HitpointDisplay = TopLeftCornerHUD?.transform.Find("HPUI").gameObject;
+            }
+            if (!HitpointDisplay) { return; }
 
             localPosition = localPosition == Vector3.zero ? HitpointDisplay.transform.localPosition : localPosition;
             bool GICompat = ConfigSettings.Compat.GeneralImprovements.Value;

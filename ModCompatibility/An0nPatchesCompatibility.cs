@@ -1,6 +1,6 @@
 ﻿using InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.UIHandler;
+using static InsanityDisplay.UI.MeterHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {

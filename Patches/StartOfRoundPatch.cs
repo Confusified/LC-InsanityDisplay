@@ -1,8 +1,6 @@
 ﻿using DunGen;
 using HarmonyLib;
 using InsanityDisplay.ModCompatibility;
-using UnityEngine;
-using static InsanityDisplay.UI.UIHandler;
 
 namespace InsanityDisplay.Patches
 {

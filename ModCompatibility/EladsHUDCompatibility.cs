@@ -2,7 +2,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InsanityDisplay.UI.UIHandler;
+using static InsanityDisplay.UI.MeterHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {
