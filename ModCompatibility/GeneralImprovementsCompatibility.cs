@@ -1,43 +1,30 @@
-﻿using DunGen;
-using System.Collections;
+﻿using InsanityDisplay.Config;
 using UnityEngine;
+using static InsanityDisplay.UI.MeterHandler;
+using static InsanityDisplay.UI.IconHandler;
 
 namespace InsanityDisplay.ModCompatibility
 {
     public class GeneralImprovementsCompatibility
     {
-        private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
-        private const int maxAttempts = 500; //Amount of frames it will retry (until it is found)
         private static GameObject HitpointDisplay;
+        private static Vector3 localPosition = Vector3.zero;
+        private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
 
         public static void MoveHPHud()
         {
-            HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
-
-            if (HitpointDisplay == null) { CoroutineHelper.Start(RetryUntilFound()); return; }
-
-            HitpointDisplay.transform.localPosition += localPositionOffset;
-        }
-
-        private static IEnumerator RetryUntilFound() //with a max limit of maxAttempts
-        {
-            for (int i = 0; i < maxAttempts; i++)
+            if (!HitpointDisplay)
             {
-
-                HitpointDisplay = GameObject.Find("Systems/UI/Canvas/IngamePlayerHUD/TopLeftCorner/HPUI")?.gameObject;
-                if (HitpointDisplay == null)
-                {
-                    yield return null; //Wait one frame
-                    continue;
-                }
-                HitpointDisplay.transform.localPosition += localPositionOffset;
-                break;
+                HitpointDisplay = TopLeftCornerHUD?.transform.Find("HPUI").gameObject;
             }
-            if (HitpointDisplay == null)
+            if (!HitpointDisplay) { return; }
+
+            localPosition = localPosition == Vector3.zero ? HitpointDisplay.transform.localPosition : localPosition;
+            bool GICompat = ConfigSettings.Compat.GeneralImprovements.Value;
+            if ((GICompat && HitpointDisplay.transform.localPosition != (localPosition + localPositionOffset)) || (!GICompat && HitpointDisplay.transform.localPosition != (localPosition - selfLocalPositionOffset))) //update if hud is positioned incorrectly
             {
-                Initialise.modLogger.LogError("GeneralImprovements' health display wasn't found");
+                HitpointDisplay.transform.localPosition = GICompat && ConfigSettings.ModEnabled.Value ? localPosition + localPositionOffset : (localPosition - selfLocalPositionOffset); //subtract the offset 
             }
-
         }
     }
 }

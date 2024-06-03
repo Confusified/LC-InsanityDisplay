@@ -2,6 +2,7 @@
 using static InsanityDisplay.Initialise;
 using static InsanityDisplay.Config.ConfigSettings;
 using BepInEx.Configuration;
+using System;
 
 namespace InsanityDisplay.Config
 {
@@ -10,10 +11,11 @@ namespace InsanityDisplay.Config
         public static void InitialiseConfig()
         {
             ModEnabled = modConfig.Bind<bool>("Display Settings", "Meter enabled", true, "Add a bar above the stamina bar which display your insanity");
-            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: FFFFFF(FF) (White)");
-            useAccurateDisplay = modConfig.Bind<bool>("Display Settings", "Accurate meter", false, "Show your insanity value more accurately, instead of showing it in the vanilla way");
+            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "#7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: #FFFFFF(FF) (White)");
+            useAccurateDisplay = modConfig.Bind<bool>("Display Settings", "Accurate meter", true, "Show your insanity value more accurately, instead of showing it in the vanilla way");
             enableReverse = modConfig.Bind<bool>("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             alwaysFull = modConfig.Bind<bool>("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
+            iconAlwaysCentered = modConfig.Bind<bool>("Display Settings", "Always Centered Player Icon", false, "Always have the player icon centered, instead of it moving to it's vanilla position when the insanity meter is not visible");
 
             Compat.LCCrouchHUD = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.An0nPatches = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
@@ -25,6 +27,13 @@ namespace InsanityDisplay.Config
             Compat.InfectedCompany = modConfig.Bind<bool>("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
+
+            MeterColor.SettingChanged += (object obj, EventArgs args) => //always set to fully visible
+            {
+                if (!MeterColor.Value.StartsWith("#")) { MeterColor.Value = "#" + MeterColor.Value; }
+                ColorUtility.TryParseHtmlString(MeterColor.Value, out Color meterColor);
+                MeterColor.Value = "#" + ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
+            };
 
             RemoveDeprecatedSettings();
             return;

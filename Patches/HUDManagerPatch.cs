@@ -1,55 +1,52 @@
 ﻿using HarmonyLib;
 using InsanityDisplay.Config;
 using InsanityDisplay.ModCompatibility;
-using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
-using static InsanityDisplay.UI.UIHandler;
+using DunGen;
+using static InsanityDisplay.UI.MeterHandler;
+using static InsanityDisplay.UI.IconHandler;
 
 namespace InsanityDisplay.Patches
 {
     [HarmonyPatch(typeof(HUDManager))]
-    public class HUDManageratch
+    public class HUDManagerPatch
     {
         [HarmonyPatch("Start")]
         [HarmonyPostfix]
-        private static void CreateMeter()
+        private static void StartPostfix()
         {
-            CreateInMemory(); //This will create in memory AND also in scene afterwards
-            return;
+            CoroutineHelper.Start(CreateInsanityMeter());
+        }
+
+        private static IEnumerator CreateInsanityMeter()
+        {
+            yield return new WaitUntil(() => GameNetworkManager.Instance.localPlayerController?.sprintMeterUI != null);
+            CreateInScene();
         }
 
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         private static void SetMeterValues()
         {
-            if (InsanityImage == null) { InsanityImage = InsanityMeter?.GetComponent<Image>(); }
-            if (InsanityImage == null || InsanityMeter == null) { return; } //In case something goes wrong
+            if (InsanityMeter != null && InsanityMeter.activeSelf != ConfigSettings.ModEnabled.Value)
+            {
+                InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+            }
 
-            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null) //if mod is found 
             {
-                if (!ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value) //if compat is disabled, meter is disabled, or meter always full
+                bool setToActive = !ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value || (CompatibilityList.ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value && ConfigSettings.Compat.InfectedCompany.Value);
+                GameObject infectedCompanySlider = InfectedCompanyCompatibility.modInsanitySlider.gameObject;
+
+                if (infectedCompanySlider.activeSelf != setToActive)
                 {
-                    InfectedCompanyCompatibility.modInsanitySlider.gameObject.SetActive(true); //enable infectedcompany's insanity meter
-                }
-                else
-                {
-                    InfectedCompanyCompatibility.modInsanitySlider.gameObject.SetActive(false); //disable infectedcompany's insanity meter
+                    infectedCompanySlider.SetActive(setToActive);
                 }
             }
-
-            if (ConfigSettings.MeterColor.Value.StartsWith("#")) { ConfigSettings.MeterColor.Value.Substring(1); } //Remove # if user put it there
-            ColorUtility.TryParseHtmlString("#" + ConfigSettings.MeterColor.Value, out Color meterColor);
-
-            if (CompatibilityList.ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value && (!CompatibilityList.ModInstalled.LethalCompanyVR || CompatibilityList.ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value))
-            {
-                if (EladsHUDCompatibility.InsanityInfo == null) { return; } //In case something goes wrong
-                EladsHUDCompatibility.InsanityInfo.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
-                EladsHUDCompatibility.InsanityInfo.text = $"{Math.Floor(GetFillAmount() * 100)}%";
-            }
-            InsanityImage.fillAmount = GetFillAmount();
-            InsanityImage.color = meterColor + new Color(0, 0, 0, 1); //Always set to completely visible regardless of config
+            AdjustIcon();
+            EnableCompatibilities(hasCustomBehaviour: true); //only update those that are meant to be updated
+            UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
         }
     }
 }
