@@ -15,7 +15,7 @@ namespace InsanityDisplay.ModCompatibility
         {
             if (!HitpointDisplay)
             {
-                HitpointDisplay = TopLeftCornerHUD?.transform.Find("HPUI").gameObject;
+                HitpointDisplay = TopLeftCornerHUD?.transform.Find("HPUI")?.gameObject;
             }
             if (!HitpointDisplay) { return; }
 

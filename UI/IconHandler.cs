@@ -12,15 +12,11 @@ namespace InsanityDisplay.UI
         public static Vector3 selfLocalPosition = Vector3.zero;
         public static void AdjustIcon()
         {
-            if (!selfIcon)
-            {
-                selfIcon = TopLeftCornerHUD?.transform.Find("Self").gameObject; //Doesn't seem to have a simple variable attached to it
-            }
-            if (!selfRedIcon)
-            {
-                selfRedIcon = HUDManager.Instance.selfRedCanvasGroup?.gameObject;
-            }
+
+            GameObject selfIcon = TopLeftCornerHUD?.transform.Find("Self")?.gameObject; //Doesn't seem to have a simple variable attached to it
+            GameObject selfRedIcon = HUDManager.Instance.selfRedCanvasGroup?.gameObject;
             if (!selfIcon || !selfRedIcon) { return; }
+
             if (selfLocalPosition == Vector3.zero)
             {
                 selfLocalPosition = selfIcon.transform.localPosition;

@@ -11,7 +11,7 @@ namespace InsanityDisplay.Config
         public static void InitialiseConfig()
         {
             ModEnabled = modConfig.Bind<bool>("Display Settings", "Meter enabled", true, "Add a bar above the stamina bar which display your insanity");
-            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "#7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: #FFFFFF(FF) (White)");
+            MeterColor = modConfig.Bind<string>("Display Settings", "Color of the Meter", "7300A6FF", "The colour that the insanity meter will have\n The colour value must be in HEX\nExample: FFFFFF(FF) (White)");
             useAccurateDisplay = modConfig.Bind<bool>("Display Settings", "Accurate meter", true, "Show your insanity value more accurately, instead of showing it in the vanilla way");
             enableReverse = modConfig.Bind<bool>("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             alwaysFull = modConfig.Bind<bool>("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
@@ -28,15 +28,19 @@ namespace InsanityDisplay.Config
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
-            MeterColor.SettingChanged += (object obj, EventArgs args) => //always set to fully visible
-            {
-                if (!MeterColor.Value.StartsWith("#")) { MeterColor.Value = "#" + MeterColor.Value; }
-                ColorUtility.TryParseHtmlString(MeterColor.Value, out Color meterColor);
-                MeterColor.Value = "#" + ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
-            };
-
             RemoveDeprecatedSettings();
+
+            FixColor(); //Fix the meter being white if the user's config doesn't start with '#'
+            MeterColor.SettingChanged += FixColor;
             return;
+        }
+
+        private static void FixColor(object obj = null, EventArgs args = null)
+        {
+            if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } //Remove '#' from the user's config value
+            ColorUtility.TryParseHtmlString("#" + MeterColor.Value, out Color meterColor);
+            MeterColor.Value = ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
+            modLogger.LogInfo($"{meterColor} {meterColor + Color.black}");
         }
 
         public static void RemoveDeprecatedSettings()
