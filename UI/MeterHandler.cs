@@ -144,7 +144,7 @@ namespace InsanityDisplay.UI
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
-            ColorUtility.TryParseHtmlString(ConfigSettings.MeterColor.Value, out Color meterColor);
+            ColorUtility.TryParseHtmlString('#' + ConfigSettings.MeterColor.Value, out Color meterColor);
 
             if (textMeter != null) //player is using elad's hud
             {
@@ -170,7 +170,7 @@ namespace InsanityDisplay.UI
                 lastInsanityValue = insanityValue;
             }
 
-            if (oldColorValue.CompareRGB(meterColor) || oldColorValue.a != meterColor.a)
+            if (oldColorValue.CompareRGB(meterColor))
             {
                 oldColorValue = meterColor;
             }

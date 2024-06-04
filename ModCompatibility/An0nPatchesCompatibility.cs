@@ -13,7 +13,7 @@ namespace InsanityDisplay.ModCompatibility
         {
             if (CompatibilityList.ModInstalled.EladsHUD) { return; }
 
-            GameObject An0nTextHUD = TopLeftCornerHUD?.transform.Find("HPSP").gameObject;
+            GameObject An0nTextHUD = TopLeftCornerHUD?.transform.Find("HPSP")?.gameObject;
 
             if (An0nTextHUD == null) { Initialise.modLogger.LogError("An0nTextHUD's HUD wasn't found"); return; }
 
