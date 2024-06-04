@@ -28,15 +28,18 @@ namespace InsanityDisplay.Config
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
-            MeterColor.SettingChanged += (object obj, EventArgs args) => //always set to fully visible
-            {
-                if (!MeterColor.Value.StartsWith("#")) { MeterColor.Value = "#" + MeterColor.Value; }
-                ColorUtility.TryParseHtmlString(MeterColor.Value, out Color meterColor);
-                MeterColor.Value = "#" + ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
-            };
+            FixColor(null, null); //Fix the meter being white if the user's config doesn't start with '#'
+            MeterColor.SettingChanged += FixColor;
 
             RemoveDeprecatedSettings();
             return;
+        }
+
+        private static void FixColor(object obj, EventArgs args)
+        {
+            if (!MeterColor.Value.StartsWith("#")) { MeterColor.Value = "#" + MeterColor.Value; }
+            ColorUtility.TryParseHtmlString(MeterColor.Value, out Color meterColor);
+            MeterColor.Value = "#" + ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
         }
 
         public static void RemoveDeprecatedSettings()

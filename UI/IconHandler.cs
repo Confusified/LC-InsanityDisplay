@@ -14,7 +14,7 @@ namespace InsanityDisplay.UI
         {
             if (!selfIcon)
             {
-                selfIcon = TopLeftCornerHUD?.transform.Find("Self").gameObject; //Doesn't seem to have a simple variable attached to it
+                selfIcon = TopLeftCornerHUD?.transform.Find("Self")?.gameObject; //Doesn't seem to have a simple variable attached to it
             }
             if (!selfRedIcon)
             {
