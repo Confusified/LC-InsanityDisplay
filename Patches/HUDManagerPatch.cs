@@ -44,9 +44,9 @@ namespace InsanityDisplay.Patches
                     infectedCompanySlider.SetActive(setToActive);
                 }
             }
+            UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
             AdjustIcon();
             EnableCompatibilities(hasCustomBehaviour: true); //only update those that are meant to be updated
-            UpdateMeter(imageMeter: InsanityImage, textMeter: EladsHUDCompatibility.InsanityInfo); //elad's will be null if not present
         }
     }
 }
