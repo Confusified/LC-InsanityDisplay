@@ -35,13 +35,13 @@ namespace InsanityDisplay.UI
         {
             if (InsanityMeter != null) { return; } //Already exists
 
-            localPlayer = GameNetworkManager.Instance.localPlayerController;
-            vanillaSprintMeter = localPlayer.sprintMeterUI.gameObject;
+            localPlayer = GameNetworkManager.Instance?.localPlayerController;
+            vanillaSprintMeter = localPlayer?.sprintMeterUI?.gameObject;
 
             InsanityMeter = GameObject.Instantiate(vanillaSprintMeter);
             InsanityMeter.name = "InsanityMeter";
 
-            TopLeftCornerHUD = vanillaSprintMeter.transform.parent.gameObject;
+            TopLeftCornerHUD = vanillaSprintMeter?.transform.parent.gameObject;
 
             Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetParent(TopLeftCornerHUD.transform);
@@ -73,8 +73,11 @@ namespace InsanityDisplay.UI
                 ModInstalled.EladsHUD, ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || (ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)),
                 () =>
                 {
-                    GameObject.Destroy(InsanityMeter);
-                    InsanityMeter = null;
+                    if (!EladsHUDCompatibility.InsanityInfo && InsanityMeter) //if there isn't a meter existant yet (in elad's hud)
+                    {
+                        GameObject.Destroy(InsanityMeter);
+                        InsanityMeter = null;
+                    }
                     EladsHUDCompatibility.EditEladsHUD();
                 },
                  customBehaviour: hasCustomBehaviour);
