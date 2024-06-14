@@ -21,7 +21,7 @@ namespace InsanityDisplay.Patches
 
         private static IEnumerator CreateInsanityMeter()
         {
-            yield return new WaitUntil(() => GameNetworkManager.Instance.localPlayerController?.sprintMeterUI != null);
+            yield return new WaitUntil(() => GameNetworkManager.Instance?.localPlayerController?.sprintMeterUI != null && HUDManager.Instance?.selfRedCanvasGroup != null);
             CreateInScene();
         }
 

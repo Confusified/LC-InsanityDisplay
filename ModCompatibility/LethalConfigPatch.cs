@@ -9,6 +9,9 @@ namespace InsanityDisplay.ModCompatibility
     {
         public static void SetLethalConfigEntries()
         {
+            //Skip auto-generating a config 
+            LethalConfigManager.SkipAutoGen();
+
             //Display Settings
             var modenabledEntry = new BoolCheckBoxConfigItem(ModEnabled, false);
             var metercolorEntry = new TextInputFieldConfigItem(MeterColor, new TextInputFieldOptions { CharacterLimit = 9, RequiresRestart = false });

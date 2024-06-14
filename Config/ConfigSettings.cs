@@ -11,6 +11,7 @@ namespace InsanityDisplay.Config
         public static ConfigEntry<bool> enableReverse; //Become a sanity meter instead of insanity meter
         public static ConfigEntry<bool> alwaysFull; //Basically just always show the bar
         public static ConfigEntry<bool> iconAlwaysCentered; //The player icon that displays your health (i intend to move it whenever the insanity meter is not visible)
+        // ^ change into an Enum, so user can choose between Always, AvoidOverlap, Never (haven't found a good name for the default behaviour yet)
 
         //Mod Compatibility Settings
         public class Compat

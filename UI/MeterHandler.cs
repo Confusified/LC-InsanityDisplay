@@ -55,7 +55,6 @@ namespace InsanityDisplay.UI
 
             InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
 
-
             AdjustIcon();
             EnableCompatibilities(isMeterCreation: true);
             return;

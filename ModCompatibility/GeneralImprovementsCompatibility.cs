@@ -23,7 +23,7 @@ namespace InsanityDisplay.ModCompatibility
             bool GICompat = ConfigSettings.Compat.GeneralImprovements.Value;
             if ((GICompat && HitpointDisplay.transform.localPosition != (localPosition + localPositionOffset)) || (!GICompat && HitpointDisplay.transform.localPosition != (localPosition - selfLocalPositionOffset))) //update if hud is positioned incorrectly
             {
-                HitpointDisplay.transform.localPosition = GICompat && ConfigSettings.ModEnabled.Value ? localPosition + localPositionOffset : (localPosition - selfLocalPositionOffset); //subtract the offset 
+                HitpointDisplay.transform.localPosition = GICompat && ConfigSettings.ModEnabled.Value ? localPosition + localPositionOffset : (localPosition - selfLocalPositionOffset); //subtract the offset (generalimprovements' positioning is very weird for me without the mod (and with))
             }
         }
     }
