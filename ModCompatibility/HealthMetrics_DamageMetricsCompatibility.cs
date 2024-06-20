@@ -1,7 +1,8 @@
-﻿using InsanityDisplay.Config;
+﻿using LC_InsanityDisplay;
+using LC_InsanityDisplay.Config;
 using UnityEngine;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class HealthMetrics_DamageMetricsCompatibility
     {
@@ -18,19 +19,19 @@ namespace InsanityDisplay.ModCompatibility
             {
                 string Display = usingHealthMetrics ? "HealthMetrics" : "DamageMetrics";
 
-                Initialise.modLogger.LogError($"{Display}' display wasn't found");
+                Initialise.Logger.LogError($"{Display}' display wasn't found");
                 return;
             }
             localPosition = localPosition == Vector3.zero ? MetricDisplay.transform.localPosition : localPosition;
 
             //if mod is enabled and     using health metrics and not positioned correctly or if not using health metrics and not positioned correctly
-            bool HealthCompat = ConfigSettings.Compat.HealthMetrics.Value;
-            bool DamageCompat = ConfigSettings.Compat.DamageMetrics.Value;
-            if (ConfigSettings.ModEnabled.Value && ((usingHealthMetrics && HealthCompat && MetricDisplay.transform.localPosition != (localPosition + localPositionOffset_Health)) || (!usingHealthMetrics && DamageCompat && MetricDisplay.transform.localPosition != (localPosition + localPositionOffset_Damage)))) //update if hud is positioned incorrectly
+            bool HealthCompat = ConfigHandler.Compat.HealthMetrics.Value;
+            bool DamageCompat = ConfigHandler.Compat.DamageMetrics.Value;
+            if (ConfigHandler.ModEnabled.Value && (usingHealthMetrics && HealthCompat && MetricDisplay.transform.localPosition != localPosition + localPositionOffset_Health || !usingHealthMetrics && DamageCompat && MetricDisplay.transform.localPosition != localPosition + localPositionOffset_Damage)) //update if hud is positioned incorrectly
             {
                 MetricDisplay.transform.localPosition = usingHealthMetrics ? localPosition + localPositionOffset_Health : localPosition + localPositionOffset_Damage;
             }
-            else if (!ConfigSettings.ModEnabled.Value || (!HealthCompat && usingHealthMetrics) || (!DamageCompat && !usingHealthMetrics)) //can create overlap issue when mod is disabled because of the icon being centered
+            else if (!ConfigHandler.ModEnabled.Value || !HealthCompat && usingHealthMetrics || !DamageCompat && !usingHealthMetrics) //can create overlap issue when mod is disabled because of the icon being centered
             {
                 MetricDisplay.transform.localPosition = localPosition;
             }

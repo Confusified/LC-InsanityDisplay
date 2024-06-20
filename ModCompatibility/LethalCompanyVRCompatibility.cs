@@ -1,10 +1,10 @@
 ﻿using LCVR;
 using UnityEngine;
-using InsanityDisplay.UI;
 using System.Collections;
 using LCVR.Player;
+using LC_InsanityDisplay.UI;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class LethalCompanyVRCompatibility
     {

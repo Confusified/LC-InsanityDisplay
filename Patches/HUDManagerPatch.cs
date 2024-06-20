@@ -1,13 +1,13 @@
 ﻿using HarmonyLib;
-using InsanityDisplay.Config;
-using InsanityDisplay.ModCompatibility;
 using System.Collections;
 using UnityEngine;
 using DunGen;
-using static InsanityDisplay.UI.MeterHandler;
-using static InsanityDisplay.UI.IconHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.IconHandler;
+using LC_InsanityDisplay.ModCompatibility;
+using LC_InsanityDisplay.Config;
 
-namespace InsanityDisplay.Patches
+namespace LC_InsanityDisplay.Patches
 {
     [HarmonyPatch(typeof(HUDManager))]
     public class HUDManagerPatch
@@ -29,14 +29,14 @@ namespace InsanityDisplay.Patches
         [HarmonyPostfix]
         private static void SetMeterValues()
         {
-            if (InsanityMeter != null && InsanityMeter.activeSelf != ConfigSettings.ModEnabled.Value)
+            if (InsanityMeter != null && InsanityMeter.activeSelf != ConfigHandler.ModEnabled.Value)
             {
-                InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+                InsanityMeter.SetActive(ConfigHandler.ModEnabled.Value);
             }
 
             if (CompatibilityList.ModInstalled.InfectedCompany && InfectedCompanyCompatibility.modInsanitySlider != null) //if mod is found 
             {
-                bool setToActive = !ConfigSettings.ModEnabled.Value || ConfigSettings.alwaysFull.Value || !ConfigSettings.Compat.InfectedCompany.Value || (CompatibilityList.ModInstalled.EladsHUD && !ConfigSettings.Compat.EladsHUD.Value && ConfigSettings.Compat.InfectedCompany.Value);
+                bool setToActive = !ConfigHandler.ModEnabled.Value || ConfigHandler.alwaysFull.Value || !ConfigHandler.Compat.InfectedCompany.Value || CompatibilityList.ModInstalled.EladsHUD && !ConfigHandler.Compat.EladsHUD.Value && ConfigHandler.Compat.InfectedCompany.Value;
                 GameObject infectedCompanySlider = InfectedCompanyCompatibility.modInsanitySlider.gameObject;
 
                 if (infectedCompanySlider.activeSelf != setToActive)

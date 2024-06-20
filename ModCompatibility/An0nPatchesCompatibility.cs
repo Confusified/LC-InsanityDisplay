@@ -1,8 +1,9 @@
-﻿using InsanityDisplay.Config;
+﻿using LC_InsanityDisplay;
+using LC_InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class An0nPatchesCompatibility
     {
@@ -15,13 +16,16 @@ namespace InsanityDisplay.ModCompatibility
 
             GameObject An0nTextHUD = TopLeftCornerHUD?.transform.Find("HPSP")?.gameObject;
 
-            if (An0nTextHUD == null) { Initialise.modLogger.LogError("An0nTextHUD's HUD wasn't found"); return; }
-
-            bool An0nCompat = ConfigSettings.Compat.An0nPatches.Value;
-            localPosition = localPosition == Vector3.zero ? An0nTextHUD.transform.localPosition : localPosition;
-            if ((An0nCompat && An0nTextHUD.transform.localPosition != (localPosition + localPositionOffset)) || (!An0nCompat && An0nTextHUD.transform.localPosition != localPosition)) //update if hud is positioned incorrectly
+            if (An0nTextHUD == null)
             {
-                An0nTextHUD.transform.localPosition = An0nCompat && ConfigSettings.ModEnabled.Value ? localPosition + localPositionOffset : localPosition;
+                Initialise.Logger.LogError("An0nTextHUD's HUD wasn't found"); return;
+            }
+
+            bool An0nCompat = ConfigHandler.Compat.An0nPatches.Value;
+            localPosition = localPosition == Vector3.zero ? An0nTextHUD.transform.localPosition : localPosition;
+            if (An0nCompat && An0nTextHUD.transform.localPosition != localPosition + localPositionOffset || !An0nCompat && An0nTextHUD.transform.localPosition != localPosition) //update if hud is positioned incorrectly
+            {
+                An0nTextHUD.transform.localPosition = An0nCompat && ConfigHandler.ModEnabled.Value ? localPosition + localPositionOffset : localPosition;
             }
         }
     }

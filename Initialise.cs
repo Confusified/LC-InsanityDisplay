@@ -3,50 +3,49 @@ using BepInEx.Logging;
 using BepInEx.Configuration;
 using HarmonyLib;
 using System.Reflection;
-using InsanityDisplay.Config;
 using BepInEx.Bootstrap;
 using System;
 using System.Collections.Generic;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
+using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
+using LC_InsanityDisplay.ModCompatibility;
+using LC_InsanityDisplay.Config;
 
-namespace InsanityDisplay
+namespace LC_InsanityDisplay
 {
     //Soft dependencies
+    [CompatibleDependency(ModGUIDS.LethalConfig, typeof(LethalConfigPatch))] //New system to use for dependencies
+    [CompatibleDependency(ModGUIDS.LobbyCompatibility, typeof(LobbyCompatibilityPatch))]
     [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.EladsHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(ModGUIDS.LobbyCompatibility, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(ModGUIDS.LethalConfig, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
     //Plugin
-    [BepInPlugin(modGUID, modName, modVersion)]
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Initialise : BaseUnityPlugin
     {
-        private const string modGUID = "com.Confusified.InsanityDisplay";
-        private const string modName = "InsanityDisplay";
-        private const string modVersion = "1.2.2";
 
-        public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + modGUID.Substring(4).Replace(".", "\\"));
+        public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + MyPluginInfo.PLUGIN_GUID[4..].Replace(".", "\\"));
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
 
-        private readonly Harmony _Harmony = new Harmony(modGUID);
-        public static ManualLogSource modLogger;
+        private readonly Harmony _Harmony = new Harmony(MyPluginInfo.PLUGIN_GUID); //Can be removed after changing all Harmony patches into Monomod hooks
+        internal new static ManualLogSource Logger { get; private set; } = null!;
 
         public void Awake()
         {
-            modLogger = BepInEx.Logging.Logger.CreateLogSource(modGUID);
-            modLogger = Logger;
+            Logger = BepInEx.Logging.Logger.CreateLogSource(MyPluginInfo.PLUGIN_GUID);
+            Logger = Logger;
 
             ConfigHandler.InitialiseConfig();
-
+            if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); return; }
             CheckForModCompatibility();
+            CompatibleDependencyAttribute.Init(this);
 
             _Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            modLogger.LogInfo($"{modName} {modVersion} loaded");
+            Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
         }
 
@@ -60,8 +59,6 @@ namespace InsanityDisplay
                 { ModGUIDS.GeneralImprovements, () => ModInstalled.GeneralImprovements = true },
                 { ModGUIDS.HealthMetrics, () => ModInstalled.HealthMetrics = true },
                 { ModGUIDS.DamageMetrics, () => ModInstalled.DamageMetrics = true },
-                { ModGUIDS.LobbyCompatibility, () => ModCompatibility.LobbyCompatibilityPatch.UseLobbyCompatibility(modGUID, modVersion) },
-                { ModGUIDS.LethalConfig, () => ModCompatibility.LethalConfigPatch.SetLethalConfigEntries() },
                 { ModGUIDS.LethalCompanyVR, () => ModInstalled.LethalCompanyVR = true },
                 { ModGUIDS.InfectedCompany, () => ModInstalled.InfectedCompany = true }
              };
@@ -71,7 +68,7 @@ namespace InsanityDisplay
                 if (Chainloader.PluginInfos.ContainsKey(modAction.Key))
                 {
                     modAction.Value.Invoke();
-                    modLogger.LogDebug($"Found {modAction.Key}");
+                    Logger.LogDebug($"Found {modAction.Key}");
                 }
             }
         }

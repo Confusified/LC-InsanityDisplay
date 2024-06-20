@@ -1,16 +1,17 @@
-﻿using InsanityDisplay.Config;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using InsanityDisplay.ModCompatibility;
 using GameNetcodeStuff;
 using DunGen;
 using TMPro;
 using System;
-using static InsanityDisplay.ModCompatibility.CompatibilityList;
-using static InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
-using static InsanityDisplay.UI.IconHandler;
+using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
+using static LC_InsanityDisplay.ModCompatibility.InfectedCompanyCompatibility;
+using static LC_InsanityDisplay.UI.IconHandler;
+using LC_InsanityDisplay;
+using LC_InsanityDisplay.Config;
+using LC_InsanityDisplay.ModCompatibility;
 
-namespace InsanityDisplay.UI
+namespace LC_InsanityDisplay.UI
 {
     public class MeterHandler
     {
@@ -22,14 +23,14 @@ namespace InsanityDisplay.UI
         private static float lastInsanityValue;
         private static Color oldColorValue;
 
-        public static GameObject InsanityMeter;
+        public static GameObject? InsanityMeter;
 
-        public static Image InsanityImage;
-        public static GameObject TopLeftCornerHUD;
+        public static Image? InsanityImage;
+        public static GameObject? TopLeftCornerHUD;
 
-        private static PlayerControllerB localPlayer;
+        private static PlayerControllerB? localPlayer;
 
-        public static GameObject vanillaSprintMeter;
+        public static GameObject? vanillaSprintMeter;
 
         public static void CreateInScene()
         {
@@ -38,7 +39,7 @@ namespace InsanityDisplay.UI
             localPlayer = GameNetworkManager.Instance?.localPlayerController;
             vanillaSprintMeter = localPlayer?.sprintMeterUI?.gameObject;
 
-            InsanityMeter = GameObject.Instantiate(vanillaSprintMeter);
+            InsanityMeter = UnityEngine.Object.Instantiate(vanillaSprintMeter);
             InsanityMeter.name = "InsanityMeter";
 
             TopLeftCornerHUD = vanillaSprintMeter?.transform.parent.gameObject;
@@ -53,7 +54,7 @@ namespace InsanityDisplay.UI
 
             UpdateMeter(imageMeter: InsanityImage);
 
-            InsanityMeter.SetActive(ConfigSettings.ModEnabled.Value);
+            InsanityMeter.SetActive(ConfigHandler.ModEnabled.Value);
 
             AdjustIcon();
             EnableCompatibilities(isMeterCreation: true);
@@ -64,54 +65,54 @@ namespace InsanityDisplay.UI
         {
             if (isMeterCreation)
             {
-                Initialise.modLogger.LogInfo("Enabling compatibilities");
+                Initialise.Logger.LogInfo("Enabling compatibilities");
             }
 
-            EnableCompatibility(ModInstalled.LCCrouchHUD, ConfigSettings.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.LCCrouchHUD, ConfigHandler.Compat.LCCrouchHUD.Value, LCCrouchHUDCompatibility.MoveCrouchHUD, customBehaviour: hasCustomBehaviour);
             EnableCompatibility(
-                ModInstalled.EladsHUD, ConfigSettings.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || (ModInstalled.LethalCompanyVR && !ConfigSettings.Compat.LethalCompanyVR.Value)),
+                ModInstalled.EladsHUD, ConfigHandler.Compat.EladsHUD.Value && (!ModInstalled.LethalCompanyVR || ModInstalled.LethalCompanyVR && !ConfigHandler.Compat.LethalCompanyVR.Value),
                 () =>
                 {
                     if (!EladsHUDCompatibility.InsanityInfo && InsanityMeter) //if there isn't a meter existant yet (in elad's hud)
                     {
-                        GameObject.Destroy(InsanityMeter);
-                        InsanityMeter = null;
+                        UnityEngine.Object.Destroy(InsanityMeter);
+                        InsanityMeter = null!;
                     }
                     EladsHUDCompatibility.EditEladsHUD();
                 },
                  customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.An0nPatches, ConfigSettings.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.GeneralImprovements, ConfigSettings.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.HealthMetrics, ConfigSettings.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.DamageMetrics, ConfigSettings.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), customBehaviour: hasCustomBehaviour);
-            EnableCompatibility(ModInstalled.LethalCompanyVR, ConfigSettings.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()));
-            EnableCompatibility(ModInstalled.InfectedCompany, ConfigSettings.Compat.InfectedCompany.Value, null, customBehaviour: hasCustomBehaviour); //Handled in StartOfRoundPatch
+            EnableCompatibility(ModInstalled.An0nPatches, ConfigHandler.Compat.An0nPatches.Value, An0nPatchesCompatibility.MoveTextHUD, customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.GeneralImprovements, ConfigHandler.Compat.GeneralImprovements.Value, GeneralImprovementsCompatibility.MoveHPHud, customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.HealthMetrics, ConfigHandler.Compat.HealthMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(true), customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.DamageMetrics, ConfigHandler.Compat.DamageMetrics.Value, () => HealthMetrics_DamageMetricsCompatibility.MoveDisplay(false), customBehaviour: hasCustomBehaviour);
+            EnableCompatibility(ModInstalled.LethalCompanyVR, ConfigHandler.Compat.LethalCompanyVR.Value, () => CoroutineHelper.Start(LethalCompanyVRCompatibility.EnableVRCompatibility()));
+            EnableCompatibility(ModInstalled.InfectedCompany, ConfigHandler.Compat.InfectedCompany.Value, null!, customBehaviour: hasCustomBehaviour); //Handled in StartOfRoundPatch
         }
 
-        private static void EnableCompatibility(bool condition1, bool condition2, Action compatibilityAction = null, bool customBehaviour = false)
+        private static void EnableCompatibility(bool condition1, bool condition2, Action compatibilityAction = null!, bool customBehaviour = false)
         {
-            if ((condition1 && condition2) || (condition1 && customBehaviour))
+            if (condition1 && condition2 || condition1 && customBehaviour)
             {
                 compatibilityAction?.Invoke();
             }
         }
 
-        public static void UpdateMeter(Image imageMeter = null, TextMeshProUGUI textMeter = null)
+        public static void UpdateMeter(Image imageMeter = null!, TextMeshProUGUI textMeter = null!)
         {
-            if (!ConfigSettings.ModEnabled.Value || (imageMeter == null && textMeter == null)) { return; } //Meter isn't visible so don't update at all
-            bool enableReverse = ConfigSettings.enableReverse.Value;
-            bool alwaysFull = ConfigSettings.alwaysFull.Value;
-            bool useAccurate = ConfigSettings.useAccurateDisplay.Value;
+            if (!ConfigHandler.ModEnabled.Value || imageMeter == null && textMeter == null) { return; } //Meter isn't visible so don't update at all
+            bool enableReverse = ConfigHandler.enableReverse.Value;
+            bool alwaysFull = ConfigHandler.alwaysFull.Value;
+            bool useAccurate = ConfigHandler.useAccurateDisplay.Value;
             bool gameHasStarted = GameNetworkManager.Instance.gameHasStarted;
             localPlayer = GameNetworkManager.Instance.localPlayerController;
 
-            if (localPlayer == null || (!useAccurate && !alwaysFull && !enableReverse && !gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 0) || (textMeter != null && textMeter.text != "0%"))) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
-            if (alwaysFull || (!useAccurate && enableReverse && !gameHasStarted) && ((imageMeter != null && imageMeter.fillAmount != 1) || (textMeter != null && textMeter.text != "100%"))) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
+            if (localPlayer == null || !useAccurate && !alwaysFull && !enableReverse && !gameHasStarted && (imageMeter != null && imageMeter.fillAmount != 0 || textMeter != null && textMeter.text != "0%")) { SetValueForCorrectType(imageMeter, textMeter, 0); return; } //if player doesnt exist or in orbit (with certain settings disabled) set to 0
+            if (alwaysFull || !useAccurate && enableReverse && !gameHasStarted && (imageMeter != null && imageMeter.fillAmount != 1 || textMeter != null && textMeter.text != "100%")) { SetValueForCorrectType(imageMeter, textMeter, 1); return; } //if alwaysfull enabled or in orbit and reverse enabled set to 1
 
             float finalInsanityValue = 0;
-            bool compatibleEladsHUD = ModInstalled.EladsHUD && ConfigSettings.Compat.EladsHUD.Value;
+            bool compatibleEladsHUD = ModInstalled.EladsHUD && ConfigHandler.Compat.EladsHUD.Value;
 
-            if (ConfigSettings.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null)
+            if (ConfigHandler.Compat.InfectedCompany.Value && ModInstalled.InfectedCompany && modInsanitySlider != null)
             {
                 float modInsanityValue = modInsanitySlider.value / modInsanitySlider.maxValue;
 
@@ -146,7 +147,7 @@ namespace InsanityDisplay.UI
 
         private static void SetValueForCorrectType(Image imageMeter, TextMeshProUGUI textMeter, float insanityValue)
         {
-            ColorUtility.TryParseHtmlString('#' + ConfigSettings.MeterColor.Value, out Color meterColor);
+            ColorUtility.TryParseHtmlString('#' + ConfigHandler.MeterColor.Value, out Color meterColor);
 
             if (textMeter != null) //player is using elad's hud
             {

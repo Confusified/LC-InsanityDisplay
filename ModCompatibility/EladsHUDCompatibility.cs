@@ -1,10 +1,10 @@
-﻿using InsanityDisplay.Config;
+﻿using LC_InsanityDisplay.Config;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class EladsHUDCompatibility
     {
@@ -24,12 +24,12 @@ namespace InsanityDisplay.ModCompatibility
             if (!InsanityMeter)
             {
                 //Create the meter and remove unnecessary elements from it
-                InsanityMeter = GameObject.Instantiate(EladsHUDStamina);
+                InsanityMeter = Object.Instantiate(EladsHUDStamina);
                 InsanityMeter.name = "Insanity";
                 //Unity Log Warning: Unable to add the requested character to font asset [3270-REGULAR SDF]'s atlas texture. Please make the texture [3270-REGULAR SDF Atlas] readable.
                 //Most likely caused by destroying these
-                GameObject.Destroy(InsanityMeter.transform.Find("CarryInfo")?.gameObject); //Remove CarryInfo
-                GameObject.Destroy(InsanityMeter.transform.Find("Bar/Stamina Change FG")?.gameObject); //Remove unnecessary part of the insanity bar
+                Object.Destroy(InsanityMeter.transform.Find("CarryInfo")?.gameObject); //Remove CarryInfo
+                Object.Destroy(InsanityMeter.transform.Find("Bar/Stamina Change FG")?.gameObject); //Remove unnecessary part of the insanity bar
 
                 Transform EladsHUDObject = EladsHUDStamina.transform.parent;
                 Transform StaminaObject = EladsHUDStamina.transform;
@@ -57,14 +57,14 @@ namespace InsanityDisplay.ModCompatibility
 
             UpdateMeter(imageMeter: InsanityImage, textMeter: InsanityInfo);
 
-            bool EladsCompat = ConfigSettings.Compat.EladsHUD.Value;
-            if ((EladsCompat && batteryUI.localPosition != (batteryLocalPosition + localPositionOffset)) || (!EladsCompat && batteryUI.localPosition != batteryLocalPosition)) //update if hud is positioned incorrectly (only the battery part of elad's hud)
+            bool EladsCompat = ConfigHandler.Compat.EladsHUD.Value;
+            if (EladsCompat && batteryUI.localPosition != batteryLocalPosition + localPositionOffset || !EladsCompat && batteryUI.localPosition != batteryLocalPosition) //update if hud is positioned incorrectly (only the battery part of elad's hud)
             {
-                batteryUI.localPosition = EladsCompat && ConfigSettings.ModEnabled.Value ? batteryLocalPosition + localPositionOffset : batteryLocalPosition;
+                batteryUI.localPosition = EladsCompat && ConfigHandler.ModEnabled.Value ? batteryLocalPosition + localPositionOffset : batteryLocalPosition;
             }
 
-            bool MeterActive = EladsCompat && ConfigSettings.ModEnabled.Value;
-            if (InsanityMeter.activeSelf != (MeterActive) || PercentageInsanityText.activeSelf != (MeterActive)) //if compat not enabled or mod not enabeld hide the meter
+            bool MeterActive = EladsCompat && ConfigHandler.ModEnabled.Value;
+            if (InsanityMeter.activeSelf != MeterActive || PercentageInsanityText.activeSelf != MeterActive) //if compat not enabled or mod not enabeld hide the meter
             {
                 InsanityMeter.SetActive(MeterActive);
                 PercentageInsanityText.SetActive(MeterActive);

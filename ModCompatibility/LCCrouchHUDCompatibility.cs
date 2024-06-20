@@ -1,8 +1,9 @@
-﻿using InsanityDisplay.Config;
+﻿using LC_InsanityDisplay;
+using LC_InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class LCCrouchHUDCompatibility
     {
@@ -14,12 +15,12 @@ namespace InsanityDisplay.ModCompatibility
 
             GameObject CrouchHUDIcon = TopLeftCornerHUD.transform.Find("Self/CrouchIcon")?.gameObject;
 
-            if (CrouchHUDIcon == null) { Initialise.modLogger.LogError("LCCrouchHud's icon wasn't found"); return; }
+            if (CrouchHUDIcon == null) { Initialise.Logger.LogError("LCCrouchHud's icon wasn't found"); return; }
 
-            bool CrouchHUDCompat = ConfigSettings.Compat.LCCrouchHUD.Value;
-            if ((CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != (positionToLocal + localPositionOffset)) || (!CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != positionToLocal)) //update if hud is positioned incorrectly
+            bool CrouchHUDCompat = ConfigHandler.Compat.LCCrouchHUD.Value;
+            if (CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != positionToLocal + localPositionOffset || !CrouchHUDCompat && CrouchHUDIcon.transform.localPosition != positionToLocal) //update if hud is positioned incorrectly
             {
-                CrouchHUDIcon.transform.localPosition = CrouchHUDCompat && ConfigSettings.ModEnabled.Value ? positionToLocal + localPositionOffset : positionToLocal;
+                CrouchHUDIcon.transform.localPosition = CrouchHUDCompat && ConfigHandler.ModEnabled.Value ? positionToLocal + localPositionOffset : positionToLocal;
             }
         }
     }

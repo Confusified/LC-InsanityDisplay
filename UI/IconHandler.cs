@@ -1,9 +1,9 @@
 ﻿using GameNetcodeStuff;
-using InsanityDisplay.Config;
+using LC_InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
 
-namespace InsanityDisplay.UI
+namespace LC_InsanityDisplay.UI
 {
     public class IconHandler
     {
@@ -24,12 +24,12 @@ namespace InsanityDisplay.UI
 
                 //only check one to reduce the amount of conditions
                 //if meter enabled, position wrong, always centered, filled more than the minimum
-                if (ConfigSettings.ModEnabled.Value && (selfIcon.transform.localPosition != (selfLocalPosition + selfLocalPositionOffset) && InsanityImage?.fillAmount > accurate_MinValue) || ConfigSettings.iconAlwaysCentered.Value)
+                if (ConfigHandler.ModEnabled.Value && selfIcon.transform.localPosition != selfLocalPosition + selfLocalPositionOffset && InsanityImage?.fillAmount > accurate_MinValue || ConfigHandler.iconAlwaysCentered.Value)
                 {
                     selfRedIcon.transform.localPosition = selfIcon.transform.localPosition = Vector3.Lerp(selfIcon.transform.localPosition, selfLocalPosition + selfLocalPositionOffset, InsanityImage.fillAmount); //move to the offset position
                 }
                 //if position wrong, not always centered and meter disabled, filled equal or less than the minimum
-                else if (((!ConfigSettings.iconAlwaysCentered.Value && selfIcon.transform.localPosition != (selfLocalPosition)) || ((!ConfigSettings.ModEnabled.Value && !ConfigSettings.iconAlwaysCentered.Value))) && InsanityImage?.fillAmount <= accurate_MinValue)
+                else if ((!ConfigHandler.iconAlwaysCentered.Value && selfIcon.transform.localPosition != selfLocalPosition || !ConfigHandler.ModEnabled.Value && !ConfigHandler.iconAlwaysCentered.Value) && InsanityImage?.fillAmount <= accurate_MinValue)
                 {
                     selfRedIcon.transform.localPosition = selfIcon.transform.localPosition = Vector3.Lerp(selfIcon.transform.localPosition, selfLocalPosition, InsanityImage.fillAmount); //move to the normal position
                 }

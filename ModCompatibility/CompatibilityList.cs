@@ -1,5 +1,4 @@
-﻿
-namespace InsanityDisplay.ModCompatibility
+﻿namespace LC_InsanityDisplay.ModCompatibility
 {
     public class CompatibilityList //perhaps misleading name, but here are the variables for any compatibility
     {

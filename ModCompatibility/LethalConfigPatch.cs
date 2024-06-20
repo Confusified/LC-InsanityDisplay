@@ -1,54 +1,61 @@
-﻿using LethalConfig;
+﻿using static LC_InsanityDisplay.Config.ConfigHandler;
+using LethalConfig;
 using LethalConfig.ConfigItems;
-using static InsanityDisplay.Config.ConfigSettings;
 using LethalConfig.ConfigItems.Options;
+using Steamworks.Data;
+using LC_InsanityDisplay;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class LethalConfigPatch
     {
-        public static void SetLethalConfigEntries()
+        private static void Initialize()
         {
-            //Skip auto-generating a config 
+            //TODO merge many variables into one as they are only used to add a config item 
+            //did that and DAMN it looks TERRIBLE
+
+            //Skip auto-generating a config
             LethalConfigManager.SkipAutoGen();
 
-            //Display Settings
-            var modenabledEntry = new BoolCheckBoxConfigItem(ModEnabled, false);
-            var metercolorEntry = new TextInputFieldConfigItem(MeterColor, new TextInputFieldOptions { CharacterLimit = 9, RequiresRestart = false });
-            var useaccuratedisplayEntry = new BoolCheckBoxConfigItem(useAccurateDisplay, false);
-            var enablereverseEntry = new BoolCheckBoxConfigItem(enableReverse, false);
-            var alwaysfullEntry = new BoolCheckBoxConfigItem(alwaysFull, false);
-            var iconAlwaysCenteredEntry = new BoolCheckBoxConfigItem(iconAlwaysCentered, false);
-            //Mod Compatibility Settings
-            var lccrouchudEntry = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, false);
-            var an0npatchesEntry = new BoolCheckBoxConfigItem(Compat.An0nPatches, false);
-            var eladshudEntry = new BoolCheckBoxConfigItem(Compat.EladsHUD, false);
-            var generalimprovementsEntry = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, false);
-            var healthmetricsEntry = new BoolCheckBoxConfigItem(Compat.HealthMetrics, false);
-            var damagemetricsEntry = new BoolCheckBoxConfigItem(Compat.DamageMetrics, false);
-            var lcvrEntry = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET (did i never fully implement this? damn)
-            var infectedcompanyEntry = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
+            //Variables to be used
+            BoolCheckBoxConfigItem entryBoolCheckBox;
+            TextInputFieldConfigItem entryTextInputField;
 
             //Display Settings
-            LethalConfigManager.AddConfigItem(modenabledEntry);
-            LethalConfigManager.AddConfigItem(metercolorEntry);
-            LethalConfigManager.AddConfigItem(useaccuratedisplayEntry);
-            LethalConfigManager.AddConfigItem(enablereverseEntry);
-            LethalConfigManager.AddConfigItem(alwaysfullEntry);
-            LethalConfigManager.AddConfigItem(iconAlwaysCenteredEntry);
+
+            //entryBoolCheckBox = new BoolCheckBoxConfigItem(ModEnabled, false);
+            //LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryTextInputField = new TextInputFieldConfigItem(MeterColor, new TextInputFieldOptions { CharacterLimit = 9, RequiresRestart = false });
+            LethalConfigManager.AddConfigItem(entryTextInputField);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(useAccurateDisplay, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(enableReverse, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(alwaysFull, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(iconAlwaysCentered, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             //Mod Compatibility Settings
-            LethalConfigManager.AddConfigItem(lccrouchudEntry);
-            LethalConfigManager.AddConfigItem(an0npatchesEntry);
-            LethalConfigManager.AddConfigItem(eladshudEntry);
-            LethalConfigManager.AddConfigItem(generalimprovementsEntry);
-            LethalConfigManager.AddConfigItem(healthmetricsEntry);
-            LethalConfigManager.AddConfigItem(damagemetricsEntry);
-            LethalConfigManager.AddConfigItem(lcvrEntry); //NOT FINISHED YET
-            LethalConfigManager.AddConfigItem(infectedcompanyEntry);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.An0nPatches, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.EladsHUD, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.HealthMetrics, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.DamageMetrics, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET (did i never fully implement this? damn)
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 
-            Initialise.modLogger.LogDebug("Added entries to LethalConfig");
+            Initialise.Logger.LogDebug("Added entries to LethalConfig");
         }
     }
 }

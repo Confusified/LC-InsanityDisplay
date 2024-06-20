@@ -1,12 +1,15 @@
 ﻿using DunGen;
 using HarmonyLib;
-using InsanityDisplay.ModCompatibility;
+using LC_InsanityDisplay.ModCompatibility;
 
-namespace InsanityDisplay.Patches
+namespace LC_InsanityDisplay.Patches
 {
     [HarmonyPatch(typeof(StartOfRound))]
     public class StartOfRoundPatch
     {
+        /// <summary>
+        /// StartOfRoundPatch is only used for the functionality of InfectedCompany's compatibility
+        /// </summary>
         [HarmonyPatch("StartGame")]
         [HarmonyPostfix]
         public static void RoundStartedPostfix(StartOfRound __instance)

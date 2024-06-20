@@ -2,11 +2,11 @@
 using LobbyCompatibility.Features;
 using System;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class LobbyCompatibilityPatch
     {
-        public static void UseLobbyCompatibility(string modGUID, string modVersion)
+        private static void Initialize(string modGUID, string modVersion)
         {
             PluginHelper.RegisterPlugin(modGUID, Version.Parse(modVersion), CompatibilityLevel.ClientOnly, VersionStrictness.None);
         }

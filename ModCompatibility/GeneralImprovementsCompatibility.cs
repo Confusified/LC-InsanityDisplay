@@ -1,9 +1,9 @@
-﻿using InsanityDisplay.Config;
+﻿using LC_InsanityDisplay.Config;
 using UnityEngine;
-using static InsanityDisplay.UI.MeterHandler;
-using static InsanityDisplay.UI.IconHandler;
+using static LC_InsanityDisplay.UI.MeterHandler;
+using static LC_InsanityDisplay.UI.IconHandler;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class GeneralImprovementsCompatibility
     {
@@ -20,10 +20,10 @@ namespace InsanityDisplay.ModCompatibility
             if (!HitpointDisplay) { return; }
 
             localPosition = localPosition == Vector3.zero ? HitpointDisplay.transform.localPosition : localPosition;
-            bool GICompat = ConfigSettings.Compat.GeneralImprovements.Value;
-            if ((GICompat && HitpointDisplay.transform.localPosition != (localPosition + localPositionOffset)) || (!GICompat && HitpointDisplay.transform.localPosition != (localPosition - selfLocalPositionOffset))) //update if hud is positioned incorrectly
+            bool GICompat = ConfigHandler.Compat.GeneralImprovements.Value;
+            if (GICompat && HitpointDisplay.transform.localPosition != localPosition + localPositionOffset || !GICompat && HitpointDisplay.transform.localPosition != localPosition - selfLocalPositionOffset) //update if hud is positioned incorrectly
             {
-                HitpointDisplay.transform.localPosition = GICompat && ConfigSettings.ModEnabled.Value ? localPosition + localPositionOffset : (localPosition - selfLocalPositionOffset); //subtract the offset (generalimprovements' positioning is very weird for me without the mod (and with))
+                HitpointDisplay.transform.localPosition = GICompat && ConfigHandler.ModEnabled.Value ? localPosition + localPositionOffset : localPosition - selfLocalPositionOffset; //subtract the offset (generalimprovements' positioning is very weird for me without the mod (and with))
             }
         }
     }

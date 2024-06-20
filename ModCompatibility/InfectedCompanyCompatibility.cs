@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.ModCompatibility
 {
     public class InfectedCompanyCompatibility
     {
@@ -17,8 +17,11 @@ namespace InsanityDisplay.ModCompatibility
             while (modInsanitySlider == null) //forever (bad) loop to find it
             {
                 GameObject objectInsanityMeter = GameObject.Find("UI_CustomPlayerHUD(Clone)/InfectedPlayerHUD/InsanityMeter").gameObject;
-                objectInsanityMeter?.TryGetComponent<Slider>(out modInsanitySlider);
-                if (modInsanitySlider != null) { Initialise.modLogger.LogDebug("found"); yield break; } //found infectedcompany's insanity meter when in use and ready
+                objectInsanityMeter?.TryGetComponent(out modInsanitySlider);
+                if (modInsanitySlider != null)
+                {
+                    Initialise.Logger.LogDebug("found"); yield break;
+                } //found infectedcompany's insanity meter when in use and ready
 
                 yield return null; //Wait one frame
             }
