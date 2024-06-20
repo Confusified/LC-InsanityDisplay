@@ -2,37 +2,43 @@
 using static LC_InsanityDisplay.Initialise;
 using BepInEx.Configuration;
 using System;
-using LC_InsanityDisplay;
+using LC_InsanityDisplay.UI;
 
 namespace LC_InsanityDisplay.Config
 {
     public class ConfigHandler
     {
         //Display Settings
-        public static ConfigEntry<bool> ModEnabled { get; internal set; }
-        public static ConfigEntry<string> MeterColor { get; internal set; } //Default is purple (in file it would be HEX)
-        public static ConfigEntry<bool> useAccurateDisplay { get; internal set; }
-        public static ConfigEntry<bool> enableReverse { get; internal set; } //Become a sanity meter instead of insanity meter
-        public static ConfigEntry<bool> alwaysFull { get; internal set; } //Basically just always show the bar
-        public static ConfigEntry<bool> iconAlwaysCentered { get; internal set; } //The player icon that displays your health (i intend to move it whenever the insanity meter is not visible)
-        // ^ change into an Enum, so user can choose between Always, AvoidOverlap, Never (haven't found a good name for the default behaviour yet)
+        public static ConfigEntry<bool> ModEnabled { get; internal set; } = null!; //If disabled the mod simply won't run
+        public static ConfigEntry<string> MeterColor { get; internal set; } = null!;//Default is purple (in file it would be HEX)
+        public static ConfigEntry<bool> useAccurateDisplay { get; internal set; } = null!;
+        public static ConfigEntry<bool> enableReverse { get; internal set; } = null!; //Become a sanity meter instead of insanity meter
+        public static ConfigEntry<bool> alwaysFull { get; internal set; } = null!; //Basically just always show the bar
+        public static ConfigEntry<CenteredIconSettings> iconAlwaysCentered { get; internal set; } = null!;//The player icon that displays your health (i intend to move it whenever the insanity meter is not visible)
+
+        public enum CenteredIconSettings
+        {
+            Never = 0,
+            AvoidOverlap = 1,
+            Always = 2
+        }
 
         //Mod Compatibility Settings
         public class Compat
         {
-            public static ConfigEntry<bool> LCCrouchHUD;
-            public static ConfigEntry<bool> An0nPatches;
-            public static ConfigEntry<bool> EladsHUD;
-            public static ConfigEntry<bool> GeneralImprovements;
-            public static ConfigEntry<bool> HealthMetrics;
-            public static ConfigEntry<bool> DamageMetrics;
-            public static ConfigEntry<bool> LethalCompanyVR;
-            public static ConfigEntry<bool> InfectedCompany;
+            public static ConfigEntry<bool> LCCrouchHUD { get; internal set; } = null!;
+            public static ConfigEntry<bool> An0nPatches { get; internal set; } = null!;
+            public static ConfigEntry<bool> EladsHUD { get; internal set; } = null!;
+            public static ConfigEntry<bool> GeneralImprovements { get; internal set; } = null!;
+            public static ConfigEntry<bool> HealthMetrics { get; internal set; } = null!;
+            public static ConfigEntry<bool> DamageMetrics { get; internal set; } = null!;
+            public static ConfigEntry<bool> LethalCompanyVR { get; internal set; } = null!;
+            public static ConfigEntry<bool> InfectedCompany { get; internal set; } = null!;
         }
 
         //_DontTouch
-        public static ConfigEntry<byte> ConfigVersion { get; internal set; }
-        public static byte CurrentVersion = 1;
+        public static ConfigEntry<byte> ConfigVersion { get; internal set; } = null!;
+        public static byte CurrentVersion = 3;
 
         public static void InitialiseConfig()
         {
@@ -41,7 +47,7 @@ namespace LC_InsanityDisplay.Config
             useAccurateDisplay = modConfig.Bind("Display Settings", "Accurate meter", true, "Show your insanity value more accurately, instead of showing it in the vanilla way");
             enableReverse = modConfig.Bind("Display Settings", "Sanity Meter", false, "Turn the insanity meter into a sanity meter");
             alwaysFull = modConfig.Bind("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
-            iconAlwaysCentered = modConfig.Bind("Display Settings", "Always Centered Player Icon", false, "Always have the player icon centered, instead of it moving to it's vanilla position when the insanity meter is not visible");
+            iconAlwaysCentered = modConfig.Bind("Display Settings", "Center Player Icon", CenteredIconSettings.AvoidOverlap, "Always have the player icon centered, instead of it moving to it's vanilla position when the insanity meter is not visible");
 
             Compat.LCCrouchHUD = modConfig.Bind("Mod Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.An0nPatches = modConfig.Bind("Mod Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
@@ -58,24 +64,35 @@ namespace LC_InsanityDisplay.Config
 
             FixColor(); //Fix the meter being white if the user's config doesn't start with '#'
             MeterColor.SettingChanged += FixColor;
+            alwaysFull.SettingChanged += SettingChanged;
+            enableReverse.SettingChanged += SettingChanged;
             return;
+        }
+
+        private static void SettingChanged(object sender, EventArgs e)
+        {
+            HUDBehaviour.UpdateMeter(settingChanged: true);
         }
 
         private static void FixColor(object obj = null!, EventArgs args = null!)
         {
             if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } //Remove '#' from the user's config value
             ColorUtility.TryParseHtmlString("#" + MeterColor.Value, out Color meterColor);
-            MeterColor.Value = ColorUtility.ToHtmlStringRGBA(meterColor + Color.black);
-            Initialise.Logger.LogInfo($"{meterColor} {meterColor + Color.black}");
+            Color newColor = meterColor + Color.black;
+            MeterColor.Value = ColorUtility.ToHtmlStringRGBA(newColor);
+            HUDBehaviour.InsanityMeterColor = newColor;
+            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); //Update the insanity meter if it exists
         }
 
         public static void RemoveDeprecatedSettings()
         {
-            if (ConfigVersion.Value == CurrentVersion) { return; } //Don't update config values
+            byte oldConfigVersion = ConfigVersion.Value;
+            if (oldConfigVersion == CurrentVersion) { return; } //Don't update config values
 
             ConfigEntry<bool> oldBoolEntry;
+            ConfigEntry<Color> oldColorEntry;
             //From before ConfigVersion existed so anything below 1
-            if (ConfigVersion.Value < 1)
+            if (oldConfigVersion < 1)
             {
                 oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable LCCrouchHUD compatibility", true);
                 Compat.LCCrouchHUD.Value = oldBoolEntry.Value;
@@ -101,15 +118,21 @@ namespace LC_InsanityDisplay.Config
                 Compat.DamageMetrics.Value = oldBoolEntry.Value;
                 modConfig.Remove(oldBoolEntry.Definition);
 
-                ConfigEntry<Color> oldColorEntry = modConfig.Bind("Display Settings", "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
+                oldColorEntry = modConfig.Bind("Display Settings", "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
                 MeterColor.Value = ColorUtility.ToHtmlStringRGB(oldColorEntry.Value);
                 modConfig.Remove(oldColorEntry.Definition);
 
             }
+            if (oldConfigVersion < 2) //below 1.3.0
+            {
+                oldBoolEntry = modConfig.Bind("Display Settings", "Always Centered Player Icon", true);
+                if (oldBoolEntry.Value) iconAlwaysCentered.Value = CenteredIconSettings.Always;
+                else iconAlwaysCentered.Value = CenteredIconSettings.AvoidOverlap;
+                modConfig.Remove(oldBoolEntry.Definition);
+            }
 
             ConfigVersion.Value = CurrentVersion;
-            Initialise.Logger.LogDebug("Succesfully updated config file version");
-            modConfig.Save();
+            Initialise.Logger.LogDebug($"Succesfully updated config file version from {oldConfigVersion} => {CurrentVersion}");
             return;
         }
     }

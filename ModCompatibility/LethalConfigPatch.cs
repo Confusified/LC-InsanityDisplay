@@ -20,11 +20,9 @@ namespace LC_InsanityDisplay.ModCompatibility
             //Variables to be used
             BoolCheckBoxConfigItem entryBoolCheckBox;
             TextInputFieldConfigItem entryTextInputField;
+            EnumDropDownConfigItem<CenteredIconSettings> entryIconDropDownConfigItem;
 
             //Display Settings
-
-            //entryBoolCheckBox = new BoolCheckBoxConfigItem(ModEnabled, false);
-            //LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryTextInputField = new TextInputFieldConfigItem(MeterColor, new TextInputFieldOptions { CharacterLimit = 9, RequiresRestart = false });
             LethalConfigManager.AddConfigItem(entryTextInputField);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(useAccurateDisplay, false);
@@ -33,8 +31,8 @@ namespace LC_InsanityDisplay.ModCompatibility
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(alwaysFull, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
-            entryBoolCheckBox = new BoolCheckBoxConfigItem(iconAlwaysCentered, false);
-            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryIconDropDownConfigItem = new EnumDropDownConfigItem<CenteredIconSettings>(iconAlwaysCentered, false);
+            LethalConfigManager.AddConfigItem(entryIconDropDownConfigItem);
             //Mod Compatibility Settings
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LCCrouchHUD, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);

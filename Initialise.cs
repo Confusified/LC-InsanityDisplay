@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
 using LC_InsanityDisplay.ModCompatibility;
 using LC_InsanityDisplay.Config;
+using LC_InsanityDisplay.UI;
 
 namespace LC_InsanityDisplay
 {
@@ -31,7 +32,6 @@ namespace LC_InsanityDisplay
         public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + MyPluginInfo.PLUGIN_GUID[4..].Replace(".", "\\"));
         public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
 
-        private readonly Harmony _Harmony = new Harmony(MyPluginInfo.PLUGIN_GUID); //Can be removed after changing all Harmony patches into Monomod hooks
         internal new static ManualLogSource Logger { get; private set; } = null!;
 
         public void Awake()
@@ -41,12 +41,20 @@ namespace LC_InsanityDisplay
 
             ConfigHandler.InitialiseConfig();
             if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); return; }
+            //eventually get rid of checkformodcompatibility in favour of the attribute one (incredibly easy to be fair)
             CheckForModCompatibility();
             CompatibleDependencyAttribute.Init(this);
 
-            _Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            HookAll();
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
+        }
+
+        private static void HookAll()
+        {
+            Logger.LogDebug("Hooking...");
+            On.HUDManager.SetSavedValues += HUDInjector.InjectIntoHud;
+            On.GameNetcodeStuff.PlayerControllerB.SetPlayerSanityLevel += HUDBehaviour.InsanityValueChanged;
         }
 
         private static void CheckForModCompatibility()

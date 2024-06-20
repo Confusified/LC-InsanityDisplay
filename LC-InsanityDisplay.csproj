@@ -44,6 +44,37 @@
         -->
     <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="packages\**" />
+    <EmbeddedResource Remove="packages\**" />
+    <None Remove="packages\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ModCompatibility\An0nPatchesCompatibility.cs" />
+    <Compile Remove="ModCompatibility\EladsHUDCompatibility.cs" />
+    <Compile Remove="ModCompatibility\GeneralImprovementsCompatibility.cs" />
+    <Compile Remove="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
+    <Compile Remove="ModCompatibility\InfectedCompanyCompatibility.cs" />
+    <Compile Remove="ModCompatibility\LCCrouchHUDCompatibility.cs" />
+    <Compile Remove="ModCompatibility\LethalCompanyVRCompatibility.cs" />
+    <Compile Remove="Patches\HUDManagerPatch.cs" />
+    <Compile Remove="Patches\StartOfRoundPatch.cs" />
+    <Compile Remove="UI\IconHandler.cs" />
+    <Compile Remove="UI\MeterHandler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ModCompatibility\An0nPatchesCompatibility.cs" />
+    <None Include="ModCompatibility\EladsHUDCompatibility.cs" />
+    <None Include="ModCompatibility\GeneralImprovementsCompatibility.cs" />
+    <None Include="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
+    <None Include="ModCompatibility\InfectedCompanyCompatibility.cs" />
+    <None Include="ModCompatibility\LCCrouchHUDCompatibility.cs" />
+    <None Include="ModCompatibility\LethalCompanyVRCompatibility.cs" />
+    <None Include="Patches\HUDManagerPatch.cs" />
+    <None Include="Patches\StartOfRoundPatch.cs" />
+    <None Include="UI\IconHandler.cs" />
+    <None Include="UI\MeterHandler.cs" />
+  </ItemGroup>
 
   <!-- Primary Package References - BepInEx -->
   <ItemGroup>
