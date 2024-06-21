@@ -4,11 +4,14 @@ using System;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class LobbyCompatibilityPatch
+    public class LobbyCompatibilityPatch : CompatBase
     {
-        private static void Initialize(string modGUID, string modVersion)
+        internal static LobbyCompatibilityPatch Instance { get; private set; } = null!;
+        internal new const string ModGUID = "BMX.LobbyCompatibility";
+        private static void Initialize()
         {
-            PluginHelper.RegisterPlugin(modGUID, Version.Parse(modVersion), CompatibilityLevel.ClientOnly, VersionStrictness.None);
+            Instance = new() { Installed = true };
+            PluginHelper.RegisterPlugin(guid: MyPluginInfo.PLUGIN_GUID, version: Version.Parse(MyPluginInfo.PLUGIN_VERSION), CompatibilityLevel.ClientOnly, VersionStrictness.None);
         }
     }
 }

@@ -5,11 +5,17 @@ using static LC_InsanityDisplay.UI.IconHandler;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class GeneralImprovementsCompatibility
+    public class GeneralImprovementsCompatibility : CompatBase
     {
+        public static GeneralImprovementsCompatibility Instance { get; private set; } = null!;
         private static GameObject HitpointDisplay;
         private static Vector3 localPosition = Vector3.zero;
         private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
+
+        private static void Initialize()
+        {
+            Instance = new() { Installed = true };
+        }
 
         public static void MoveHPHud()
         {

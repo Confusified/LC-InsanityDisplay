@@ -66,12 +66,14 @@ namespace LC_InsanityDisplay.Config
             MeterColor.SettingChanged += FixColor;
             alwaysFull.SettingChanged += SettingChanged;
             enableReverse.SettingChanged += SettingChanged;
+            iconAlwaysCentered.SettingChanged += SettingChanged;
             return;
         }
 
         private static void SettingChanged(object sender, EventArgs e)
         {
-            HUDBehaviour.UpdateMeter(settingChanged: true);
+            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); //Update the insanity meter if it exists
+            if (HUDBehaviour.PlayerIcon && HUDBehaviour.PlayerRedIcon) HUDBehaviour.UpdateIconPosition(settingChanged: true); //Update the icon if it exists
         }
 
         private static void FixColor(object obj = null!, EventArgs args = null!)

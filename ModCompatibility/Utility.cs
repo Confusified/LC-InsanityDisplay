@@ -37,7 +37,7 @@ namespace LC_InsanityDisplay.ModCompatibility
                 {
                     // Log.Info("Found compatible mod: " + attr.DependencyGUID);
                     attr.Handler.GetMethod("Initialize", bindingFlags)?.Invoke(null, null);
-                    attr.Handler = null;
+                    attr.Handler = null!;
                 }
                 else
                 {
@@ -45,5 +45,13 @@ namespace LC_InsanityDisplay.ModCompatibility
                 }
             }
         }
+    }
+    /// <summary>
+    /// This serves for compatibility classes to inherit from to make it slightly easier for me to create and maintain them
+    /// </summary>
+    abstract public class CompatBase
+    {
+        public bool Installed = false;
+        public const string ModGUID = "";
     }
 }

@@ -7,10 +7,14 @@ using LC_InsanityDisplay;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class LethalConfigPatch
+    public class LethalConfigPatch : CompatBase
     {
+        internal static LethalConfigPatch Instance { get; private set; } = null!;
+        internal new const string ModGUID = "ainavt.lc.lethalconfig";
         private static void Initialize()
         {
+            Instance = new() { Installed = true };
+
             //TODO merge many variables into one as they are only used to add a config item 
             //did that and DAMN it looks TERRIBLE
 

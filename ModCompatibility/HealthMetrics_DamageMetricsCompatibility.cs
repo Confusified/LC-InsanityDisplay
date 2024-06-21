@@ -4,11 +4,18 @@ using UnityEngine;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class HealthMetrics_DamageMetricsCompatibility
+    public class HealthMetrics_DamageMetricsCompatibility : CompatBase
     {
+        public static HealthMetrics_DamageMetricsCompatibility Instance { get; private set; } = null!;
+        public new const string ModGUID = "";
         private static Vector3 localPositionOffset_Damage = new Vector3(-10f, 0, 0);
         private static Vector3 localPositionOffset_Health = new Vector3(-2f, 0, 0);
         private static Vector3 localPosition = Vector3.zero;
+
+        private static void Initialize()
+        {
+            Instance = new() { Installed = true };
+        }
 
         public static void MoveDisplay(bool usingHealthMetrics)
         {

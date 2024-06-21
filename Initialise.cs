@@ -1,8 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Configuration;
-using HarmonyLib;
-using System.Reflection;
 using BepInEx.Bootstrap;
 using System;
 using System.Collections.Generic;
@@ -14,11 +12,11 @@ using LC_InsanityDisplay.UI;
 namespace LC_InsanityDisplay
 {
     //Soft dependencies
-    [CompatibleDependency(ModGUIDS.LethalConfig, typeof(LethalConfigPatch))] //New system to use for dependencies
-    [CompatibleDependency(ModGUIDS.LobbyCompatibility, typeof(LobbyCompatibilityPatch))]
+    [CompatibleDependency(LethalConfigPatch.ModGUID, typeof(LethalConfigPatch))]
+    [CompatibleDependency(LobbyCompatibilityPatch.ModGUID, typeof(LobbyCompatibilityPatch))]
+    [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
     [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(ModGUIDS.EladsHUD, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
@@ -30,7 +28,7 @@ namespace LC_InsanityDisplay
     {
 
         public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + MyPluginInfo.PLUGIN_GUID[4..].Replace(".", "\\"));
-        public static ConfigFile modConfig = new ConfigFile(configLocation + ".cfg", false);
+        public static ConfigFile modConfig = new(configLocation + ".cfg", false);
 
         internal new static ManualLogSource Logger { get; private set; } = null!;
 
@@ -42,7 +40,7 @@ namespace LC_InsanityDisplay
             ConfigHandler.InitialiseConfig();
             if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); return; }
             //eventually get rid of checkformodcompatibility in favour of the attribute one (incredibly easy to be fair)
-            CheckForModCompatibility();
+            //CheckForModCompatibility();
             CompatibleDependencyAttribute.Init(this);
 
             HookAll();
@@ -62,7 +60,6 @@ namespace LC_InsanityDisplay
             var modActions = new Dictionary<string, Action>
             {
                 { ModGUIDS.LCCrouchHUD, () => ModInstalled.LCCrouchHUD = true },
-                { ModGUIDS.EladsHUD, () => ModInstalled.EladsHUD = true },
                 { ModGUIDS.An0nPatches, () => ModInstalled.An0nPatches = true },
                 { ModGUIDS.GeneralImprovements, () => ModInstalled.GeneralImprovements = true },
                 { ModGUIDS.HealthMetrics, () => ModInstalled.HealthMetrics = true },

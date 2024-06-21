@@ -1,22 +1,27 @@
-﻿using LC_InsanityDisplay.Config;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using static LC_InsanityDisplay.UI.MeterHandler;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class EladsHUDCompatibility
+    public class EladsHUDCompatibility : CompatBase
     {
-        private static Vector3 localPositionOffset = new Vector3(0, 10, 0);
-        private static Vector3 Percentage_localPositionOffset = new Vector3(0, 28.4f, 0);
-        private static Vector3 batteryLocalPosition = Vector3.zero;
+        internal static EladsHUDCompatibility Instance { get; private set; } = null!;
+        internal new const string ModGUID = "me.eladnlg.customhud";
 
-        private static GameObject PercentageInsanityText;
-        private static Transform batteryUI;
+        //private static Vector3 localPositionOffset = new Vector3(0, 10, 0);
+        //private static Vector3 Percentage_localPositionOffset = new Vector3(0, 28.4f, 0);
+        //private static Vector3 batteryLocalPosition = Vector3.zero;
 
-        public static TextMeshProUGUI InsanityInfo;
+        //private static GameObject PercentageInsanityText;
+        //private static Transform batteryUI;
 
+        //public static TextMeshProUGUI InsanityInfo;
+
+        private static void Initialize()
+        {
+            Instance = new() { Installed = true };
+        }
+        /*
         public static void EditEladsHUD() //This will create a new bar, the stamina bar, and move some elements to make it not overlap (also this code is kinda all over the place damn)
         {
             GameObject EladsHUDStamina = vanillaSprintMeter?.transform.parent.transform.parent.Find("PlayerInfo(Clone)/Stamina")?.gameObject;
@@ -70,5 +75,6 @@ namespace LC_InsanityDisplay.ModCompatibility
                 PercentageInsanityText.SetActive(MeterActive);
             }
         }
+        */
     }
 }

@@ -51,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ModCompatibility\An0nPatchesCompatibility.cs" />
-    <Compile Remove="ModCompatibility\EladsHUDCompatibility.cs" />
     <Compile Remove="ModCompatibility\GeneralImprovementsCompatibility.cs" />
     <Compile Remove="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
     <Compile Remove="ModCompatibility\InfectedCompanyCompatibility.cs" />
@@ -64,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ModCompatibility\An0nPatchesCompatibility.cs" />
-    <None Include="ModCompatibility\EladsHUDCompatibility.cs" />
     <None Include="ModCompatibility\GeneralImprovementsCompatibility.cs" />
     <None Include="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
     <None Include="ModCompatibility\InfectedCompanyCompatibility.cs" />
