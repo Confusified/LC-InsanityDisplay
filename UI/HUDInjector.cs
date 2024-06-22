@@ -180,11 +180,11 @@ namespace LC_InsanityDisplay.UI
             CurrentMeterFill = ReturnInsanityLevel();
 
             // Don't update when not necessary
-            if ((LastIconPosition == VanillaIconPosition && NeverCenter) || //If Never Centering
-                (LastIconPosition == CenteredIconPosition && AlwaysCenter) || //If Always Centering
-                (CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition) || //If there is no visible change when it's max
-                (!usingAccurateDisplay && (CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition)) || //No visible change without Accurate Display
-                (usingAccurateDisplay && (CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition)) || //No visible change with Accurate Display
+            if ((LastIconPosition == VanillaIconPosition && NeverCenter) || //If Never Centering and vanilla position
+                (LastIconPosition == CenteredIconPosition && AlwaysCenter) || //If Always Centering and centered
+                (CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter) || //If there is no visible change when it's max
+                (!usingAccurateDisplay && (CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition) && !AlwaysCenter) || //No visible change without Accurate Display
+                (usingAccurateDisplay && (CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition) && !AlwaysCenter) || //No visible change with Accurate Display
                 (CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition) //Icon is centered 
                 && !settingChanged) return;
 

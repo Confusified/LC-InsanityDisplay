@@ -56,8 +56,6 @@
     <Compile Remove="ModCompatibility\InfectedCompanyCompatibility.cs" />
     <Compile Remove="ModCompatibility\LCCrouchHUDCompatibility.cs" />
     <Compile Remove="ModCompatibility\LethalCompanyVRCompatibility.cs" />
-    <Compile Remove="UI\IconHandler.cs" />
-    <Compile Remove="UI\MeterHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ModCompatibility\An0nPatchesCompatibility.cs" />
@@ -66,8 +64,6 @@
     <None Include="ModCompatibility\InfectedCompanyCompatibility.cs" />
     <None Include="ModCompatibility\LCCrouchHUDCompatibility.cs" />
     <None Include="ModCompatibility\LethalCompanyVRCompatibility.cs" />
-    <None Include="UI\IconHandler.cs" />
-    <None Include="UI\MeterHandler.cs" />
   </ItemGroup>
 
   <!-- Primary Package References - BepInEx -->
