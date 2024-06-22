@@ -3,10 +3,9 @@ using UnityEngine;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class EladsHUDCompatibility : CompatBase
+    public class EladsHUDCompatibility
     {
-        internal static EladsHUDCompatibility Instance { get; private set; } = null!;
-        internal new const string ModGUID = "me.eladnlg.customhud";
+        internal const string ModGUID = "me.eladnlg.customhud";
 
         //private static Vector3 localPositionOffset = new Vector3(0, 10, 0);
         //private static Vector3 Percentage_localPositionOffset = new Vector3(0, 28.4f, 0);
@@ -19,7 +18,7 @@ namespace LC_InsanityDisplay.ModCompatibility
 
         private static void Initialize()
         {
-            Instance = new() { Installed = true };
+
         }
         /*
         public static void EditEladsHUD() //This will create a new bar, the stamina bar, and move some elements to make it not overlap (also this code is kinda all over the place damn)

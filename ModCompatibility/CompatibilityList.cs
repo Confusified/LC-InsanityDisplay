@@ -4,7 +4,6 @@
     {
         public class ModGUIDS
         {
-            public const string LCCrouchHUD = "LCCrouchHUD";
             //public const string EladsHUD = "me.eladnlg.customhud";
             public const string An0nPatches = "com.an0n.patch";
             public const string GeneralImprovements = "ShaosilGaming.GeneralImprovements";
@@ -15,17 +14,5 @@
             public const string LethalCompanyVR = "io.daxcess.lcvr";
             public const string InfectedCompany = "InfectedCompany.InfectedCompany";
         }
-        public class ModInstalled
-        {
-            public static bool LCCrouchHUD;
-            //public static bool EladsHUD;
-            public static bool An0nPatches;
-            public static bool GeneralImprovements;
-            public static bool HealthMetrics;
-            public static bool DamageMetrics;
-            public static bool LethalCompanyVR;
-            public static bool InfectedCompany;
-        }
-
     }
 }

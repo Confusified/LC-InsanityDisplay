@@ -1,4 +1,5 @@
 ﻿using GameNetcodeStuff;
+using LC_InsanityDisplay.ModCompatibility;
 using UnityEngine;
 using UnityEngine.UI;
 using static LC_InsanityDisplay.Config.ConfigHandler;
@@ -13,14 +14,14 @@ namespace LC_InsanityDisplay.UI
     /// </summary>
     internal class HUDInjector
     {
-        public static PlayerControllerB LocalPlayerInstance { get; internal set; } = null!;
-        public static HUDManager HUDManagerInstance { get; internal set; } = null!;
+        internal static PlayerControllerB LocalPlayerInstance { get; private set; } = null!;
+        internal static HUDManager HUDManagerInstance { get; private set; } = null!;
         public static GameObject InsanityMeter { get; internal set; } = null!;
         public static Image InsanityMeterComponent { get; internal set; } = null!;
         public static Vector3 localPositionOffset = new(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
 
         private static GameObject VanillaSprintMeter { get; set; } = null!;
-        private static GameObject TopLeftHUD { get; set; } = null!;
+        internal static GameObject TopLeftHUD { get; private set; } = null!;
         private const float localScaleMultiplier = 0.86f; //SprintMeter scale is 1.6892 (for all) and my intended scale is 1.4 (so 1.4/1.628 is 0.86f)
 
         /// <summary>
@@ -32,9 +33,24 @@ namespace LC_InsanityDisplay.UI
         public static void InjectIntoHud(On.HUDManager.orig_SetSavedValues orig, HUDManager self, int playerObjectId = -1)
         {
             orig(self, playerObjectId);
-            if (InsanityMeter == null && LocalPlayerInstance == null)
+            if (playerObjectId == -1 || (playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId])) //check for the localplayer
             {
+                //Set variables for later use
                 HUDManagerInstance = self;
+                LocalPlayerInstance = StartOfRound.Instance.localPlayerController;
+                VanillaSprintMeter = LocalPlayerInstance.sprintMeterUI.gameObject;
+                TopLeftHUD = VanillaSprintMeter.transform.parent.gameObject;
+                PlayerIcon = TopLeftHUD.transform.Find("Self").gameObject;
+                PlayerRedIcon = HUDManagerInstance.selfRedCanvasGroup.gameObject;
+                VanillaIconPosition = PlayerIcon.transform.localPosition;
+                CurrentPosition = VanillaIconPosition;
+                CenteredIconPosition = VanillaIconPosition + IconPositionOffset;
+
+
+                //Activate all compatibilities (that are present) and have a Start() method
+                CompatibleDependencyAttribute.Activate();
+                Initialise.Logger.LogDebug("Activated all the compatibilities");
+
                 //Set up the insanity meter
                 Initialise.Logger.LogDebug("Setting up insanity meter...");
                 CreateMeter();
@@ -43,43 +59,39 @@ namespace LC_InsanityDisplay.UI
 
         private static void CreateMeter() //potentially save the meter for when going back to the menu and into a lobby again?
         {
-            if (InsanityMeter != null) { return; } //Already exists, alternate: if exists change the hide flag and put it in the correct location etc
-            //Set variables for later use
-            LocalPlayerInstance = GameNetworkManager.Instance.localPlayerController;
-            VanillaSprintMeter = LocalPlayerInstance.sprintMeterUI.gameObject;
-            TopLeftHUD = VanillaSprintMeter.transform.parent.gameObject;
-            PlayerIcon = TopLeftHUD.transform.Find("Self").gameObject;
-            PlayerRedIcon = HUDManagerInstance.selfRedCanvasGroup.gameObject;
-            VanillaIconPosition = PlayerIcon.transform.localPosition;
-            CurrentPosition = VanillaIconPosition;
-            CenteredIconPosition = VanillaIconPosition + IconPositionOffset;
+            if (InsanityMeter) return; //Make sure the meter doesn't already exist
 
             //Create insanity meter
-            InsanityMeter = Object.Instantiate(VanillaSprintMeter);
+            InsanityMeter = Object.Instantiate(VanillaSprintMeter, TopLeftHUD.transform);
+            InsanityMeter.SetActive(false); //Should prevent it being marked as dirty
             InsanityMeter.name = "InsanityMeter";
 
             InsanityMeterComponent = InsanityMeter.GetComponentInChildren<Image>();
+
             //Set the insanity meter in the correct position
             Transform meterTransform = InsanityMeter.transform;
-            meterTransform.SetParent(parent: TopLeftHUD.transform, worldPositionStays: false);
             meterTransform.SetAsFirstSibling();
             meterTransform.localPosition = VanillaSprintMeter.transform.localPosition + localPositionOffset;
             meterTransform.localScale *= localScaleMultiplier;
+
             //Reset values to avoid any issues
             CurrentlySetColor = TransparantColor;
             LastInsanityLevel = -1;
             LastIconPosition = VanillaIconPosition;
 
+
             //Update the insanity meter to have the correct visuals
             UpdateMeter(settingChanged: true);
+            InsanityMeter.SetActive(true); //Insanity meter is now set up
             Initialise.Logger.LogDebug("Finished setting up the insanity meter");
             //Update the icon to be positioned correctly
             UpdateIconPosition(settingChanged: true);
+
         }
     }
 
     /// <summary>
-    /// This class will be responsible for all the behaviour of the insanity meter and the player icon
+    /// This class will be responsible for all the behaviour of the insanity meter and the player icon.
     /// Compatibilities not included, probably
     /// </summary>
     internal class HUDBehaviour
@@ -92,13 +104,13 @@ namespace LC_InsanityDisplay.UI
         public static GameObject PlayerIcon { get; internal set; } = null!;
         public static GameObject PlayerRedIcon { get; internal set; } = null!;
 
-        internal static Color TransparantColor { get; set; } = new(0, 0, 0, 0);
+        internal static Color TransparantColor { get; private set; } = new(0, 0, 0, 0);
 
         internal static float LastInsanityLevel { get; set; } = -1;
         internal static float InsanityLevel { get; set; }
         internal static float InsanityLevel_AccurateMargin { get; set; }
         internal static Vector3 LastIconPosition { get; set; }
-        internal static Vector3 IconPositionOffset { get; set; } = new Vector3(-6.8f, 4f, 0f);
+        internal static Vector3 IconPositionOffset { get; private set; } = new Vector3(-6.8f, 4f, 0f);
         internal static Vector3 VanillaIconPosition { get; set; }
         internal static Vector3 CenteredIconPosition { get; set; }
 
@@ -109,11 +121,12 @@ namespace LC_InsanityDisplay.UI
 
         private static CenteredIconSettings IconSetting;
         private static Vector3 NewPosition;
+        private static float CurrentFillAmount;
         private static bool NeverCenter;
         private static bool AlwaysCenter;
         private static float CurrentMeterFill;
-        //lerp formula: 1.179x^2 - 0.337x + 0.03
-        //x = CurrentMeterFill
+        //lerp formula: 1.179x^2 - 0.337x + 0.03 (maybe just make it (minValue*CurrentMeterFill)+minValue)
+        //x being CurrentMeterFill
         private const float lerpNumber1 = 1.179f;
         private const float lerpNumber2 = 0.337f;
         private const float lerpNumber3 = 0.03f;
@@ -124,10 +137,14 @@ namespace LC_InsanityDisplay.UI
         internal static void UpdateMeter(bool settingChanged = false)
         {
             if (!LocalPlayerInstance || !InsanityMeterComponent) return;
-
-            if ((!SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || InsanityMeterComponent.fillAmount > accurate_MinValue && LastInsanityLevel == 0)) || settingChanged || (SetAlwaysFull && InsanityMeterComponent.fillAmount != 1) || (ReverseEnabled && LastInsanityLevel == 0 && InsanityMeterComponent.fillAmount < accurate_MaxValue)) //Only update if actually changed (or called by a settingchange)
+            CurrentFillAmount = InsanityMeterComponent.fillAmount;
+            if (settingChanged ||
+                (!SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || (CurrentFillAmount > accurate_MinValue && LastInsanityLevel == 0) || (ReverseEnabled && LastInsanityLevel == 0 && CurrentFillAmount < accurate_MaxValue))) ||
+                (SetAlwaysFull && CurrentFillAmount != 1)
+               ) //Only update if actually changed (or called by a settingchange)
             {
                 CurrentMeterFill = ReturnInsanityLevel();
+                CurrentFillAmount = CurrentMeterFill;
                 InsanityMeterComponent.fillAmount = CurrentMeterFill;
             }
             if (CurrentlySetColor != InsanityMeterColor) //Only update the colour when it's been changed
@@ -161,8 +178,13 @@ namespace LC_InsanityDisplay.UI
             {
                 if (SetAlwaysFull != alwaysFull.Value) SetAlwaysFull = alwaysFull.Value;
                 if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
+                CurrentFillAmount = InsanityMeterComponent.fillAmount;
 
-                if (((CurrentMeterFill != InsanityLevel || LastInsanityLevel != self.insanityLevel) && !SetAlwaysFull) || (SetAlwaysFull && InsanityMeterComponent.fillAmount != 1) || (ReverseEnabled && InsanityMeterComponent.fillAmount < accurate_MaxValue && self.insanityLevel == 0)) UpdateMeter();
+                if (((CurrentMeterFill != InsanityLevel || LastInsanityLevel != self.insanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull) ||
+                    (SetAlwaysFull && CurrentFillAmount != 1) ||
+                    (ReverseEnabled && CurrentFillAmount < accurate_MaxValue && self.insanityLevel == 0))
+                    UpdateMeter();
+
                 if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
                 LastInsanityLevel = self.insanityLevel;
             }
@@ -193,17 +215,13 @@ namespace LC_InsanityDisplay.UI
             else if (SetAlwaysFull || AlwaysCenter || (CurrentMeterFill > accurate_MaxValue && !NeverCenter)) NewPosition = CenteredIconPosition; //Set it to the centered position
             else //Set it to a certain position in between vanilla and centered
             {
-                CurrentPosition = PlayerIcon.transform.localPosition;
                 float lerpValue = (lerpNumber1 * (CurrentMeterFill * CurrentMeterFill)) - (lerpNumber2 * CurrentMeterFill) + lerpNumber3;
-                if (CurrentMeterFill > accurate_MinValue)
-                {
-                    if (Vector3.Distance(NewPosition, CenteredIconPosition) <= 0.05f) NewPosition = CenteredIconPosition;
-                    else NewPosition = Vector3.Lerp(CurrentPosition, CenteredIconPosition, lerpValue);
-                }
+                Vector3 targetVector3 = CurrentMeterFill > accurate_MinValue ? CenteredIconPosition : VanillaIconPosition;
+                if (Vector3.Distance(NewPosition, targetVector3) <= 0.05f) NewPosition = targetVector3;
                 else
                 {
-                    if (Vector3.Distance(NewPosition, VanillaIconPosition) <= 0.05f) NewPosition = VanillaIconPosition;
-                    else NewPosition = Vector3.Lerp(CurrentPosition, VanillaIconPosition, lerpValue);
+                    CurrentPosition = PlayerIcon.transform.localPosition;
+                    NewPosition = Vector3.Lerp(CurrentPosition, targetVector3, lerpValue);
                 }
             }
 

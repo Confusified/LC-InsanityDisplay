@@ -1,18 +1,23 @@
-﻿using BepInEx.Bootstrap;
-using BepInEx;
+﻿using BepInEx;
+using BepInEx.Bootstrap;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
+    /// <summary>
+    /// This class contains the methods that call compatibility related code
+    /// </summary>
     internal class CompatibleDependencyAttribute : BepInDependency
     {
         public System.Type Handler;
-
+        private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
+        internal static IEnumerable<CompatibleDependencyAttribute> attributes = null!;
         /// <summary>
-        /// Marks this BepInEx.BaseUnityPlugin as soft depenant on another plugin.
+        /// Marks this BepInEx.BaseUnityPlugin as soft dependant on another plugin.
         /// The handler type must have an Initialize() method that will automatically be invoked if the compatible dependency is present.
         /// source: https://discord.com/channels/1168655651455639582/1216761387343151134/1216761387343151134
+        /// I have modified it
         /// </summary>
         /// <param name="guid">The GUID of the referenced plugin.</param>
         /// <param name="handlerType">The class type that will handle this compatibility. Must contain a private method called Initialize()</param>
@@ -28,30 +33,32 @@ namespace LC_InsanityDisplay.ModCompatibility
         /// <param name="source">The source plugin instance with the BepInPlugin attribute.</param>
         public static void Init(BepInEx.BaseUnityPlugin source)
         {
-            const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
-
-            IEnumerable<CompatibleDependencyAttribute> attributes = source.GetType().GetCustomAttributes<CompatibleDependencyAttribute>();
+            attributes = source.GetType().GetCustomAttributes<CompatibleDependencyAttribute>();
             foreach (CompatibleDependencyAttribute attr in attributes)
             {
-                if (Chainloader.PluginInfos.ContainsKey(attr.DependencyGUID))
-                {
-                    // Log.Info("Found compatible mod: " + attr.DependencyGUID);
-                    attr.Handler.GetMethod("Initialize", bindingFlags)?.Invoke(null, null);
-                    attr.Handler = null!;
-                }
-                else
-                {
-                    // Log.Info("Compatibility not found: " + attr.DependencyGUID);
-                }
+                RunMethodIfFound(attr, "Initialize");
             }
         }
-    }
-    /// <summary>
-    /// This serves for compatibility classes to inherit from to make it slightly easier for me to create and maintain them
-    /// </summary>
-    abstract public class CompatBase
-    {
-        public bool Installed = false;
-        public const string ModGUID = "";
+
+        public static void Activate()
+        {
+            foreach (CompatibleDependencyAttribute attr in attributes)
+            {
+                RunMethodIfFound(attr, "Start");
+            }
+        }
+
+        private static void RunMethodIfFound(CompatibleDependencyAttribute attribute, string methodToRun)
+        {
+            if (Chainloader.PluginInfos.ContainsKey(attribute.DependencyGUID))
+            {
+                // Initialise.Logger.LogDebug("Found compatible mod: " + attr.DependencyGUID);
+                attribute.Handler.GetMethod(methodToRun, bindingFlags)?.Invoke(null, null);
+            }
+            else
+            {
+                // Initialise.Logger.LogDebug("Compatibility not found: " + attr.DependencyGUID);
+            }
+        }
     }
 }

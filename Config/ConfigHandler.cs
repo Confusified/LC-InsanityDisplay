@@ -1,8 +1,9 @@
-﻿using UnityEngine;
-using static LC_InsanityDisplay.Initialise;
-using BepInEx.Configuration;
-using System;
+﻿using BepInEx.Configuration;
+using LC_InsanityDisplay.ModCompatibility;
 using LC_InsanityDisplay.UI;
+using System;
+using UnityEngine;
+using static LC_InsanityDisplay.Initialise;
 
 namespace LC_InsanityDisplay.Config
 {
@@ -69,7 +70,10 @@ namespace LC_InsanityDisplay.Config
             alwaysFull.SettingChanged += SettingChanged;
             enableReverse.SettingChanged += SettingChanged;
             iconAlwaysCentered.SettingChanged += SettingChanged;
-            return;
+
+            //Compatibilities
+            Compat.LCCrouchHUD.SettingChanged += LCCrouchHUDCompatibility.UpdateIconPosition;
+            Compat.GeneralImprovements.SettingChanged += GeneralImprovementsCompatibility.UpdateDisplayPosition;
         }
 
         private static void SettingChanged(object sender, EventArgs e)

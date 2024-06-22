@@ -11,19 +11,20 @@ using LC_InsanityDisplay.UI;
 
 namespace LC_InsanityDisplay
 {
+    //Plugin
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     //Soft dependencies
     [CompatibleDependency(LethalConfigPatch.ModGUID, typeof(LethalConfigPatch))]
     [CompatibleDependency(LobbyCompatibilityPatch.ModGUID, typeof(LobbyCompatibilityPatch))]
-    [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
-    [BepInDependency(ModGUIDS.LCCrouchHUD, BepInDependency.DependencyFlags.SoftDependency)]
+    [CompatibleDependency(LCCrouchHUDCompatibility.ModGUID, typeof(LCCrouchHUDCompatibility))]
+    [CompatibleDependency(GeneralImprovementsCompatibility.ModGUID, typeof(GeneralImprovementsCompatibility))]
+    //[CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
     [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
-    //Plugin
-    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Initialise : BaseUnityPlugin
     {
 
@@ -39,11 +40,10 @@ namespace LC_InsanityDisplay
 
             ConfigHandler.InitialiseConfig();
             if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); return; }
-            //eventually get rid of checkformodcompatibility in favour of the attribute one (incredibly easy to be fair)
-            //CheckForModCompatibility();
-            CompatibleDependencyAttribute.Init(this);
 
+            CompatibleDependencyAttribute.Init(this);
             HookAll();
+
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
         }
@@ -53,29 +53,6 @@ namespace LC_InsanityDisplay
             Logger.LogDebug("Hooking...");
             On.HUDManager.SetSavedValues += HUDInjector.InjectIntoHud;
             On.GameNetcodeStuff.PlayerControllerB.SetPlayerSanityLevel += HUDBehaviour.InsanityValueChanged;
-        }
-
-        private static void CheckForModCompatibility()
-        {
-            var modActions = new Dictionary<string, Action>
-            {
-                { ModGUIDS.LCCrouchHUD, () => ModInstalled.LCCrouchHUD = true },
-                { ModGUIDS.An0nPatches, () => ModInstalled.An0nPatches = true },
-                { ModGUIDS.GeneralImprovements, () => ModInstalled.GeneralImprovements = true },
-                { ModGUIDS.HealthMetrics, () => ModInstalled.HealthMetrics = true },
-                { ModGUIDS.DamageMetrics, () => ModInstalled.DamageMetrics = true },
-                { ModGUIDS.LethalCompanyVR, () => ModInstalled.LethalCompanyVR = true },
-                { ModGUIDS.InfectedCompany, () => ModInstalled.InfectedCompany = true }
-             };
-
-            foreach (var modAction in modActions)
-            {
-                if (Chainloader.PluginInfos.ContainsKey(modAction.Key))
-                {
-                    modAction.Value.Invoke();
-                    Logger.LogDebug($"Found {modAction.Key}");
-                }
-            }
         }
     }
 }

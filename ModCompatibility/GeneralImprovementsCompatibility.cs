@@ -1,36 +1,47 @@
 ﻿using LC_InsanityDisplay.Config;
+using LC_InsanityDisplay.UI;
+using System;
+using TMPro;
 using UnityEngine;
-using static LC_InsanityDisplay.UI.MeterHandler;
-using static LC_InsanityDisplay.UI.IconHandler;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
-    public class GeneralImprovementsCompatibility : CompatBase
+    public class GeneralImprovementsCompatibility
     {
-        public static GeneralImprovementsCompatibility Instance { get; private set; } = null!;
-        private static GameObject HitpointDisplay;
+        //GI doesn't have config changes until restarting game, so if health ui is not found never check for it again
+        internal const string ModGUID = "ShaosilGaming.GeneralImprovements";
+
+        private static GameObject HitpointDisplay = null!;
         private static Vector3 localPosition = Vector3.zero;
-        private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
+        private static Vector3 localPositionOffset = (Vector3.left * 2f) + (Vector3.up * 28f);//new Vector3(-2f, 28f, 0);
+
+        public static bool HitpointDisplayActive = false;
 
         private static void Initialize()
         {
-            Instance = new() { Installed = true };
+            HitpointDisplayActive = GeneralImprovements.Plugin.ShowHitPoints.Value;
         }
 
-        public static void MoveHPHud()
+        private static void Start()
         {
-            if (!HitpointDisplay)
+            if (!HitpointDisplayActive) return; //Don't run if the hitpoints are disabled
+            TextMeshProUGUI[] ComponentList = HUDInjector.TopLeftHUD.GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (TextMeshProUGUI component in ComponentList) //fetch the HitpointDisplay (is there a better for this? probably
             {
-                HitpointDisplay = TopLeftCornerHUD?.transform.Find("HPUI")?.gameObject;
+                if (component.name != "HP") continue;
+                HitpointDisplay = component.gameObject;
+                break;
             }
-            if (!HitpointDisplay) { return; }
+            if (localPosition == Vector3.zero) localPosition = HitpointDisplay.transform.localPosition;
 
-            localPosition = localPosition == Vector3.zero ? HitpointDisplay.transform.localPosition : localPosition;
-            bool GICompat = ConfigHandler.Compat.GeneralImprovements.Value;
-            if (GICompat && HitpointDisplay.transform.localPosition != localPosition + localPositionOffset || !GICompat && HitpointDisplay.transform.localPosition != localPosition - selfLocalPositionOffset) //update if hud is positioned incorrectly
-            {
-                HitpointDisplay.transform.localPosition = GICompat && ConfigHandler.ModEnabled.Value ? localPosition + localPositionOffset : localPosition - selfLocalPositionOffset; //subtract the offset (generalimprovements' positioning is very weird for me without the mod (and with))
-            }
+            UpdateDisplayPosition();
+        }
+
+        internal static void UpdateDisplayPosition(object sender = null!, EventArgs e = null!)
+        {
+            if (!HitpointDisplayActive || !HitpointDisplay) return; //can't update it if it's not there 
+            Transform DisplayTransform = HitpointDisplay.transform;
+            DisplayTransform.localPosition = ConfigHandler.Compat.GeneralImprovements.Value ? localPosition + localPositionOffset : localPosition;
         }
     }
 }
