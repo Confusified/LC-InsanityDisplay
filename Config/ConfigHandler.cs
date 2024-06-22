@@ -34,6 +34,7 @@ namespace LC_InsanityDisplay.Config
             public static ConfigEntry<bool> DamageMetrics { get; internal set; } = null!;
             public static ConfigEntry<bool> LethalCompanyVR { get; internal set; } = null!;
             public static ConfigEntry<bool> InfectedCompany { get; internal set; } = null!;
+            public static ConfigEntry<bool> InfectedCompany_InfectedOnly { get; internal set; } = null!;
         }
 
         //_DontTouch
@@ -57,6 +58,7 @@ namespace LC_InsanityDisplay.Config
             Compat.DamageMetrics = modConfig.Bind("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.LethalCompanyVR = modConfig.Bind("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
             Compat.InfectedCompany = modConfig.Bind("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
+            Compat.InfectedCompany_InfectedOnly = modConfig.Bind("Mod Compatibility Settings", "Only show Insanity Meter when infected", false, "Enabling this will only show the insanity meter when you are the infected");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
@@ -132,6 +134,8 @@ namespace LC_InsanityDisplay.Config
                 else iconAlwaysCentered.Value = CenteredIconSettings.AvoidOverlap;
                 modConfig.Remove(oldBoolEntry.Definition);
             }
+            //remove orphaned entries
+
 
             ConfigVersion.Value = CurrentVersion;
             Initialise.Logger.LogDebug($"Succesfully updated config file version from {oldConfigVersion} => {CurrentVersion}");
