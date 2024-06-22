@@ -10,14 +10,33 @@ namespace LC_InsanityDisplay
 {
     //Soft dependencies
     [CompatibleDependency(LethalConfigPatch.ModGUID, typeof(LethalConfigPatch))]
+    [BepInDependency(LethalConfigPatch.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(LobbyCompatibilityPatch.ModGUID, typeof(LobbyCompatibilityPatch))]
+    [BepInDependency(LobbyCompatibilityPatch.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(LCCrouchHUDCompatibility.ModGUID, typeof(LCCrouchHUDCompatibility))]
+    [BepInDependency(LCCrouchHUDCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(GeneralImprovementsCompatibility.ModGUID, typeof(GeneralImprovementsCompatibility))]
+    [BepInDependency(GeneralImprovementsCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(An0nPatchesCompatibility.ModGUID, typeof(An0nPatchesCompatibility))]
+    [BepInDependency(An0nPatchesCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
+    [BepInDependency(EladsHUDCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
+    [CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+
+    //[CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+
+    //[CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
+
+    //[CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
     //Plugin
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]

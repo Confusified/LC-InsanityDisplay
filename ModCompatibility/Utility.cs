@@ -50,10 +50,9 @@ namespace LC_InsanityDisplay.ModCompatibility
 
         private static void RunMethodIfFound(CompatibleDependencyAttribute attribute, string methodToRun)
         {
-            Initialise.Logger.LogDebug($"{attribute.DependencyGUID} => Found: {IsModPresent(attribute.DependencyGUID)}");
             if (IsModPresent(attribute.DependencyGUID))
             {
-                Initialise.Logger.LogDebug("Found compatible mod: " + attribute.DependencyGUID);
+                //Initialise.Logger.LogDebug("Found compatible mod: " + attribute.DependencyGUID);
                 attribute.Handler.GetMethod(methodToRun, bindingFlags)?.Invoke(null, null);
             }
             //else
