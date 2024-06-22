@@ -53,6 +53,11 @@ namespace LC_InsanityDisplay.ModCompatibility
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 
             Initialise.Logger.LogDebug("Added entries to LethalConfig");
+
+            MeterColor.SettingChanged += FixColor;
+            alwaysFull.SettingChanged += SettingChanged;
+            enableReverse.SettingChanged += SettingChanged;
+            iconAlwaysCentered.SettingChanged += SettingChanged;
         }
     }
 }

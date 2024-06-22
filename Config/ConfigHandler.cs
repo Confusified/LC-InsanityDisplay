@@ -66,23 +66,15 @@ namespace LC_InsanityDisplay.Config
             RemoveDeprecatedSettings();
 
             FixColor(); //Fix the meter being white if the user's config doesn't start with '#'
-            MeterColor.SettingChanged += FixColor;
-            alwaysFull.SettingChanged += SettingChanged;
-            enableReverse.SettingChanged += SettingChanged;
-            iconAlwaysCentered.SettingChanged += SettingChanged;
-
-            //Compatibilities
-            Compat.LCCrouchHUD.SettingChanged += LCCrouchHUDCompatibility.UpdateIconPosition;
-            Compat.GeneralImprovements.SettingChanged += GeneralImprovementsCompatibility.UpdateDisplayPosition;
         }
 
-        private static void SettingChanged(object sender, EventArgs e)
+        internal static void SettingChanged(object sender, EventArgs e)
         {
             if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); //Update the insanity meter if it exists
             if (HUDBehaviour.PlayerIcon && HUDBehaviour.PlayerRedIcon) HUDBehaviour.UpdateIconPosition(settingChanged: true); //Update the icon if it exists
         }
 
-        private static void FixColor(object obj = null!, EventArgs args = null!)
+        internal static void FixColor(object obj = null!, EventArgs args = null!)
         {
             if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } //Remove '#' from the user's config value
             ColorUtility.TryParseHtmlString("#" + MeterColor.Value, out Color meterColor);

@@ -1,30 +1,26 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using BepInEx.Configuration;
-using BepInEx.Bootstrap;
-using System;
-using System.Collections.Generic;
-using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
-using LC_InsanityDisplay.ModCompatibility;
+using BepInEx.Logging;
 using LC_InsanityDisplay.Config;
+using LC_InsanityDisplay.ModCompatibility;
 using LC_InsanityDisplay.UI;
+using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
 
 namespace LC_InsanityDisplay
 {
-    //Plugin
-    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     //Soft dependencies
     [CompatibleDependency(LethalConfigPatch.ModGUID, typeof(LethalConfigPatch))]
     [CompatibleDependency(LobbyCompatibilityPatch.ModGUID, typeof(LobbyCompatibilityPatch))]
     [CompatibleDependency(LCCrouchHUDCompatibility.ModGUID, typeof(LCCrouchHUDCompatibility))]
     [CompatibleDependency(GeneralImprovementsCompatibility.ModGUID, typeof(GeneralImprovementsCompatibility))]
-    //[CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
-    [BepInDependency(ModGUIDS.An0nPatches, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInDependency(ModGUIDS.GeneralImprovements, BepInDependency.DependencyFlags.SoftDependency)]
+    [CompatibleDependency(An0nPatchesCompatibility.ModGUID, typeof(An0nPatchesCompatibility))]
+    [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
     [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModGUIDS.InfectedCompany, BepInDependency.DependencyFlags.SoftDependency)]
+    //Plugin
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Initialise : BaseUnityPlugin
     {
 

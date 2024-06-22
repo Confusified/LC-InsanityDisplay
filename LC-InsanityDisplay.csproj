@@ -50,16 +50,10 @@
     <None Remove="packages\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="ModCompatibility\An0nPatchesCompatibility.cs" />
-    <Compile Remove="ModCompatibility\EladsHUDCompatibility.cs" />
-    <Compile Remove="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
     <Compile Remove="ModCompatibility\InfectedCompanyCompatibility.cs" />
     <Compile Remove="ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ModCompatibility\An0nPatchesCompatibility.cs" />
-    <None Include="ModCompatibility\EladsHUDCompatibility.cs" />
-    <None Include="ModCompatibility\HealthMetrics_DamageMetricsCompatibility.cs" />
     <None Include="ModCompatibility\InfectedCompanyCompatibility.cs" />
     <None Include="ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
@@ -81,9 +75,6 @@
 
   <!-- Package References -->
   <ItemGroup>
-    <Reference Include="GeneralImprovements">
-      <HintPath>$(CopyToDirectory)\ShaosilGaming-GeneralImprovements-1.1.12\GeneralImprovements.dll</HintPath>
-    </Reference>
     <Reference Include="LCVR">
       <HintPath>$(PluginLimbo)\normallyenabled\LCVR-1.2.2\BepInEx\plugins\LCVR\LCVR.dll</HintPath>
     </Reference>

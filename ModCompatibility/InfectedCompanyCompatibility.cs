@@ -6,6 +6,14 @@ namespace LC_InsanityDisplay.ModCompatibility
 {
     public class InfectedCompanyCompatibility
     {
+
+        private static void Initialize()
+        {
+            //Example
+            //On.StartOfRound.Start
+        }
+
+
         public static Slider modInsanitySlider = null;
         public static IEnumerator ConvertInsanity()
         {
