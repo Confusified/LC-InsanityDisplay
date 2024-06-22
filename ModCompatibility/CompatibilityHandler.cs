@@ -22,10 +22,8 @@ namespace LC_InsanityDisplay.ModCompatibility
         private static void Initialize()
         {
             DisableCrouchHUD = CompatibleDependencyAttribute.IsModPresent(EladsHUDCompatibility.ModGUID);
-            Initialise.Logger.LogDebug(DisableCrouchHUD);
             if (DisableCrouchHUD) return;
             ConfigHandler.Compat.LCCrouchHUD.SettingChanged += UpdateIconPosition;
-            Initialise.Logger.LogDebug("listening to changes : ABCDE");
         }
 
         private static void Start()
@@ -41,7 +39,6 @@ namespace LC_InsanityDisplay.ModCompatibility
 
         private static void UpdateIconPosition(object sender = null!, EventArgs e = null!)
         {
-            if (sender != null) Initialise.Logger.LogDebug("updated config");
             if (CrouchHUD == null || IconTransform == null || positionToLocal == Vector3.zero) return; //can't update it if it ain't there
 
             IconTransform.SetLocalPositionAndRotation(localPosition: ConfigHandler.Compat.LCCrouchHUD.Value ? positionToLocal + localPositionOffset : positionToLocal, localRotation: IconTransform.localRotation);
@@ -59,10 +56,8 @@ namespace LC_InsanityDisplay.ModCompatibility
         private static void Initialize()
         {
             DisableAn0nHud = CompatibleDependencyAttribute.IsModPresent(EladsHUDCompatibility.ModGUID);
-            Initialise.Logger.LogDebug(DisableAn0nHud);
             if (DisableAn0nHud) return; //Don't run if Elad's HUD is present or ... or ...
             ConfigHandler.Compat.An0nPatches.SettingChanged += UpdateAn0nDisplay;
-            Initialise.Logger.LogDebug("listening to changes : ABCDE");
         }
 
         private static void Start()

@@ -71,14 +71,13 @@ namespace LC_InsanityDisplay.UI
             //Set the insanity meter in the correct position
             Transform meterTransform = InsanityMeter.transform;
             meterTransform.SetAsFirstSibling();
-            meterTransform.localPosition = VanillaSprintMeter.transform.localPosition + localPositionOffset;
+            meterTransform.SetLocalPositionAndRotation(VanillaSprintMeter.transform.localPosition + localPositionOffset, meterTransform.localRotation);
             meterTransform.localScale *= localScaleMultiplier;
 
             //Reset values to avoid any issues
             CurrentlySetColor = TransparantColor;
             LastInsanityLevel = -1;
             LastIconPosition = VanillaIconPosition;
-
 
             //Update the insanity meter to have the correct visuals
             UpdateMeter(settingChanged: true);

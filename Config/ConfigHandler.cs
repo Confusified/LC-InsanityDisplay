@@ -1,5 +1,4 @@
 ﻿using BepInEx.Configuration;
-using LC_InsanityDisplay.ModCompatibility;
 using LC_InsanityDisplay.UI;
 using System;
 using UnityEngine;
@@ -131,7 +130,11 @@ namespace LC_InsanityDisplay.Config
                 modConfig.Remove(oldBoolEntry.Definition);
             }
             //remove orphaned entries
-
+            /*
+            PropertyInfo orphanedEntriesProp = modConfig.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
+            var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(modConfig, null);
+            orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
+            */
 
             ConfigVersion.Value = CurrentVersion;
             Initialise.Logger.LogDebug($"Succesfully updated config file version from {oldConfigVersion} => {CurrentVersion}");
