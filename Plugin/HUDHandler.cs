@@ -1,13 +1,13 @@
 ﻿using GameNetcodeStuff;
-using LC_InsanityDisplay.ModCompatibility;
+using LC_InsanityDisplay.Plugin.ModCompatibility;
 using UnityEngine;
 using UnityEngine.UI;
-using static LC_InsanityDisplay.Config.ConfigHandler;
-using static LC_InsanityDisplay.UI.HUDBehaviour;
-using static LC_InsanityDisplay.UI.HUDInjector;
+using static LC_InsanityDisplay.Plugin.ConfigHandler;
+using static LC_InsanityDisplay.Plugin.UI.HUDBehaviour;
+using static LC_InsanityDisplay.Plugin.UI.HUDInjector;
 
 
-namespace LC_InsanityDisplay.UI
+namespace LC_InsanityDisplay.Plugin.UI
 {
     /// <summary>
     /// This class will be responsible for injecting the insanity meter into the hud
@@ -33,7 +33,7 @@ namespace LC_InsanityDisplay.UI
         public static void InjectIntoHud(On.HUDManager.orig_SetSavedValues orig, HUDManager self, int playerObjectId = -1)
         {
             orig(self, playerObjectId);
-            if (playerObjectId == -1 || (playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId])) //check for the localplayer
+            if (playerObjectId == -1 || playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId]) //check for the localplayer
             {
                 //Set variables for later use
                 HUDManagerInstance = self;
@@ -136,11 +136,9 @@ namespace LC_InsanityDisplay.UI
         internal static void UpdateMeter(bool settingChanged = false)
         {
             if (!LocalPlayerInstance || !InsanityMeterComponent) return;
-            CurrentFillAmount = InsanityMeterComponent.fillAmount;
             if (settingChanged ||
-                (!SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || (CurrentFillAmount > accurate_MinValue && LastInsanityLevel == 0) || (ReverseEnabled && LastInsanityLevel == 0 && CurrentFillAmount < accurate_MaxValue))) ||
-                (SetAlwaysFull && CurrentFillAmount != 1)
-               ) //Only update if actually changed (or called by a settingchange)
+                !SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || CurrentFillAmount > accurate_MinValue && LastInsanityLevel == 0 || ReverseEnabled && LastInsanityLevel == 0 && CurrentFillAmount < accurate_MaxValue) ||
+                SetAlwaysFull && CurrentFillAmount != 1) //Only update if actually changed (or called by a settingchange)
             {
                 CurrentMeterFill = ReturnInsanityLevel();
                 CurrentFillAmount = CurrentMeterFill;
@@ -179,9 +177,9 @@ namespace LC_InsanityDisplay.UI
                 if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
                 CurrentFillAmount = InsanityMeterComponent.fillAmount;
 
-                if (((CurrentMeterFill != InsanityLevel || LastInsanityLevel != self.insanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull) ||
-                    (SetAlwaysFull && CurrentFillAmount != 1) ||
-                    (ReverseEnabled && CurrentFillAmount < accurate_MaxValue && self.insanityLevel == 0))
+                if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != self.insanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
+                    SetAlwaysFull && CurrentFillAmount != 1 ||
+                    ReverseEnabled && CurrentFillAmount < accurate_MaxValue && self.insanityLevel == 0)
                     UpdateMeter();
 
                 if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
@@ -198,23 +196,23 @@ namespace LC_InsanityDisplay.UI
             if (IconSetting != iconAlwaysCentered.Value) IconSetting = iconAlwaysCentered.Value;
             if (NeverCenter != (IconSetting == CenteredIconSettings.Never)) NeverCenter = IconSetting == CenteredIconSettings.Never;
             if (AlwaysCenter != (IconSetting == CenteredIconSettings.Always)) AlwaysCenter = IconSetting == CenteredIconSettings.Always;
-            CurrentMeterFill = ReturnInsanityLevel();
+            if (settingChanged) CurrentMeterFill = ReturnInsanityLevel();
 
             // Don't update when not necessary
-            if ((LastIconPosition == VanillaIconPosition && NeverCenter) || //If Never Centering and vanilla position
-                (LastIconPosition == CenteredIconPosition && AlwaysCenter) || //If Always Centering and centered
-                (CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter) || //If there is no visible change when it's max
-                (!usingAccurateDisplay && (CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition) && !AlwaysCenter) || //No visible change without Accurate Display
-                (usingAccurateDisplay && (CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition) && !AlwaysCenter) || //No visible change with Accurate Display
-                (CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition) //Icon is centered 
+            if (LastIconPosition == VanillaIconPosition && NeverCenter || //If Never Centering and vanilla position
+                LastIconPosition == CenteredIconPosition && AlwaysCenter || //If Always Centering and centered
+                CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter || //If there is no visible change when it's max
+                !usingAccurateDisplay && CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change without Accurate Display
+                usingAccurateDisplay && CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change with Accurate Display
+                CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition //Icon is centered 
                 && !settingChanged) return;
 
             //Determine the position the player icon must be in
-            if (NeverCenter || (CurrentMeterFill < accurate_MinValue && NeverCenter)) NewPosition = VanillaIconPosition; //Set it to the vanilla position
-            else if (SetAlwaysFull || AlwaysCenter || (CurrentMeterFill > accurate_MaxValue && !NeverCenter)) NewPosition = CenteredIconPosition; //Set it to the centered position
+            if (NeverCenter || CurrentMeterFill < accurate_MinValue && NeverCenter) NewPosition = VanillaIconPosition; //Set it to the vanilla position
+            else if (SetAlwaysFull || AlwaysCenter || CurrentMeterFill > accurate_MaxValue && !NeverCenter) NewPosition = CenteredIconPosition; //Set it to the centered position
             else //Set it to a certain position in between vanilla and centered
             {
-                float lerpValue = (lerpNumber1 * (CurrentMeterFill * CurrentMeterFill)) - (lerpNumber2 * CurrentMeterFill) + lerpNumber3;
+                float lerpValue = lerpNumber1 * (CurrentMeterFill * CurrentMeterFill) - lerpNumber2 * CurrentMeterFill + lerpNumber3;
                 Vector3 targetVector3 = CurrentMeterFill > accurate_MinValue ? CenteredIconPosition : VanillaIconPosition;
                 if (Vector3.Distance(NewPosition, targetVector3) <= 0.05f) NewPosition = targetVector3;
                 else

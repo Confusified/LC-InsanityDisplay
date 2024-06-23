@@ -50,12 +50,12 @@
     <None Remove="packages\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="ModCompatibility\InfectedCompanyCompatibility.cs" />
-    <Compile Remove="ModCompatibility\LethalCompanyVRCompatibility.cs" />
+    <Compile Remove="Plugin\ModCompatibility\InfectedCompanyCompatibility.cs" />
+    <Compile Remove="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ModCompatibility\InfectedCompanyCompatibility.cs" />
-    <None Include="ModCompatibility\LethalCompanyVRCompatibility.cs" />
+    <None Include="Plugin\ModCompatibility\InfectedCompanyCompatibility.cs" />
+    <None Include="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
 
   <!-- Primary Package References - BepInEx -->
@@ -76,10 +76,10 @@
   <!-- Package References -->
   <ItemGroup>
     <Reference Include="LCVR">
-      <HintPath>$(PluginLimbo)\normallyenabled\LCVR-1.2.2\BepInEx\plugins\LCVR\LCVR.dll</HintPath>
+      <HintPath>$(DLLDirectory)\LethalCompanyVR.dll</HintPath>
     </Reference>
     <Reference Include="LethalConfig">
-      <HintPath>$(CopyToDirectory)\LethalConfig\plugins\LethalConfig\LethalConfig.dll</HintPath>
+      <HintPath>$(DLLDirectory)\LethalConfig.dll</HintPath>
     </Reference>
     <Reference Include="MMHOOK_Assembly-CSharp">
       <HintPath>$(MMHOOKDirectory)MMHOOK_Assembly-CSharp.dll</HintPath>

@@ -9,8 +9,9 @@ namespace LC_InsanityDisplay.ModCompatibility
 
         private static void Initialize()
         {
+
             //Example
-            //On.StartOfRound.Start
+            //On.StartOfRound.Start += stuff;
         }
 
 

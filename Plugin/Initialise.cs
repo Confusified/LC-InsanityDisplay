@@ -1,12 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using LC_InsanityDisplay.Config;
-using LC_InsanityDisplay.ModCompatibility;
-using LC_InsanityDisplay.UI;
-using static LC_InsanityDisplay.ModCompatibility.CompatibilityList;
+using LC_InsanityDisplay.Plugin.ModCompatibility;
+using LC_InsanityDisplay.Plugin.UI;
+using static LC_InsanityDisplay.Plugin.ModCompatibility.CompatibilityList;
 
-namespace LC_InsanityDisplay
+namespace LC_InsanityDisplay.Plugin
 {
     //Soft dependencies
     [CompatibleDependency(LethalConfigPatch.ModGUID, typeof(LethalConfigPatch))]
@@ -28,10 +27,10 @@ namespace LC_InsanityDisplay
     [BepInDependency(EladsHUDCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
     [CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
-    [BepInDependency(ModGUIDS.HealthMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(HealthMetricsCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
-    //[CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
-    [BepInDependency(ModGUIDS.DamageMetrics, BepInDependency.DependencyFlags.SoftDependency)]
+    [CompatibleDependency(DamageMetricsCompatibility.ModGUID, typeof(DamageMetricsCompatibility))]
+    [BepInDependency(DamageMetricsCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
     //[CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(ModGUIDS.LethalCompanyVR, BepInDependency.DependencyFlags.SoftDependency)]
@@ -56,14 +55,17 @@ namespace LC_InsanityDisplay
             ConfigHandler.InitialiseConfig();
             if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); return; }
 
+            CompatibleDependencyAttribute.IsEladsHudPresent = CompatibleDependencyAttribute.IsModPresent(EladsHUDCompatibility.ModGUID);
+            //CompatibleDependencyAttribute.IsLCVRPresent = CompatibleDependencyAttribute.IsModPresent(LethalCompanyVRCompatibility.ModGUID);
+
             CompatibleDependencyAttribute.Init(this);
-            HookAll();
+            Hook();
 
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
         }
 
-        private static void HookAll()
+        private static void Hook()
         {
             Logger.LogDebug("Hooking...");
             On.HUDManager.SetSavedValues += HUDInjector.InjectIntoHud;

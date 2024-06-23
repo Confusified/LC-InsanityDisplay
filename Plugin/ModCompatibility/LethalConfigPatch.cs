@@ -1,10 +1,13 @@
 ﻿using LethalConfig;
 using LethalConfig.ConfigItems;
 using LethalConfig.ConfigItems.Options;
-using static LC_InsanityDisplay.Config.ConfigHandler;
+using static LC_InsanityDisplay.Plugin.ConfigHandler;
 
-namespace LC_InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.Plugin.ModCompatibility
 {
+    /// <summary>
+    /// Handles behaviour related to LethalConfig
+    /// </summary>
     public class LethalConfigPatch
     {
         internal const string ModGUID = "ainavt.lc.lethalconfig";

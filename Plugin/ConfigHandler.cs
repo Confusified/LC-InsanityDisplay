@@ -1,10 +1,10 @@
 ﻿using BepInEx.Configuration;
-using LC_InsanityDisplay.UI;
+using LC_InsanityDisplay.Plugin.UI;
 using System;
 using UnityEngine;
-using static LC_InsanityDisplay.Initialise;
+using static LC_InsanityDisplay.Plugin.Initialise;
 
-namespace LC_InsanityDisplay.Config
+namespace LC_InsanityDisplay.Plugin
 {
     public class ConfigHandler
     {

@@ -1,18 +1,21 @@
 ﻿using BepInEx;
 using BepInEx.Bootstrap;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
-namespace LC_InsanityDisplay.ModCompatibility
+namespace LC_InsanityDisplay.Plugin.ModCompatibility
 {
     /// <summary>
     /// This class contains the methods that call compatibility related code
     /// </summary>
     internal class CompatibleDependencyAttribute : BepInDependency
     {
+        public static bool IsEladsHudPresent = false;
+        public static bool IsLCVRPresent = false;
         public System.Type Handler;
         private const BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Static;
-        internal static IEnumerable<CompatibleDependencyAttribute> attributes = null!;
+        private static List<CompatibleDependencyAttribute> attributes = null!;
         /// <summary>
         /// Marks this BepInEx.BaseUnityPlugin as soft dependant on another plugin.
         /// The handler type must have an Initialize() method that will automatically be invoked if the compatible dependency is present.
@@ -31,34 +34,39 @@ namespace LC_InsanityDisplay.ModCompatibility
         /// You must call this method from your base plugin Awake method and pass the plugin instance to the source parameter.
         /// </summary>
         /// <param name="source">The source plugin instance with the BepInPlugin attribute.</param>
-        public static void Init(BepInEx.BaseUnityPlugin source)
+        public static void Init(BaseUnityPlugin source)
         {
-            attributes = source.GetType().GetCustomAttributes<CompatibleDependencyAttribute>();
+            attributes = source.GetType().GetCustomAttributes<CompatibleDependencyAttribute>().ToList();
+            //Initialise all depedencies
             foreach (CompatibleDependencyAttribute attr in attributes)
             {
-                RunMethodIfFound(attr, "Initialize");
+                InvokeMethodIfFound(attr, "Initialize");
             }
         }
-
+        /// <summary>
+        /// Global dependency activator
+        /// This method is called before creating the insanity meter, activating all dependencies
+        /// </summary>
         public static void Activate()
         {
             foreach (CompatibleDependencyAttribute attr in attributes)
             {
-                RunMethodIfFound(attr, "Start");
+                InvokeMethodIfFound(attr, "Start");
             }
         }
 
-        private static void RunMethodIfFound(CompatibleDependencyAttribute attribute, string methodToRun)
+        private static void InvokeMethodIfFound(CompatibleDependencyAttribute attribute, string methodToRun)
         {
+            if (attribute == null) return;
             if (IsModPresent(attribute.DependencyGUID))
             {
                 //Initialise.Logger.LogDebug("Found compatible mod: " + attribute.DependencyGUID);
                 attribute.Handler.GetMethod(methodToRun, bindingFlags)?.Invoke(null, null);
             }
-            //else
-            //{
-            // Initialise.Logger.LogDebug("Compatibility not found: " + attr.DependencyGUID);
-            //}
+            else
+            {
+                //Initialise.Logger.LogDebug("Compatibility not found: " + attribute.DependencyGUID);
+            }
         }
 
         internal static bool IsModPresent(string ModGUID)
