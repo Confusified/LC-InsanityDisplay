@@ -148,6 +148,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
     /// </summary>
     public class DamageMetricsCompatibility
     {
+        //NOTE: DamageMetrics and HealthMetrics don't work properly together, I'm not gonna fix it until there's a bug report or notice people use both at the same time
         internal const string ModGUID = "Matsuura.TestAccount666.DamageMetrics";
         private static GameObject DamageMeter = null!;
         private static Transform MeterTransform = null!;
@@ -192,12 +193,13 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
 
         private static GameObject HitpointDisplay = null!;
         private static Vector3 localPosition = Vector3.zero;
-        private static Vector3 localPositionOffset = new Vector3(-2f, 28f, 0);
+        private static Vector3 localPositionOffset = new(-2f, 28f, 0);
 
         public static bool HitpointDisplayActive = false;
 
         private static void Initialize()
         {
+            //I could check if it is enabled by using the GeneralImprovements dll but i'm stubborn
             ConfigFile GIConfig = Chainloader.PluginInfos[ModGUID].Instance.Config;
             foreach (ConfigDefinition configDef in GIConfig.Keys)
             {
@@ -216,11 +218,9 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             TextMeshProUGUI[] ComponentList = HUDInjector.TopLeftHUD.GetComponentsInChildren<TextMeshProUGUI>(true);
             foreach (TextMeshProUGUI component in ComponentList) //fetch the HitpointDisplay (is there a better for this? probably
             {
-                if (component.name != "HP") continue;
-                HitpointDisplay = component.gameObject;
-                break;
+                if (component.name == "HP") HitpointDisplay = component.gameObject; break;
             }
-            if (!HitpointDisplay) return;
+            if (!HitpointDisplay) return; //Don't continue if it wasn't able to find the HitpointDisplay
             if (localPosition == Vector3.zero) localPosition = HitpointDisplay.transform.localPosition;
 
             UpdateDisplayPosition();

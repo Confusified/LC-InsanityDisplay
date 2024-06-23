@@ -5,8 +5,7 @@
         public class ModGUIDS
         {
             public const string LethalCompanyVR = "io.daxcess.lcvr";
-            public const string InfectedCompany = "InfectedCompany.InfectedCompany";
-            public const string ShyHUD = "idk";
+            public const string ShyHUD = "ShyHUD";
         }
     }
 }

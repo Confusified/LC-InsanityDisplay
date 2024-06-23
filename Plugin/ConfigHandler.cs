@@ -1,6 +1,8 @@
 ﻿using BepInEx.Configuration;
 using LC_InsanityDisplay.Plugin.UI;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using static LC_InsanityDisplay.Plugin.Initialise;
 
@@ -9,12 +11,12 @@ namespace LC_InsanityDisplay.Plugin
     public class ConfigHandler
     {
         //Display Settings
-        public static ConfigEntry<bool> ModEnabled { get; internal set; } = null!; //If disabled the mod simply won't run
-        public static ConfigEntry<string> MeterColor { get; internal set; } = null!;//Default is purple (in file it would be HEX)
+        public static ConfigEntry<bool> ModEnabled { get; internal set; } = null!; // If disabled the mod simply won't run
+        public static ConfigEntry<string> MeterColor { get; internal set; } = null!;// Default is purple (in file it would be HEX)
         public static ConfigEntry<bool> useAccurateDisplay { get; internal set; } = null!;
-        public static ConfigEntry<bool> enableReverse { get; internal set; } = null!; //Become a sanity meter instead of insanity meter
-        public static ConfigEntry<bool> alwaysFull { get; internal set; } = null!; //Basically just always show the bar
-        public static ConfigEntry<CenteredIconSettings> iconAlwaysCentered { get; internal set; } = null!;//The player icon that displays your health (i intend to move it whenever the insanity meter is not visible)
+        public static ConfigEntry<bool> enableReverse { get; internal set; } = null!; // Become a sanity meter instead of insanity meter
+        public static ConfigEntry<bool> alwaysFull { get; internal set; } = null!; // Basically just always show the bar
+        public static ConfigEntry<CenteredIconSettings> iconAlwaysCentered { get; internal set; } = null!;// The player icon that displays your health (i intend to move it whenever the insanity meter is not visible)
 
         public enum CenteredIconSettings
         {
@@ -23,7 +25,7 @@ namespace LC_InsanityDisplay.Plugin
             Always = 2
         }
 
-        //Mod Compatibility Settings
+        // Mod Compatibility Settings (as of 1.3.0 they are now in their own sections)
         public class Compat
         {
             public static ConfigEntry<bool> LCCrouchHUD { get; internal set; } = null!;
@@ -37,7 +39,7 @@ namespace LC_InsanityDisplay.Plugin
             public static ConfigEntry<bool> InfectedCompany_InfectedOnly { get; internal set; } = null!;
         }
 
-        //_DontTouch
+        // z Do Not Touch z (intentionally starts with a 'z', so that the config is at the bottom)
         public static ConfigEntry<byte> ConfigVersion { get; internal set; } = null!;
         public static byte CurrentVersion = 3;
 
@@ -50,91 +52,131 @@ namespace LC_InsanityDisplay.Plugin
             alwaysFull = modConfig.Bind("Display Settings", "Always Show", false, "Always show the insanity meter, for aesthetic purposes");
             iconAlwaysCentered = modConfig.Bind("Display Settings", "Center Player Icon", CenteredIconSettings.AvoidOverlap, "Always have the player icon centered, instead of it moving to it's vanilla position when the insanity meter is not visible");
 
-            Compat.LCCrouchHUD = modConfig.Bind("Mod Compatibility Settings", "Enable LCCrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.An0nPatches = modConfig.Bind("Mod Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.EladsHUD = modConfig.Bind("Mod Compatibility Settings", "Enable Elads HUD compatibility", true, "Enabling this will add another bar above the stamina bar displaying your insanity level");
-            Compat.GeneralImprovements = modConfig.Bind("Mod Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.HealthMetrics = modConfig.Bind("Mod Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.DamageMetrics = modConfig.Bind("Mod Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
-            Compat.LethalCompanyVR = modConfig.Bind("Mod Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
-            Compat.InfectedCompany = modConfig.Bind("Mod Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
-            Compat.InfectedCompany_InfectedOnly = modConfig.Bind("Mod Compatibility Settings", "Only show Insanity Meter when infected", false, "Enabling this will only show the insanity meter when you are the infected");
+            Compat.LCCrouchHUD = modConfig.Bind("CrouchHUD Compatibility Settings", "Enable CrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.An0nPatches = modConfig.Bind("An0n Patches Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.EladsHUD = modConfig.Bind("Elads HUD Compatibility Settings", "Enable Elads HUD compatibility", true, "Enabling this will add another bar above the stamina bar displaying your insanity level");
+            Compat.GeneralImprovements = modConfig.Bind("GeneralImprovements Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.HealthMetrics = modConfig.Bind("HealthMetrics Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.DamageMetrics = modConfig.Bind("DamageMetrics Compatibility Settings", "Enable DamageMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.LethalCompanyVR = modConfig.Bind("LethalCompanyVR Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
+            Compat.InfectedCompany = modConfig.Bind("InfectedCompany Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
+            Compat.InfectedCompany_InfectedOnly = modConfig.Bind("InfectedCompany Compatibility Settings", "Only show Insanity Meter when infected", false, "Enabling this will only show the insanity meter when you are the infected");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
             RemoveDeprecatedSettings();
 
-            FixColor(); //Fix the meter being white if the user's config doesn't start with '#'
+            FixColor(); // Fix the meter being white if the user's config doesn't start with '#' (generally for older versions of the mod but, i'm keeping it here just to be safe)
         }
 
-        internal static void SettingChanged(object sender, EventArgs e)
+        internal static void SettingChanged(object sender = null!, EventArgs e = null!)
         {
-            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); //Update the insanity meter if it exists
-            if (HUDBehaviour.PlayerIcon && HUDBehaviour.PlayerRedIcon) HUDBehaviour.UpdateIconPosition(settingChanged: true); //Update the icon if it exists
+            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); // Update the insanity meter if it exists
+            if (HUDBehaviour.PlayerIcon && HUDBehaviour.PlayerRedIcon) HUDBehaviour.UpdateIconPosition(settingChanged: true); // Update the icon if it exists
         }
 
         internal static void FixColor(object obj = null!, EventArgs args = null!)
         {
-            if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } //Remove '#' from the user's config value
+            if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } // Remove '#' from the user's config value
             ColorUtility.TryParseHtmlString("#" + MeterColor.Value, out Color meterColor);
             Color newColor = meterColor + Color.black;
             MeterColor.Value = ColorUtility.ToHtmlStringRGBA(newColor);
             HUDBehaviour.InsanityMeterColor = newColor;
-            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); //Update the insanity meter if it exists
+            if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); // Update the insanity meter if it exists
         }
 
-        public static void RemoveDeprecatedSettings()
+        public static void RemoveDeprecatedSettings() // Could be improved
         {
             byte oldConfigVersion = ConfigVersion.Value;
-            if (oldConfigVersion == CurrentVersion) { return; } //Don't update config values
+            if (oldConfigVersion == CurrentVersion) { return; } // Don't update config values
 
             ConfigEntry<bool> oldBoolEntry;
             ConfigEntry<Color> oldColorEntry;
-            //From before ConfigVersion existed so anything below 1
-            if (oldConfigVersion < 1)
+            // From before ConfigVersion existed so anything below 1
+
+            if (oldConfigVersion < 2) // Below 1.3.0 (people using the alpha versions of 1.3.0 will have their compatibility settings reset, due to an oversight)
             {
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable LCCrouchHUD compatibility", true);
-                Compat.LCCrouchHUD.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
+                const string DisplaySection = "Display Settings";
+                const string ModCompatSection = "Mod Compatibility Settings";
 
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable An0n Patches compatibility", true);
-                Compat.An0nPatches.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
-
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable Elads HUD compatibility", true);
-                Compat.EladsHUD.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
-
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable GeneralImprovements compatibility", true);
-                Compat.GeneralImprovements.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
-
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable HealthMetrics compatibility", true);
-                Compat.HealthMetrics.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
-
-                oldBoolEntry = modConfig.Bind("Compatibility Settings", "Enable DamageMetrics compatibility", true);
-                Compat.DamageMetrics.Value = oldBoolEntry.Value;
-                modConfig.Remove(oldBoolEntry.Definition);
-
-                oldColorEntry = modConfig.Bind("Display Settings", "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
-                MeterColor.Value = ColorUtility.ToHtmlStringRGB(oldColorEntry.Value);
-                modConfig.Remove(oldColorEntry.Definition);
-
-            }
-            if (oldConfigVersion < 2) //below 1.3.0
-            {
-                oldBoolEntry = modConfig.Bind("Display Settings", "Always Centered Player Icon", true);
+                oldBoolEntry = modConfig.Bind(DisplaySection, "Always Centered Player Icon", true);
                 if (oldBoolEntry.Value) iconAlwaysCentered.Value = CenteredIconSettings.Always;
                 else iconAlwaysCentered.Value = CenteredIconSettings.AvoidOverlap;
                 modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable LCCrouchHUD compatibility", true);
+                Compat.LCCrouchHUD.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable An0n Patches compatibility", true);
+                Compat.An0nPatches.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable Elads HUD compatibility", true);
+                Compat.EladsHUD.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable GeneralImprovements compatibility", true);
+                Compat.GeneralImprovements.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable HealthMetrics compatibility", true);
+                Compat.HealthMetrics.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable DamgeMetrics compatibility", true);
+                Compat.DamageMetrics.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable LethalCompanyVR compatibility", true);
+                Compat.LethalCompanyVR.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Enable InfectedCompany compatibility", true);
+                Compat.InfectedCompany.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                oldBoolEntry = modConfig.Bind(ModCompatSection, "Only show Insanity Meter when infected", true);
+                Compat.InfectedCompany_InfectedOnly.Value = oldBoolEntry.Value;
+                modConfig.Remove(oldBoolEntry.Definition);
+
+                if (oldConfigVersion < 1)
+                {
+                    const string CompatSection = "Compatibility Settings";
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable LCCrouchHUD compatibility", true);
+                    Compat.LCCrouchHUD.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable An0n Patches compatibility", true);
+                    Compat.An0nPatches.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable Elads HUD compatibility", true);
+                    Compat.EladsHUD.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable GeneralImprovements compatibility", true);
+                    Compat.GeneralImprovements.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable HealthMetrics compatibility", true);
+                    Compat.HealthMetrics.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldBoolEntry = modConfig.Bind(CompatSection, "Enable DamageMetrics compatibility", true);
+                    Compat.DamageMetrics.Value = oldBoolEntry.Value;
+                    modConfig.Remove(oldBoolEntry.Definition);
+
+                    oldColorEntry = modConfig.Bind(DisplaySection, "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
+                    MeterColor.Value = ColorUtility.ToHtmlStringRGB(oldColorEntry.Value);
+                    modConfig.Remove(oldColorEntry.Definition);
+
+                }
             }
-            //remove orphaned entries
-            /*
+            // Clear orphaned entries (Unbinded/Abandoned entries)
             PropertyInfo orphanedEntriesProp = modConfig.GetType().GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
             var orphanedEntries = (Dictionary<ConfigDefinition, string>)orphanedEntriesProp.GetValue(modConfig, null);
-            orphanedEntries.Clear(); // Clear orphaned entries (Unbinded/Abandoned entries)
-            */
+            orphanedEntries.Clear();
 
             ConfigVersion.Value = CurrentVersion;
             Initialise.Logger.LogDebug($"Succesfully updated config file version from {oldConfigVersion} => {CurrentVersion}");

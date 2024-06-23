@@ -38,6 +38,7 @@
   <PropertyGroup>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+
     <!--
         Trim the project path to prevent players from potentially
         viewing Private Information in stack traces.
@@ -50,11 +51,9 @@
     <None Remove="packages\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Plugin\ModCompatibility\InfectedCompanyCompatibility.cs" />
     <Compile Remove="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Plugin\ModCompatibility\InfectedCompanyCompatibility.cs" />
     <None Include="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
   </ItemGroup>
 

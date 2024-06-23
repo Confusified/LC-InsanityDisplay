@@ -1,6 +1,8 @@
 ﻿using GameNetcodeStuff;
+using LC_InsanityDisplay.ModCompatibility;
 using LC_InsanityDisplay.Plugin.ModCompatibility;
 using UnityEngine;
+using UnityEngine.Bindings;
 using UnityEngine.UI;
 using static LC_InsanityDisplay.Plugin.ConfigHandler;
 using static LC_InsanityDisplay.Plugin.UI.HUDBehaviour;
@@ -16,24 +18,26 @@ namespace LC_InsanityDisplay.Plugin.UI
     {
         internal static PlayerControllerB LocalPlayerInstance { get; private set; } = null!;
         internal static HUDManager HUDManagerInstance { get; private set; } = null!;
+        internal static GameObject TopLeftHUD { get; private set; } = null!;
+        internal const string ModName = "InsanityMeter";
+
         public static GameObject InsanityMeter { get; internal set; } = null!;
         public static Image InsanityMeterComponent { get; internal set; } = null!;
         public static Vector3 localPositionOffset = new(-3.4f, 3.7f, 0f); //-271.076 102.6285 -13.0663 = normal
 
         private static GameObject VanillaSprintMeter { get; set; } = null!;
-        internal static GameObject TopLeftHUD { get; private set; } = null!;
         private const float localScaleMultiplier = 0.86f; //SprintMeter scale is 1.6892 (for all) and my intended scale is 1.4 (so 1.4/1.628 is 0.86f)
 
         /// <summary>
         /// Inject into the HUD after all necessary variables have been initialised
-        /// This method is also called in StartOfRound.OnPlayerConnectedClientRpc(), so only run the code when the insanity meter has not been created yet
-        /// Order of execution: https://boxy-svg.com/app/new:PkmnhM-eZH
+        /// This method is also called in StartOfRound.OnPlayerConnectedClientRpc(), so only run the code when the connected player is the localplayer
+        /// Order of execution: https://boxy-svg.com/app/ > Import (import the .svg file from the source)
         /// source: https://discord.com/channels/1168655651455639582/1191246381634043995/1194046052387532810
         /// </summary>
         public static void InjectIntoHud(On.HUDManager.orig_SetSavedValues orig, HUDManager self, int playerObjectId = -1)
         {
             orig(self, playerObjectId);
-            if (playerObjectId == -1 || playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId]) //check for the localplayer
+            if (playerObjectId == -1 || playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId]) //only continue if the player who connected is the localplayer
             {
                 //Set variables for later use
                 HUDManagerInstance = self;
@@ -46,27 +50,28 @@ namespace LC_InsanityDisplay.Plugin.UI
                 CurrentPosition = VanillaIconPosition;
                 CenteredIconPosition = VanillaIconPosition + IconPositionOffset;
 
-
                 //Activate all compatibilities (that are present) and have a Start() method
+                Initialise.Logger.LogDebug("Activating compatibilities...");
                 CompatibleDependencyAttribute.Activate();
                 Initialise.Logger.LogDebug("Activated all the compatibilities");
 
                 //Set up the insanity meter
                 Initialise.Logger.LogDebug("Setting up insanity meter...");
                 CreateMeter();
+                Initialise.Logger.LogDebug("Finished setting up the insanity meter");
             }
         }
 
-        private static void CreateMeter() //potentially save the meter for when going back to the menu and into a lobby again?
+        private static void CreateMeter()
         {
             if (InsanityMeter) return; //Make sure the meter doesn't already exist
 
             //Create insanity meter
             InsanityMeter = Object.Instantiate(VanillaSprintMeter, TopLeftHUD.transform);
             InsanityMeter.SetActive(false); //Should prevent it being marked as dirty
-            InsanityMeter.name = "InsanityMeter";
+            InsanityMeter.name = ModName;
 
-            InsanityMeterComponent = InsanityMeter.GetComponentInChildren<Image>();
+            InsanityMeterComponent = InsanityMeter.GetComponentInChildren<Image>(true);
 
             //Set the insanity meter in the correct position
             Transform meterTransform = InsanityMeter.transform;
@@ -75,14 +80,17 @@ namespace LC_InsanityDisplay.Plugin.UI
             meterTransform.localScale *= localScaleMultiplier;
 
             //Reset values to avoid any issues
-            CurrentlySetColor = TransparantColor;
+            CurrentlySetColor = new(0, 0, 0, 0); //The way the mod is currently set up doesn't allow for a transparant meter
             LastInsanityLevel = -1;
             LastIconPosition = VanillaIconPosition;
 
             //Update the insanity meter to have the correct visuals
             UpdateMeter(settingChanged: true);
-            InsanityMeter.SetActive(true); //Insanity meter is now set up
-            Initialise.Logger.LogDebug("Finished setting up the insanity meter");
+            if (!InfectedCompanyCompatibility.InfectedMeter || !InfectedCompanyCompatibility.IsInfectedCompanyEnabled || !InfectedCompanyCompatibility.OnlyUseInfectedCompany)
+            {
+                InsanityMeter.SetActive(true);
+            } //Insanity meter is now set up
+
             //Update the icon to be positioned correctly
             UpdateIconPosition(settingChanged: true);
 
@@ -103,11 +111,8 @@ namespace LC_InsanityDisplay.Plugin.UI
         public static GameObject PlayerIcon { get; internal set; } = null!;
         public static GameObject PlayerRedIcon { get; internal set; } = null!;
 
-        internal static Color TransparantColor { get; private set; } = new(0, 0, 0, 0);
-
         internal static float LastInsanityLevel { get; set; } = -1;
         internal static float InsanityLevel { get; set; }
-        internal static float InsanityLevel_AccurateMargin { get; set; }
         internal static Vector3 LastIconPosition { get; set; }
         internal static Vector3 IconPositionOffset { get; private set; } = new Vector3(-6.8f, 4f, 0f);
         internal static Vector3 VanillaIconPosition { get; set; }
@@ -124,7 +129,7 @@ namespace LC_InsanityDisplay.Plugin.UI
         private static bool NeverCenter;
         private static bool AlwaysCenter;
         private static float CurrentMeterFill;
-        //lerp formula: 1.179x^2 - 0.337x + 0.03 (maybe just make it (minValue*CurrentMeterFill)+minValue)
+        //lerp formula: 1.179x^2 - 0.337x + 0.03 (could be made simpler but i'm a sucker for the animation)
         //x being CurrentMeterFill
         private const float lerpNumber1 = 1.179f;
         private const float lerpNumber2 = 0.337f;
@@ -138,11 +143,14 @@ namespace LC_InsanityDisplay.Plugin.UI
             if (!LocalPlayerInstance || !InsanityMeterComponent) return;
             if (settingChanged ||
                 !SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || CurrentFillAmount > accurate_MinValue && LastInsanityLevel == 0 || ReverseEnabled && LastInsanityLevel == 0 && CurrentFillAmount < accurate_MaxValue) ||
+                //((InfectedCompanyCompatibility.InfectedMeter && !InfectedCompanyCompatibility.IsPlayerInfected && !InfectedCompanyCompatibility.OnlyUseInfectedCompany) || !InfectedCompanyCompatibility.InfectedMeter && InfectedCompanyCompatibility.IsInfectedCompanyEnabled)) || //InfectedCompany specific conditions
                 SetAlwaysFull && CurrentFillAmount != 1) //Only update if actually changed (or called by a settingchange)
             {
+
                 CurrentMeterFill = ReturnInsanityLevel();
                 CurrentFillAmount = CurrentMeterFill;
-                InsanityMeterComponent.fillAmount = CurrentMeterFill;
+
+                if ((!SetAlwaysFull && InsanityMeter.activeSelf) || SetAlwaysFull) InsanityMeterComponent.fillAmount = CurrentMeterFill;
             }
             if (CurrentlySetColor != InsanityMeterColor) //Only update the colour when it's been changed
             {
@@ -157,11 +165,20 @@ namespace LC_InsanityDisplay.Plugin.UI
         private static float ReturnInsanityLevel()
         {
             if (SetAlwaysFull) return 1;
-            InsanityLevel = LocalPlayerInstance.insanityLevel / LocalPlayerInstance.maxInsanityLevel;
-            InsanityLevel_AccurateMargin = InsanityLevel * accurate_Diff;
+            //Determine if to use vanilla's insanity or InfectedCompany's insanity
+            if (InfectedCompanyCompatibility.InfectedMeter && InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.IsPlayerInfected)
+            {
+                InsanityLevel = InfectedCompanyCompatibility.InfectedMeterComponent.value;
+            }
+            else InsanityLevel = LocalPlayerInstance.insanityLevel / LocalPlayerInstance.maxInsanityLevel;
+
             if (usingAccurateDisplay != useAccurateDisplay.Value) usingAccurateDisplay = useAccurateDisplay.Value;
             if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
-            if (usingAccurateDisplay) return !ReverseEnabled ? accurate_MinValue + InsanityLevel_AccurateMargin : accurate_MaxValue - InsanityLevel_AccurateMargin; //Return the accurate version (normal or reversed)
+            if (usingAccurateDisplay)//Return the accurate version (normal or reversed)
+            {
+                float InsanityLevel_AccurateMargin = InsanityLevel * accurate_Diff;
+                return !ReverseEnabled ? accurate_MinValue + InsanityLevel_AccurateMargin : accurate_MaxValue - InsanityLevel_AccurateMargin;
+            }
 
             return !ReverseEnabled ? InsanityLevel : 1 - InsanityLevel; //return normal insanity value (or reversed version)
         }
@@ -176,14 +193,15 @@ namespace LC_InsanityDisplay.Plugin.UI
                 if (SetAlwaysFull != alwaysFull.Value) SetAlwaysFull = alwaysFull.Value;
                 if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
                 CurrentFillAmount = InsanityMeterComponent.fillAmount;
-
-                if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != self.insanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
+                float currentInsanityLevel = self.insanityLevel;
+                if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != currentInsanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
                     SetAlwaysFull && CurrentFillAmount != 1 ||
-                    ReverseEnabled && CurrentFillAmount < accurate_MaxValue && self.insanityLevel == 0)
+                    ReverseEnabled && CurrentFillAmount < accurate_MaxValue && currentInsanityLevel == 0 && InsanityMeter.activeSelf)
+                    //((!InfectedCompanyCompatibility.InfectedMeter || (!InfectedCompanyCompatibility.OnlyUseInfectedCompany && InfectedCompanyCompatibility.InfectedMeter)) && InsanityMeter.activeSelf))
                     UpdateMeter();
 
                 if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
-                LastInsanityLevel = self.insanityLevel;
+                if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
             }
         }
 
@@ -204,7 +222,8 @@ namespace LC_InsanityDisplay.Plugin.UI
                 CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter || //If there is no visible change when it's max
                 !usingAccurateDisplay && CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change without Accurate Display
                 usingAccurateDisplay && CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change with Accurate Display
-                CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition //Icon is centered 
+                CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition || //Icon is centered 
+                (InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.InfectedMeter && !InsanityMeter.activeSelf && LastIconPosition != VanillaIconPosition)//Don't update if InfectedCompany active, meter is disabled 
                 && !settingChanged) return;
 
             //Determine the position the player icon must be in
@@ -214,6 +233,7 @@ namespace LC_InsanityDisplay.Plugin.UI
             {
                 float lerpValue = lerpNumber1 * (CurrentMeterFill * CurrentMeterFill) - lerpNumber2 * CurrentMeterFill + lerpNumber3;
                 Vector3 targetVector3 = CurrentMeterFill > accurate_MinValue ? CenteredIconPosition : VanillaIconPosition;
+                if (!InsanityMeter.activeSelf && targetVector3 != VanillaIconPosition) targetVector3 = VanillaIconPosition; //Set the VanillaIconPosition if the meter is not visible and isn't already set as it
                 if (Vector3.Distance(NewPosition, targetVector3) <= 0.05f) NewPosition = targetVector3;
                 else
                 {

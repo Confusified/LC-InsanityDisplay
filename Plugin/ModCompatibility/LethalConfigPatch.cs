@@ -52,6 +52,8 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany_InfectedOnly, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
 
