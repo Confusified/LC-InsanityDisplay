@@ -7,7 +7,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
     /// <summary>
     /// Registers the mod to LobbyCompatibility
     /// </summary>
-    public class LobbyCompatibilityPatch
+    public class LobbyCompatibility_Compatibility
     {
         internal const string ModGUID = "BMX.LobbyCompatibility";
         private static void Initialize()

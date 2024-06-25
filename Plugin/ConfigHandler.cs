@@ -10,7 +10,7 @@ namespace LC_InsanityDisplay.Plugin
 {
     public class ConfigHandler
     {
-        //Display Settings
+        // Display Settings
         public static ConfigEntry<bool> ModEnabled { get; internal set; } = null!; // If disabled the mod simply won't run
         public static ConfigEntry<string> MeterColor { get; internal set; } = null!;// Default is purple (in file it would be HEX)
         public static ConfigEntry<bool> useAccurateDisplay { get; internal set; } = null!;
@@ -37,6 +37,7 @@ namespace LC_InsanityDisplay.Plugin
             public static ConfigEntry<bool> LethalCompanyVR { get; internal set; } = null!;
             public static ConfigEntry<bool> InfectedCompany { get; internal set; } = null!;
             public static ConfigEntry<bool> InfectedCompany_InfectedOnly { get; internal set; } = null!;
+            public static ConfigEntry<bool> ShyHUD { get; internal set; } = null!;
         }
 
         // z Do Not Touch z (intentionally starts with a 'z', so that the config is at the bottom)
@@ -61,6 +62,7 @@ namespace LC_InsanityDisplay.Plugin
             Compat.LethalCompanyVR = modConfig.Bind("LethalCompanyVR Compatibility Settings", "Enable LethalCompanyVR compatibility", true, "Enabling this will add the insanity meter to the hud in VR");
             Compat.InfectedCompany = modConfig.Bind("InfectedCompany Compatibility Settings", "Enable InfectedCompany compatibility", true, "Enabling this will hide InfectedCompany's insanity meter and use this mod's insanity meter instead");
             Compat.InfectedCompany_InfectedOnly = modConfig.Bind("InfectedCompany Compatibility Settings", "Only show Insanity Meter when infected", false, "Enabling this will only show the insanity meter when you are the infected");
+            Compat.ShyHUD = modConfig.Bind("ShyHUD Compatibility Settings", "Enable ShyHUD compatibility", true, "Enabling this will hide the insanity meter when it's full");
 
             ConfigVersion = modConfig.Bind<byte>("z Do Not Touch z", "Config Version", 0, "The current version of your config file");
 
@@ -79,17 +81,19 @@ namespace LC_InsanityDisplay.Plugin
         {
             if (MeterColor.Value.StartsWith("#")) { MeterColor.Value.Substring(1); } // Remove '#' from the user's config value
             ColorUtility.TryParseHtmlString("#" + MeterColor.Value, out Color meterColor);
-            Color newColor = meterColor + Color.black;
-            MeterColor.Value = ColorUtility.ToHtmlStringRGBA(newColor);
-            HUDBehaviour.InsanityMeterColor = newColor;
+            if (meterColor.a != 1) { meterColor.a = 1; }
+            MeterColor.Value = ColorUtility.ToHtmlStringRGBA(meterColor);
+            HUDBehaviour.InsanityMeterColor = meterColor;
             if (HUDInjector.InsanityMeter) HUDBehaviour.UpdateMeter(settingChanged: true); // Update the insanity meter if it exists
         }
 
-        public static void RemoveDeprecatedSettings() // Could be improved
+        public static void RemoveDeprecatedSettings()
         {
+            // Could be improved by putting the settings in their own if statements as to not unnecessarily set a value just for it to be overwritten by an older value)
+            // So, setting from < 2 is set and after setting from < 1 is set, this is inefficient (maybe i'll change that before 1.3.0 release)
             byte oldConfigVersion = ConfigVersion.Value;
             if (oldConfigVersion == CurrentVersion) { return; } // Don't update config values
-
+            // I feel like there's a better way to do this but, I don't know how to
             ConfigEntry<bool> oldBoolEntry;
             ConfigEntry<Color> oldColorEntry;
             // From before ConfigVersion existed so anything below 1
@@ -170,7 +174,6 @@ namespace LC_InsanityDisplay.Plugin
                     oldColorEntry = modConfig.Bind(DisplaySection, "Color of the meter", new Color(0.45f, 0, 0.65f, 1));
                     MeterColor.Value = ColorUtility.ToHtmlStringRGB(oldColorEntry.Value);
                     modConfig.Remove(oldColorEntry.Definition);
-
                 }
             }
             // Clear orphaned entries (Unbinded/Abandoned entries)

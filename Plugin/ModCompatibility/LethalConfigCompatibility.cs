@@ -8,7 +8,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
     /// <summary>
     /// Handles behaviour related to LethalConfig
     /// </summary>
-    public class LethalConfigPatch
+    public class LethalConfigCompatibility
     {
         internal const string ModGUID = "ainavt.lc.lethalconfig";
         private static void Initialize()
@@ -53,6 +53,8 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany_InfectedOnly, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.ShyHUD, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
 
             LethalConfigManager.SetModDescription("Adds an insanity meter to the hud in vanilla style");
