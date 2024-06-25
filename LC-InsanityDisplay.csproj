@@ -50,12 +50,6 @@
     <EmbeddedResource Remove="packages\**" />
     <None Remove="packages\**" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Plugin\ModCompatibility\LethalCompanyVRCompatibility.cs" />
-  </ItemGroup>
 
   <!-- Primary Package References - BepInEx -->
   <ItemGroup>

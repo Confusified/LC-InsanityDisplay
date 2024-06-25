@@ -125,10 +125,9 @@ namespace LC_InsanityDisplay.Plugin.UI
 
         private static CenteredIconSettings IconSetting;
         private static Vector3 NewPosition;
-        private static float CurrentFillAmount;
         private static bool NeverCenter;
         private static bool AlwaysCenter;
-        private static float CurrentMeterFill;
+        internal static float CurrentMeterFill;
         //lerp formula: 1.179x^2 - 0.337x + 0.03 (could be made simpler but i'm a sucker for the animation)
         //x being CurrentMeterFill
         private const float lerpNumber1 = 1.179f;
@@ -142,15 +141,14 @@ namespace LC_InsanityDisplay.Plugin.UI
         {
             if (!LocalPlayerInstance || !InsanityMeterComponent) return;
             if (settingChanged ||
-                !SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || CurrentFillAmount > accurate_MinValue && LastInsanityLevel == 0 || ReverseEnabled && LastInsanityLevel == 0 && CurrentFillAmount < accurate_MaxValue) ||
-                //((InfectedCompanyCompatibility.InfectedMeter && !InfectedCompanyCompatibility.IsPlayerInfected && !InfectedCompanyCompatibility.OnlyUseInfectedCompany) || !InfectedCompanyCompatibility.InfectedMeter && InfectedCompanyCompatibility.IsInfectedCompanyEnabled)) || //InfectedCompany specific conditions
-                SetAlwaysFull && CurrentFillAmount != 1) //Only update if actually changed (or called by a settingchange)
+                !SetAlwaysFull && (LastInsanityLevel != LocalPlayerInstance.insanityLevel || CurrentMeterFill > accurate_MinValue && LastInsanityLevel == 0 || ReverseEnabled && LastInsanityLevel == 0 && CurrentMeterFill < accurate_MaxValue) ||
+                SetAlwaysFull && CurrentMeterFill != 1) //Only update if actually changed (or called by a settingchange)
             {
-
-                CurrentMeterFill = ReturnInsanityLevel();
-                CurrentFillAmount = CurrentMeterFill;
-
-                if ((!SetAlwaysFull && InsanityMeter.activeSelf) || SetAlwaysFull) InsanityMeterComponent.fillAmount = CurrentMeterFill;
+                if ((!SetAlwaysFull && InsanityMeter.activeSelf) || SetAlwaysFull)
+                {
+                    CurrentMeterFill = ReturnInsanityLevel();
+                    InsanityMeterComponent.fillAmount = CurrentMeterFill;
+                }
             }
             if (CurrentlySetColor != InsanityMeterColor) //Only update the colour when it's been changed
             {
@@ -165,7 +163,7 @@ namespace LC_InsanityDisplay.Plugin.UI
         private static float ReturnInsanityLevel()
         {
             if (SetAlwaysFull) return 1;
-            //Determine if to use vanilla's insanity or InfectedCompany's insanity
+            // Determine if to use vanilla's insanity or InfectedCompany's insanity
             if (InfectedCompanyCompatibility.InfectedMeter && InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.IsPlayerInfected)
             {
                 InsanityLevel = InfectedCompanyCompatibility.InfectedMeterComponent.value;
@@ -174,35 +172,34 @@ namespace LC_InsanityDisplay.Plugin.UI
 
             if (usingAccurateDisplay != useAccurateDisplay.Value) usingAccurateDisplay = useAccurateDisplay.Value;
             if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
-            if (usingAccurateDisplay)//Return the accurate version (normal or reversed)
+            if (usingAccurateDisplay)// Return the accurate version (normal or reversed)
             {
                 float InsanityLevel_AccurateMargin = InsanityLevel * accurate_Diff;
                 return !ReverseEnabled ? accurate_MinValue + InsanityLevel_AccurateMargin : accurate_MaxValue - InsanityLevel_AccurateMargin;
             }
 
-            return !ReverseEnabled ? InsanityLevel : 1 - InsanityLevel; //return normal insanity value (or reversed version)
+            return !ReverseEnabled ? InsanityLevel : 1 - InsanityLevel; // Return normal insanity value (or reversed version)
         }
         /// <summary>
         /// Only updates when the insanityLevel value has changed and the appropriate conditions are met
         /// </summary>
-        internal static void InsanityValueChanged(On.GameNetcodeStuff.PlayerControllerB.orig_SetPlayerSanityLevel orig, PlayerControllerB self) //This runs every frame, but will only update when appropriate
+        internal static void InsanityValueChanged(On.GameNetcodeStuff.PlayerControllerB.orig_SetPlayerSanityLevel orig, PlayerControllerB self) // This runs every frame, but will only update when appropriate
         {
             orig(self);
-            if (InsanityMeterComponent && !self.isPlayerDead)
-            {
-                if (SetAlwaysFull != alwaysFull.Value) SetAlwaysFull = alwaysFull.Value;
-                if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
-                CurrentFillAmount = InsanityMeterComponent.fillAmount;
-                float currentInsanityLevel = self.insanityLevel;
-                if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != currentInsanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
-                    SetAlwaysFull && CurrentFillAmount != 1 ||
-                    ReverseEnabled && CurrentFillAmount < accurate_MaxValue && currentInsanityLevel == 0 && InsanityMeter.activeSelf)
-                    //((!InfectedCompanyCompatibility.InfectedMeter || (!InfectedCompanyCompatibility.OnlyUseInfectedCompany && InfectedCompanyCompatibility.InfectedMeter)) && InsanityMeter.activeSelf))
-                    UpdateMeter();
+            if (!InsanityMeterComponent || self.isPlayerDead || !self.isPlayerControlled) return;
 
-                if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
-                if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
-            }
+            if (SetAlwaysFull != alwaysFull.Value) SetAlwaysFull = alwaysFull.Value;
+            if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
+            float CurrentFillAmount = InsanityMeterComponent.fillAmount;
+            float currentInsanityLevel = self.insanityLevel;
+            if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != currentInsanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
+                SetAlwaysFull && CurrentFillAmount != 1 ||
+                ReverseEnabled && CurrentFillAmount < accurate_MaxValue && currentInsanityLevel == 0 && InsanityMeter.activeSelf)
+            { UpdateMeter(); }
+
+            if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
+            if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
+
         }
 
         /// <summary>
