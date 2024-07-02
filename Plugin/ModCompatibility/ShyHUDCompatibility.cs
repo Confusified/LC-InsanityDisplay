@@ -1,7 +1,9 @@
 ﻿using GameNetcodeStuff;
 using LC_InsanityDisplay.Plugin.UI;
 using System;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace LC_InsanityDisplay.Plugin.ModCompatibility
 {
@@ -26,11 +28,13 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
 
         private static void Start()
         {
+            if (CompatibleDependencyAttribute.IsEladsHudPresent) return;
             CurrentTransparency = 1f;
             // More stuff?
         }
         // Useful info (def helped me understanding why certain conditions were not working)
         // https://forum.unity.com/threads/crossfadealpha-help.924332/
+        // Current state: fades corrently but doesn't come back to being opaque
         internal static void UpdateMeterFade(On.GameNetcodeStuff.PlayerControllerB.orig_LateUpdate orig, PlayerControllerB self)
         {
             orig(self);

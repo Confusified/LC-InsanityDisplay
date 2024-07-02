@@ -1,7 +1,5 @@
 ﻿using LC_InsanityDisplay.Plugin.UI;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace LC_InsanityDisplay.Plugin.ModCompatibility

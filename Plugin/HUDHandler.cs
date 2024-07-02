@@ -14,12 +14,12 @@ namespace LC_InsanityDisplay.Plugin.UI
     /// <summary>
     /// This class will be responsible for injecting the insanity meter into the hud
     /// </summary>
-    internal class HUDInjector
+    public class HUDInjector
     {
         internal static PlayerControllerB LocalPlayerInstance { get; private set; } = null!;
         internal static HUDManager HUDManagerInstance { get; private set; } = null!;
         internal static GameObject TopLeftHUD { get; private set; } = null!;
-        internal const string ModName = "InsanityMeter";
+        public const string ModName = "InsanityMeter";
 
         public static GameObject InsanityMeter { get; internal set; } = null!;
         public static Image InsanityMeterComponent { get; internal set; } = null!;
@@ -39,7 +39,7 @@ namespace LC_InsanityDisplay.Plugin.UI
             orig(self, playerObjectId);
             if (playerObjectId == -1 || playerObjectId != -1 && self.localPlayer == self.playersManager.allPlayerScripts[playerObjectId]) //only continue if the player who connected is the localplayer
             {
-                //Set variables for later use
+                // Set variables for later use
                 HUDManagerInstance = self;
                 LocalPlayerInstance = StartOfRound.Instance.localPlayerController;
                 VanillaSprintMeter = LocalPlayerInstance.sprintMeterUI.gameObject;
@@ -50,12 +50,12 @@ namespace LC_InsanityDisplay.Plugin.UI
                 CurrentPosition = VanillaIconPosition;
                 CenteredIconPosition = VanillaIconPosition + IconPositionOffset;
 
-                //Activate all compatibilities (that are present) and have a Start() method
+                // Activate all compatibilities (that are present) and have a Start() method
                 Initialise.Logger.LogDebug("Activating compatibilities...");
                 CompatibleDependencyAttribute.Activate();
                 Initialise.Logger.LogDebug("Activated all the compatibilities");
 
-                //Set up the insanity meter
+                // Set up the insanity meter
                 Initialise.Logger.LogDebug("Setting up insanity meter...");
                 CreateMeter();
                 Initialise.Logger.LogDebug("Finished setting up the insanity meter");
@@ -64,34 +64,38 @@ namespace LC_InsanityDisplay.Plugin.UI
 
         private static void CreateMeter()
         {
-            if (InsanityMeter) return; //Make sure the meter doesn't already exist
+            if (!InsanityMeter) // If the Insanity meter doesn't already exist, create it.
+            {
 
-            //Create insanity meter
-            InsanityMeter = Object.Instantiate(VanillaSprintMeter, TopLeftHUD.transform);
-            InsanityMeter.SetActive(false); //Should prevent it being marked as dirty
-            InsanityMeter.name = ModName;
+                // Create insanity meter
+                InsanityMeter = Object.Instantiate(VanillaSprintMeter, TopLeftHUD.transform);
+                InsanityMeter.SetActive(false);
+                InsanityMeter.name = ModName;
 
-            InsanityMeterComponent = InsanityMeter.GetComponentInChildren<Image>(true);
+                InsanityMeterComponent = InsanityMeter.GetComponentInChildren<Image>(true);
 
-            //Set the insanity meter in the correct position
-            Transform meterTransform = InsanityMeter.transform;
-            meterTransform.SetAsFirstSibling();
-            meterTransform.SetLocalPositionAndRotation(VanillaSprintMeter.transform.localPosition + localPositionOffset, meterTransform.localRotation);
-            meterTransform.localScale *= localScaleMultiplier;
+                // Set the insanity meter in the correct position
+                Transform meterTransform = InsanityMeter.transform;
+                meterTransform.SetAsFirstSibling();
+                meterTransform.SetLocalPositionAndRotation(VanillaSprintMeter.transform.localPosition + localPositionOffset, meterTransform.localRotation);
+                meterTransform.localScale *= localScaleMultiplier;
 
-            //Reset values to avoid any issues
+
+            }
+
+            // Reset values to avoid any issues
             CurrentlySetColor = new(0, 0, 0, 0); //The way the mod is currently set up doesn't allow for a transparant meter
             LastInsanityLevel = -1;
             LastIconPosition = VanillaIconPosition;
 
-            //Update the insanity meter to have the correct visuals
+            // Update the insanity meter to have the correct visuals
             UpdateMeter(settingChanged: true);
             if (!InfectedCompanyCompatibility.InfectedMeter || !InfectedCompanyCompatibility.IsInfectedCompanyEnabled || !InfectedCompanyCompatibility.OnlyUseInfectedCompany)
             {
                 InsanityMeter.SetActive(true);
-            } //Insanity meter is now set up
+            }
 
-            //Update the icon to be positioned correctly
+            // Update the icon to be positioned correctly
             UpdateIconPosition(settingChanged: true);
 
         }
@@ -148,12 +152,14 @@ namespace LC_InsanityDisplay.Plugin.UI
                 {
                     CurrentMeterFill = ReturnInsanityLevel();
                     InsanityMeterComponent.fillAmount = CurrentMeterFill;
+                    if (EladsHUDCompatibility.InsanityPercentageObject) EladsHUDCompatibility.UpdatePercentageText();
                 }
             }
             if (CurrentlySetColor != InsanityMeterColor) //Only update the colour when it's been changed
             {
                 InsanityMeterComponent.color = InsanityMeterColor;
                 CurrentlySetColor = InsanityMeterColor;
+                if (EladsHUDCompatibility.InsanityPercentageObject) EladsHUDCompatibility.UpdateColour();
             }
         }
         /// <summary>
@@ -172,7 +178,7 @@ namespace LC_InsanityDisplay.Plugin.UI
 
             if (usingAccurateDisplay != useAccurateDisplay.Value) usingAccurateDisplay = useAccurateDisplay.Value;
             if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
-            if (usingAccurateDisplay)// Return the accurate version (normal or reversed)
+            if (usingAccurateDisplay && !EladsHUDCompatibility.InsanityPercentageObject)// Return the accurate version (normal or reversed)
             {
                 float InsanityLevel_AccurateMargin = InsanityLevel * accurate_Diff;
                 return !ReverseEnabled ? accurate_MinValue + InsanityLevel_AccurateMargin : accurate_MaxValue - InsanityLevel_AccurateMargin;
@@ -190,16 +196,18 @@ namespace LC_InsanityDisplay.Plugin.UI
 
             if (SetAlwaysFull != alwaysFull.Value) SetAlwaysFull = alwaysFull.Value;
             if (ReverseEnabled != enableReverse.Value) ReverseEnabled = enableReverse.Value;
+
             float CurrentFillAmount = InsanityMeterComponent.fillAmount;
             float currentInsanityLevel = self.insanityLevel;
+
             if ((CurrentMeterFill != InsanityLevel || LastInsanityLevel != currentInsanityLevel || CurrentMeterFill != CurrentFillAmount) && !SetAlwaysFull ||
                 SetAlwaysFull && CurrentFillAmount != 1 ||
                 ReverseEnabled && CurrentFillAmount < accurate_MaxValue && currentInsanityLevel == 0 && InsanityMeter.activeSelf)
-            { UpdateMeter(); }
+                UpdateMeter();
 
             if (PlayerIcon && PlayerRedIcon) UpdateIconPosition();
-            if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
 
+            if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
         }
 
         /// <summary>
@@ -208,6 +216,7 @@ namespace LC_InsanityDisplay.Plugin.UI
         /// </summary>
         internal static void UpdateIconPosition(bool settingChanged = false)
         {
+            if (CompatibleDependencyAttribute.IsEladsHudPresent) return; // The Player Icon is not visible when using Elad's HUD, so not need to update at all
             if (IconSetting != iconAlwaysCentered.Value) IconSetting = iconAlwaysCentered.Value;
             if (NeverCenter != (IconSetting == CenteredIconSettings.Never)) NeverCenter = IconSetting == CenteredIconSettings.Never;
             if (AlwaysCenter != (IconSetting == CenteredIconSettings.Always)) AlwaysCenter = IconSetting == CenteredIconSettings.Always;
