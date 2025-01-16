@@ -40,6 +40,8 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.An0nPatches, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LethalCompanyPatched, false);
+            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.EladsHUD, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, false);
@@ -48,8 +50,8 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.DamageMetrics, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
-            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET (did i never fully implement this? damn)
-            LethalConfigManager.AddConfigItem(entryBoolCheckBox);
+            // entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LethalCompanyVR, true); //NOT FINISHED YET
+            // LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.InfectedCompany_InfectedOnly, false);

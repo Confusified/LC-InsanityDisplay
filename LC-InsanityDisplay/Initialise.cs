@@ -26,6 +26,10 @@ namespace LC_InsanityDisplay.Plugin
     [CompatibleDependency(An0nPatchesCompatibility.ModGUID, typeof(An0nPatchesCompatibility))]
     [BepInDependency(An0nPatchesCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
+    // This is for LethalCompanyPatched, it uses the exact same UI display as An0nPatches
+    [CompatibleDependency(An0nPatchesCompatibility.AlternateModGUID, typeof(An0nPatchesCompatibility))]
+    [BepInDependency(An0nPatchesCompatibility.AlternateModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+
     [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
     [BepInDependency(EladsHUDCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
@@ -47,8 +51,8 @@ namespace LC_InsanityDisplay.Plugin
     [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Initialise : BaseUnityPlugin
     {
-
-        public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + MyPluginInfo.PLUGIN_GUID[4..].Replace(".", "\\"));
+        // InsanityDisplay.Confusified.com.GitHub
+        public static readonly string configLocation = Utility.CombinePaths(Paths.ConfigPath + "\\" + MyPluginInfo.PLUGIN_GUID[16..28].Replace(".", "\\") + MyPluginInfo.PLUGIN_GUID[..15]);
         public static ConfigFile modConfig = new(configLocation + ".cfg", false);
 
         internal new static ManualLogSource Logger { get; private set; } = null!;
@@ -66,7 +70,7 @@ namespace LC_InsanityDisplay.Plugin
             CompatibleDependencyAttribute.Init(this);
             Hook();
 
-            Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded");
+            Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
         }
 

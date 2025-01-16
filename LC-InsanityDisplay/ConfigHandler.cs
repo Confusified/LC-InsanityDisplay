@@ -30,6 +30,7 @@ namespace LC_InsanityDisplay.Plugin
         {
             public static ConfigEntry<bool> LCCrouchHUD { get; internal set; } = null!;
             public static ConfigEntry<bool> An0nPatches { get; internal set; } = null!;
+            public static ConfigEntry<bool> LethalCompanyPatched { get; internal set; } = null!;
             public static ConfigEntry<bool> EladsHUD { get; internal set; } = null!;
             public static ConfigEntry<bool> GeneralImprovements { get; internal set; } = null!;
             public static ConfigEntry<bool> HealthMetrics { get; internal set; } = null!;
@@ -55,6 +56,7 @@ namespace LC_InsanityDisplay.Plugin
 
             Compat.LCCrouchHUD = modConfig.Bind("CrouchHUD Compatibility Settings", "Enable CrouchHUD compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.An0nPatches = modConfig.Bind("An0n Patches Compatibility Settings", "Enable An0n Patches compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
+            Compat.LethalCompanyPatched = modConfig.Bind("LethalCompanyPatched Compatibility Settings", "Enable LethalCompanyPatched compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.EladsHUD = modConfig.Bind("Elads HUD Compatibility Settings", "Enable Elads HUD compatibility", true, "Enabling this will add another bar above the stamina bar displaying your insanity level");
             Compat.GeneralImprovements = modConfig.Bind("GeneralImprovements Compatibility Settings", "Enable GeneralImprovements compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
             Compat.HealthMetrics = modConfig.Bind("HealthMetrics Compatibility Settings", "Enable HealthMetrics compatibility", true, "Enabling this will adjust the hud to avoid overlapping");
