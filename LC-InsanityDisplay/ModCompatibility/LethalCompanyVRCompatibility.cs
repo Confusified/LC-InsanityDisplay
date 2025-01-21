@@ -3,6 +3,11 @@ using UnityEngine;
 using System.Collections;
 // using LCVR.Player;
 using LC_InsanityDisplay.Plugin;
+using BepInEx.Bootstrap;
+using Mono.Cecil.Cil;
+using System;
+using BepInEx;
+using BepInEx.Configuration;
 
 namespace LC_InsanityDisplay.ModCompatibility
 {
@@ -12,7 +17,23 @@ namespace LC_InsanityDisplay.ModCompatibility
 
         private static void Initialize()
         {
-            CompatibleDependencyAttribute.IsLCVRPresent = true;
+            // Do not set LCVR as present if VR mode is disabled
+
+            PluginInfo LCVRInfo;
+            Chainloader.PluginInfos.TryGetValue(ModGUID, out LCVRInfo);
+            ConfigFile LCVRConfig = LCVRInfo.Instance.Config;
+
+            foreach (var configDefinition in LCVRConfig.Keys)
+            {
+                if (configDefinition.Key == "DisableVR")
+                {
+                    if (LCVRConfig.TryGetEntry(configDefinition, out ConfigEntry<bool> configEntry))
+                    {
+                        if (configEntry.Value) return;
+                        else CompatibleDependencyAttribute.IsLCVRPresent = true;
+                    }
+                }
+            }
         }
 
         /*

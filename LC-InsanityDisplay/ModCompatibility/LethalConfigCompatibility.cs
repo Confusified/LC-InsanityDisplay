@@ -42,7 +42,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.LethalCompanyPatched, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
-            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.EladsHUD, false);
+            entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.EladsHUD, true);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);
             entryBoolCheckBox = new BoolCheckBoxConfigItem(Compat.GeneralImprovements, false);
             LethalConfigManager.AddConfigItem(entryBoolCheckBox);

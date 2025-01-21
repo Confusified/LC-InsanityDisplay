@@ -1,4 +1,7 @@
-﻿using LC_InsanityDisplay.Plugin.UI;
+﻿using BepInEx;
+using BepInEx.Bootstrap;
+using BepInEx.Configuration;
+using LC_InsanityDisplay.Plugin.UI;
 using System;
 using TMPro;
 using UnityEngine;
@@ -22,7 +25,9 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         private static GameObject InsanityMeterShadow { get; set; } = null!;
         private static Vector3 InsanityBarOffset = new(0, 8f, 0);
         private static Vector3 PercentageObjectOffset = new(0, 26.4f, 0);
-        private static Vector3 BatteryLayoutOffset = new(-7f, 4f, 0);
+        private static Vector3 BatteryLayoutOffset = new(-14f, 4f, 0);
+        private static Vector3 PTTOffset = new(120, 20, 0);
+
         private static int oldBarFill = -1;
 
         private static void Initialize()
@@ -43,19 +48,18 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             foreach (CanvasGroup component in HUDInjector.TopLeftHUD.transform.parent.GetComponentsInChildren<CanvasGroup>(true))
             {
 
-                if (component.name == "PlayerInfo(Clone)") 
+                if (component.name == "PlayerInfo(Clone)")
                 {
                     StaminaObject = component.transform.Find("Stamina").gameObject;
                     EladsHUDObject = component.gameObject;
                 }
-                Initialise.Logger.LogDebug($"canvasgroup: {component.name}");
-                
+
                 if (StaminaObject != null) break;
             }
 
             if (StaminaObject == null)
             {
-                Initialise.Logger.LogDebug("Could not find ELADS HUD Stamina bar");
+                Initialise.Logger.LogDebug("Could not find Elad's Hud Stamina bar");
                 return;
             }
 
@@ -102,17 +106,48 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
                 Initialise.Logger.LogDebug("InsanityMeterComponent is null (BAD)");
                 return;
             }
+
             // Destroy CarryInfo from the Insanity bar as it's unused
             GameObject.Destroy(unusedCarryInfo);
 
             // Move the elements to avoid overlapping
             HUDInjector.InsanityMeter.transform.localPosition += InsanityBarOffset;
             InsanityPercentageObject.transform.localPosition += PercentageObjectOffset;
-            // if oxygen then change it again
             BatteryLayoutTransform.localPosition += BatteryLayoutOffset;
+
+            // Get the HUD Scale from Elad's Hud to scale the PTT Icon up (or down)
+            PluginInfo EladsHudInfo;
+            Chainloader.PluginInfos.TryGetValue(ModGUID, out EladsHudInfo);
+            ConfigFile EladsHudConfig = EladsHudInfo.Instance.Config;
+            float EladsHudScale = 1;
+
+            foreach (var configDefinition in EladsHudConfig.Keys)
+            {
+                if (configDefinition.Key == "HUDScale")
+                {
+                    if (EladsHudConfig.TryGetEntry(configDefinition, out ConfigEntry<float> configEntry))
+                    {
+                        EladsHudScale = configEntry.Value;
+                    }
+                }
+            }
+
+            Transform PTTIconObject = HUDInjector.HUDManagerInstance.PTTIcon.transform;
+            // Disable the PTT object to reduce any calls made
+            PTTIconObject.gameObject.SetActive(false);
+            // Reposition the PTT Icon so it doesn't overlap with anything (and subjectively looks better)
+            Transform originalParent = PTTIconObject.parent;
+            PTTIconObject.SetParent(InsanityPercentageObject.transform);
+            PTTIconObject.position = InsanityPercentageObject.transform.position;
+            PTTIconObject.localPosition += PTTOffset;
+            PTTIconObject.localScale *= EladsHudScale;
+
+            PTTIconObject.SetParent(originalParent, worldPositionStays: true);
+            PTTIconObject.gameObject.SetActive(true);
 
             // The insanity meter has been set up so it can be re-enabled
             oldBarFill = -1;
+
             InsanityPercentageObject.SetActive(true); // Causes a harmless warning to show up in the console (could probably be hidden with a try catch)
             HUDInjector.InsanityMeter.SetActive(true);
         }
@@ -120,6 +155,10 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         private static void UpdateVisibility(object sender = null!, EventArgs e = null!)
         {
             EladsHUDEnabled = ConfigHandler.Compat.EladsHUD.Value;
+            if (EladsHUDEnabled)
+            {
+
+            }
         }
 
         internal static void UpdatePercentageText()
