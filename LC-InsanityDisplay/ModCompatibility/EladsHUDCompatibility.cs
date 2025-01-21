@@ -25,7 +25,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         private static GameObject InsanityMeterShadow { get; set; } = null!;
         private static Vector3 InsanityBarOffset = new(0, 8f, 0);
         private static Vector3 PercentageObjectOffset = new(0, 26.4f, 0);
-        private static Vector3 BatteryLayoutOffset = new(-14f, 4f, 0);
+        private static Vector3 BatteryLayoutOffset = new(-16f, 4f, 0);
         private static Vector3 PTTOffset = new(120, 20, 0);
 
         private static int oldBarFill = -1;
