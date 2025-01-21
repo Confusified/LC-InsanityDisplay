@@ -32,6 +32,7 @@ namespace LC_InsanityDisplay.Plugin
 
     [CompatibleDependency(EladsHUDCompatibility.ModGUID, typeof(EladsHUDCompatibility))]
     [BepInDependency(EladsHUDCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(EladsHUDCompatibility.OxygenGUID, BepInDependency.DependencyFlags.SoftDependency)]
 
     [CompatibleDependency(HealthMetricsCompatibility.ModGUID, typeof(HealthMetricsCompatibility))]
     [BepInDependency(HealthMetricsCompatibility.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
@@ -68,8 +69,12 @@ namespace LC_InsanityDisplay.Plugin
             if (!ConfigHandler.ModEnabled.Value) { Logger.LogInfo($"Stopped loading {MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION}, as it is disabled through the config file"); Destroy(this); return; } // I don't know if calling Destroy has any sort of effect
 
             CompatibleDependencyAttribute.Init(this);
+            Logger.LogDebug("Checked for compatible mods");
             Hook();
+            Logger.LogDebug("Hooked");
 
+
+            
             Logger.LogInfo($"{MyPluginInfo.PLUGIN_NAME} v{MyPluginInfo.PLUGIN_VERSION} loaded");
             return;
         }

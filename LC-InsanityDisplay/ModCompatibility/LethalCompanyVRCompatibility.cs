@@ -1,7 +1,7 @@
-﻿using LCVR;
+﻿// using LCVR;
 using UnityEngine;
 using System.Collections;
-using LCVR.Player;
+// using LCVR.Player;
 using LC_InsanityDisplay.Plugin;
 
 namespace LC_InsanityDisplay.ModCompatibility

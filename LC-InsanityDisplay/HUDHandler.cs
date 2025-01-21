@@ -79,7 +79,7 @@ namespace LC_InsanityDisplay.Plugin.UI
                 meterTransform.SetAsFirstSibling();
                 meterTransform.SetLocalPositionAndRotation(VanillaSprintMeter.transform.localPosition + localPositionOffset, meterTransform.localRotation);
                 meterTransform.localScale *= localScaleMultiplier;
-
+                
 
             }
 
@@ -223,23 +223,23 @@ namespace LC_InsanityDisplay.Plugin.UI
             if (settingChanged) CurrentMeterFill = ReturnInsanityLevel();
 
             // Don't update when not necessary
-            if (LastIconPosition == VanillaIconPosition && NeverCenter || //If Never Centering and vanilla position
-                LastIconPosition == CenteredIconPosition && AlwaysCenter || //If Always Centering and centered
-                CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter || //If there is no visible change when it's max
-                !usingAccurateDisplay && CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change without Accurate Display
-                usingAccurateDisplay && CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || //No visible change with Accurate Display
-                CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition || //Icon is centered 
-                (InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.InfectedMeter && !InsanityMeter.activeSelf && LastIconPosition != VanillaIconPosition)//Don't update if InfectedCompany active, meter is disabled 
+            if (LastIconPosition == VanillaIconPosition && NeverCenter || // If Never Centering and vanilla position
+                LastIconPosition == CenteredIconPosition && AlwaysCenter || // If Always Centering and centered
+                CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter || // If there is no visible change when it's max
+                !usingAccurateDisplay && CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || // No visible change without Accurate Display
+                usingAccurateDisplay && CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || // No visible change with Accurate Display
+                CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition || // Icon is centered 
+                (InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.InfectedMeter && !InsanityMeter.activeSelf && LastIconPosition != VanillaIconPosition) // Don't update if InfectedCompany active, meter is disabled 
                 && !settingChanged) return;
 
-            //Determine the position the player icon must be in
+            // Determine the position the player icon must be in
             if (NeverCenter || CurrentMeterFill < accurate_MinValue && NeverCenter) NewPosition = VanillaIconPosition; //Set it to the vanilla position
             else if (SetAlwaysFull || AlwaysCenter || CurrentMeterFill > accurate_MaxValue && !NeverCenter) NewPosition = CenteredIconPosition; //Set it to the centered position
-            else //Set it to a certain position in between vanilla and centered
+            else // Set it to a certain position in between vanilla and centered
             {
                 float lerpValue = lerpNumber1 * (CurrentMeterFill * CurrentMeterFill) - lerpNumber2 * CurrentMeterFill + lerpNumber3;
                 Vector3 targetVector3 = CurrentMeterFill > accurate_MinValue ? CenteredIconPosition : VanillaIconPosition;
-                if (!InsanityMeter.activeSelf && targetVector3 != VanillaIconPosition) targetVector3 = VanillaIconPosition; //Set the VanillaIconPosition if the meter is not visible and isn't already set as it
+                if (!InsanityMeter.activeSelf && targetVector3 != VanillaIconPosition) targetVector3 = VanillaIconPosition; // Set the VanillaIconPosition if the meter is not visible and isn't already set as it
                 if (Vector3.Distance(NewPosition, targetVector3) <= 0.05f) NewPosition = targetVector3;
                 else
                 {

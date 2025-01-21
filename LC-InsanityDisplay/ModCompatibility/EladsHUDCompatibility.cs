@@ -12,6 +12,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
     public class EladsHUDCompatibility
     {
         internal const string ModGUID = "me.eladnlg.customhud";
+        internal const string OxygenGUID = "consequential.Oxygen";
         internal static GameObject InsanityPercentageObject { get; private set; } = null!;
 
         private static bool EladsHUDEnabled;
@@ -26,7 +27,11 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
 
         private static void Initialize()
         {
-            if (CompatibleDependencyAttribute.IsLCVRPresent) return; // Elad's HUD isn't compatible with LCVR
+            if (CompatibleDependencyAttribute.IsLCVRPresent)
+            {
+                Initialise.Logger.LogDebug("Elad's HUD and LCVR are both found, they are not compatible with each other");
+                return; // Elad's HUD isn't compatible with LCVR
+            }
             CompatibleDependencyAttribute.IsEladsHudPresent = true;
             ConfigHandler.Compat.EladsHUD.SettingChanged += UpdateVisibility;
         }
@@ -34,29 +39,41 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         private static void Start()
         {
             if (CompatibleDependencyAttribute.IsLCVRPresent || !ConfigHandler.Compat.EladsHUD.Value) return; // Elad's HUD isn't compatible with LCVR
-
-            foreach (var maskComponent in HUDInjector.TopLeftHUD.transform.parent.GetComponentsInChildren<Mask>(true)) // Get all Mask components because there aren't many elements that make use of that component
+            GameObject? StaminaObject = null;
+            foreach (CanvasGroup component in HUDInjector.TopLeftHUD.transform.parent.GetComponentsInChildren<CanvasGroup>(true))
             {
-                GameObject StaminaObject = maskComponent.gameObject.transform.parent.parent.gameObject;
-                if (StaminaObject.name == "Stamina")
+
+                if (component.name == "PlayerInfo(Clone)") 
                 {
-                    EladsHUDObject = StaminaObject.transform.parent.gameObject;
-                    BatteryLayoutTransform = EladsHUDObject.transform.GetChild(2);
-                    // Disable the text elements (so they won't cause a warning in the console when they're copied)
-                    StaminaObject.transform.GetChild(1).gameObject.SetActive(false); // CarryInfo
-                    StaminaObject.transform.GetChild(2).gameObject.SetActive(false); // StaminaInfo
-
-                    HUDInjector.InsanityMeter = GameObject.Instantiate(StaminaObject, EladsHUDObject.transform);
-                    HUDInjector.InsanityMeter.SetActive(false);
-                    HUDInjector.InsanityMeter.name = HUDInjector.ModName;
-
-                    // Re-enable the text elements as they're part of the Stamina bar
-                    StaminaObject.transform.GetChild(1).gameObject.SetActive(true); // CarryInfo
-                    StaminaObject.transform.GetChild(2).gameObject.SetActive(true); // StaminaInfo
-                    break;
+                    StaminaObject = component.transform.Find("Stamina").gameObject;
+                    EladsHUDObject = component.gameObject;
                 }
-
+                Initialise.Logger.LogDebug($"canvasgroup: {component.name}");
+                
+                if (StaminaObject != null) break;
             }
+
+            if (StaminaObject == null)
+            {
+                Initialise.Logger.LogDebug("Could not find ELADS HUD Stamina bar");
+                return;
+            }
+
+            BatteryLayoutTransform = EladsHUDObject.transform.GetChild(2);
+            // Disable the text elements (so they won't cause a warning in the console when they're copied)
+            StaminaObject.transform.GetChild(1).gameObject.SetActive(false); // CarryInfo
+            StaminaObject.transform.GetChild(2).gameObject.SetActive(false); // StaminaInfo
+
+            HUDInjector.InsanityMeter = GameObject.Instantiate(StaminaObject, EladsHUDObject.transform);
+            HUDInjector.InsanityMeter.SetActive(false);
+            HUDInjector.InsanityMeter.name = HUDInjector.ModName;
+
+            // Re-enable the text elements as they're part of the Stamina bar
+            StaminaObject.transform.GetChild(1).gameObject.SetActive(true); // CarryInfo
+            StaminaObject.transform.GetChild(2).gameObject.SetActive(true); // StaminaInfo
+
+            Initialise.Logger.LogDebug("Created insanity bar");
+
 
             InsanityMeterShadow = HUDInjector.InsanityMeter.transform.GetChild(0).gameObject;
             InsanityMeterShadow.name = "Insanity BG";
@@ -64,6 +81,10 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             InsanityPercentageObject = HUDInjector.InsanityMeter.transform.GetChild(2).gameObject;
 
             InsanityPercentageObject.name = "InsanityInfo";
+            if (CompatibleDependencyAttribute.IsModPresent(OxygenGUID))
+            {
+                InsanityPercentageObject.transform.localPosition += InsanityBarOffset;
+            }
 
             InsanityPercentageText = InsanityPercentageObject.GetComponent<TextMeshProUGUI>();
             InsanityPercentageText.horizontalAlignment = HorizontalAlignmentOptions.Right;
@@ -76,12 +97,18 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
                 }
             }
 
+            if (HUDInjector.InsanityMeterComponent == null)
+            {
+                Initialise.Logger.LogDebug("InsanityMeterComponent is null (BAD)");
+                return;
+            }
             // Destroy CarryInfo from the Insanity bar as it's unused
             GameObject.Destroy(unusedCarryInfo);
 
             // Move the elements to avoid overlapping
             HUDInjector.InsanityMeter.transform.localPosition += InsanityBarOffset;
             InsanityPercentageObject.transform.localPosition += PercentageObjectOffset;
+            // if oxygen then change it again
             BatteryLayoutTransform.localPosition += BatteryLayoutOffset;
 
             // The insanity meter has been set up so it can be re-enabled
