@@ -79,7 +79,7 @@ namespace LC_InsanityDisplay.Plugin.UI
                 meterTransform.SetAsFirstSibling();
                 meterTransform.SetLocalPositionAndRotation(VanillaSprintMeter.transform.localPosition + localPositionOffset, meterTransform.localRotation);
                 meterTransform.localScale *= localScaleMultiplier;
-                
+
 
             }
 
@@ -130,10 +130,11 @@ namespace LC_InsanityDisplay.Plugin.UI
         private static CenteredIconSettings IconSetting;
         private static Vector3 NewPosition;
         private static bool NeverCenter;
+
         private static bool AlwaysCenter;
         internal static float CurrentMeterFill;
-        //lerp formula: 1.179x^2 - 0.337x + 0.03 (could be made simpler but i'm a sucker for the animation)
-        //x being CurrentMeterFill
+        // lerp formula: 1.179x^2 - 0.337x + 0.03 (could be made simpler but i'm a sucker for the animation)
+        // x being CurrentMeterFill
         private const float lerpNumber1 = 1.179f;
         private const float lerpNumber2 = 0.337f;
         private const float lerpNumber3 = 0.03f;
@@ -210,6 +211,10 @@ namespace LC_InsanityDisplay.Plugin.UI
             if (LastInsanityLevel != currentInsanityLevel) LastInsanityLevel = currentInsanityLevel;
         }
 
+        // Odd bug, icon doesn't start with the correct position only when SetAlwaysFull is enabled
+        // e.g. SetAlwaysFull = true, wrong start position
+        // SanityMeter = true, correct start position 
+
         /// <summary>
         /// This is responsible for moving the self icon to the correct position
         /// e.g. being centered when meter is visible or config is set to Always, etc
@@ -223,17 +228,17 @@ namespace LC_InsanityDisplay.Plugin.UI
             if (settingChanged) CurrentMeterFill = ReturnInsanityLevel();
 
             // Don't update when not necessary
-            if (LastIconPosition == VanillaIconPosition && NeverCenter || // If Never Centering and vanilla position
+            if ((LastIconPosition == VanillaIconPosition && NeverCenter || // If Never Centering and vanilla position
                 LastIconPosition == CenteredIconPosition && AlwaysCenter || // If Always Centering and centered
                 CurrentMeterFill >= accurate_MaxValue && LastIconPosition == CenteredIconPosition && !NeverCenter || // If there is no visible change when it's max
                 !usingAccurateDisplay && CurrentMeterFill < accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || // No visible change without Accurate Display
                 usingAccurateDisplay && CurrentMeterFill <= accurate_MinValue && LastIconPosition == VanillaIconPosition && !AlwaysCenter || // No visible change with Accurate Display
                 CurrentMeterFill < accurate_MaxValue && CurrentMeterFill > accurate_MinValue && LastIconPosition == CenteredIconPosition || // Icon is centered 
-                (InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.InfectedMeter && !InsanityMeter.activeSelf && LastIconPosition != VanillaIconPosition) // Don't update if InfectedCompany active, meter is disabled 
+                InfectedCompanyCompatibility.IsInfectedCompanyEnabled && InfectedCompanyCompatibility.InfectedMeter && !InsanityMeter.activeSelf && LastIconPosition != VanillaIconPosition) // Don't update if InfectedCompany active, meter is disabled 
                 && !settingChanged) return;
 
             // Determine the position the player icon must be in
-            if (NeverCenter || CurrentMeterFill < accurate_MinValue && NeverCenter) NewPosition = VanillaIconPosition; //Set it to the vanilla position
+            if (NeverCenter || CurrentMeterFill < accurate_MinValue && !AlwaysCenter) NewPosition = VanillaIconPosition; //Set it to the vanilla position
             else if (SetAlwaysFull || AlwaysCenter || CurrentMeterFill > accurate_MaxValue && !NeverCenter) NewPosition = CenteredIconPosition; //Set it to the centered position
             else // Set it to a certain position in between vanilla and centered
             {
@@ -248,8 +253,8 @@ namespace LC_InsanityDisplay.Plugin.UI
                 }
             }
 
-            LastIconPosition = NewPosition;
             PlayerIcon.transform.localPosition = PlayerRedIcon.transform.localPosition = NewPosition;
+            LastIconPosition = NewPosition;
         }
     }
 }

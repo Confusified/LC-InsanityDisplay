@@ -27,7 +27,6 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         private static Vector3 PercentageObjectOffset = new(0, 26.4f, 0);
         private static Vector3 BatteryLayoutOffset = new(-16f, 4f, 0);
         private static Vector3 PTTOffset = new(120, 20, 0);
-
         private static int oldBarFill = -1;
 
         private static void Initialize()
@@ -59,7 +58,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
 
             if (StaminaObject == null)
             {
-                Initialise.Logger.LogDebug("Could not find Elad's Hud Stamina bar");
+                Initialise.Logger.LogError("Could not find Elad's Hud Stamina bar");
                 return;
             }
 
@@ -97,18 +96,22 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
                 if (component.gameObject.GetComponent<Mask>())
                 {
                     HUDInjector.InsanityMeterComponent = component;
+                    component.transform.name = "InsanityBar";
                     break;
                 }
             }
 
             if (HUDInjector.InsanityMeterComponent == null)
             {
-                Initialise.Logger.LogDebug("InsanityMeterComponent is null (BAD)");
+                Initialise.Logger.LogError("InsanityMeterComponent is null (BAD)");
                 return;
             }
 
+            GameObject unusedStaminaChange = HUDInjector.InsanityMeterComponent.transform.parent.GetChild(1).gameObject;
             // Destroy CarryInfo from the Insanity bar as it's unused
             GameObject.Destroy(unusedCarryInfo);
+            // Destroy the stamina change from the Insanity bar as it's unused
+            GameObject.Destroy(unusedStaminaChange);
 
             // Move the elements to avoid overlapping
             HUDInjector.InsanityMeter.transform.localPosition += InsanityBarOffset;
@@ -157,7 +160,7 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
             EladsHUDEnabled = ConfigHandler.Compat.EladsHUD.Value;
             if (EladsHUDEnabled)
             {
-
+                // stuff to make it possible to toggle on and off without rejoining lobby
             }
         }
 
@@ -173,60 +176,5 @@ namespace LC_InsanityDisplay.Plugin.ModCompatibility
         {
             InsanityPercentageText.color = HUDBehaviour.InsanityMeterColor;
         }
-        /*
-        public static void EditEladsHUD() //This will create a new bar, the stamina bar, and move some elements to make it not overlap (also this code is kinda all over the place damn)
-        {
-            GameObject EladsHUDStamina = vanillaSprintMeter?.transform.parent.transform.parent.Find("PlayerInfo(Clone)/Stamina")?.gameObject;
-            if (!EladsHUDStamina) { return; }
-            if (!InsanityMeter)
-            {
-                //Create the meter and remove unnecessary elements from it
-                InsanityMeter = Object.Instantiate(EladsHUDStamina);
-                InsanityMeter.name = "Insanity";
-                //Unity Log Warning: Unable to add the requested character to font asset [3270-REGULAR SDF]'s atlas texture. Please make the texture [3270-REGULAR SDF Atlas] readable.
-                //Most likely caused by destroying these
-                Object.Destroy(InsanityMeter.transform.Find("CarryInfo")?.gameObject); //Remove CarryInfo
-                Object.Destroy(InsanityMeter.transform.Find("Bar/Stamina Change FG")?.gameObject); //Remove unnecessary part of the insanity bar
-
-                Transform EladsHUDObject = EladsHUDStamina.transform.parent;
-                Transform StaminaObject = EladsHUDStamina.transform;
-                batteryUI = EladsHUDObject.Find("BatteryLayout").gameObject.transform;
-
-                //Set the position, rotation, etc
-                Transform meterTransform = InsanityMeter.transform;
-                meterTransform.SetParent(EladsHUDObject);
-                meterTransform.localPosition = StaminaObject.localPosition;
-                meterTransform.localScale = StaminaObject.localScale;
-                meterTransform.rotation = StaminaObject.rotation;
-
-                PercentageInsanityText = meterTransform.Find("StaminaInfo").gameObject;
-                batteryLocalPosition = batteryLocalPosition == Vector3.zero ? batteryUI.localPosition : batteryLocalPosition;
-
-                InsanityInfo = PercentageInsanityText.GetComponent<TextMeshProUGUI>();
-                InsanityInfo.horizontalAlignment = HorizontalAlignmentOptions.Right;
-
-                InsanityImage = meterTransform.Find("Bar/StaminaBar").gameObject.GetComponent<Image>();
-
-                //Move with Offset (not the meter itself because without compat it wouldn't exist)
-                InsanityMeter.transform.localPosition += localPositionOffset;
-                PercentageInsanityText.transform.localPosition += Percentage_localPositionOffset;
-            }
-
-            UpdateMeter(imageMeter: InsanityImage, textMeter: InsanityInfo);
-
-            bool EladsCompat = ConfigHandler.Compat.EladsHUD.Value;
-            if (EladsCompat && batteryUI.localPosition != batteryLocalPosition + localPositionOffset || !EladsCompat && batteryUI.localPosition != batteryLocalPosition) //update if hud is positioned incorrectly (only the battery part of elad's hud)
-            {
-                batteryUI.localPosition = EladsCompat && ConfigHandler.ModEnabled.Value ? batteryLocalPosition + localPositionOffset : batteryLocalPosition;
-            }
-
-            bool MeterActive = EladsCompat && ConfigHandler.ModEnabled.Value;
-            if (InsanityMeter.activeSelf != MeterActive || PercentageInsanityText.activeSelf != MeterActive) //if compat not enabled or mod not enabeld hide the meter
-            {
-                InsanityMeter.SetActive(MeterActive);
-                PercentageInsanityText.SetActive(MeterActive);
-            }
-        }
-        */
     }
 }
